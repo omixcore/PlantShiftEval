@@ -33,6 +33,13 @@ def model_of(run: str) -> str:
 
 
 def load() -> dict[str, dict[int, dict]]:
+    if not os.path.exists(RUNS):
+        raise FileNotFoundError(
+            "Missing runs/robustness_ms.json: the repository contains only the aggregate "
+            "report/robustness_summary.json, not the raw per-seed, per-condition scores "
+            "needed to rebuild it. Archive those run-level results before rerunning this "
+            "aggregation."
+        )
     with open(RUNS, encoding="utf-8") as f:
         ms = json.load(f)
     out: dict[str, dict[int, dict]] = {}

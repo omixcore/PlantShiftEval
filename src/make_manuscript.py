@@ -374,7 +374,7 @@ def build_intro(ms):
         "start from identical pre-trained weights?",
     ])
     ms.p(
-        "To answer these questions we trained seven models across three random seeds, "
+        "To answer these questions we compared seven model configurations; six have three recorded seeds, "
         "compared them with paired, image-level statistics (exact McNemar tests, bootstrap "
         "confidence intervals, Holm correction over the full family of contrasts), and "
         "then stressed the winners along three axes that published plant-disease studies "
@@ -402,13 +402,14 @@ def build_methods(ms):
         f"Source domain. PlantVillage is a laboratory dataset of single detached leaves "
         f"photographed on plain backgrounds.[[hughes2015]][[mohanty2016]] We use the five crops with the most balanced "
         f"class structure (apple, blueberry, cherry, maize, grape), yielding 15 "
-        f"crop\u2013disease classes. The distributed train/test split was kept unchanged: "
+        f"crop–disease classes. The distributed train/test split was kept unchanged: "
         f"{n_train_capped} training and {n_test} test images are used in the "
         f"seed-replicated regime, in which each class is additionally capped at 320 "
-        f"training images (853 retained class\u2013image pairs are discarded by the cap; "
+        f"training images (853 retained class–image pairs are discarded by the cap; "
         f"the largest class contributes {max(meta['train_per_class'].values())} images). "
-        f"For the data-scaling arm we rebuilt the cache without any cap "
-        f"({n_full} training images, same test set).")
+        f"The full uncapped data-scaling arm is not included in the tracked outputs "
+        f"for this repository snapshot, so no conclusions are drawn from that arm."
+    )
     ms.p(
         f"Target domain. PlantDoc contains 2,598 field photographs of 13 crop species "
         f"annotated with bounding boxes.[[plantdoc2020]] Because our source models were trained on "
@@ -535,12 +536,15 @@ def build_methods(ms):
 
     ms.h("Compute and reproducibility", 2)
     ms.p(
-        "All experiments ran on one 16-core CPU workstation (no GPU); the full study, "
-        "including training, statistics, corruption and transfer evaluations, consumed "
-        "roughly 300 CPU-hours. Exact per-run configurations, seeds, logs, and the complete "
-        "code base (data preparation, training, statistics, figures, and this manuscript "
-        "builder) are provided in the accompanying repository; every number in this paper "
-        "is generated programmatically from the result files.")
+        "The public repository mirror does not preserve complete training logs, raw "
+        "datasets, tensor caches, trained weights, all prediction logits, raw multi-seed "
+        "per-condition corruption outputs, or a locked software environment. The exact "
+        "hardware/runtime records needed to independently verify CPU-hour totals are also "
+        "not included, so no runtime-total claim is made here. The manuscript builder "
+        "requires local cache metadata and selected run artifacts that are not bundled. "
+        "The historical metrics have not been regenerated after the validation-split "
+        "correction and must be treated as provisional."
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -561,22 +565,21 @@ def build_results(ms):
 
     ms.h("Results", 1)
 
-    ms.h("In-domain accuracy: pre-training dominates, architecture follows", 2)
+    ms.h("Recorded in-domain metrics: initialization and learning rate differ", 2)
     ms.p(
-        f"Table 2 summarizes the seed-replicated regime. The two ImageNet-pretrained "
-        f"models are statistically indistinguishable from each other "
-        f"(MTD-P {f3(s_pt['macro_f1'])} \u00b1 {f3(s_pt['macro_f1_sd'])} versus ResNet-18 "
-        f"{f3(s_r18['macro_f1'])} \u00b1 {f3(s_r18['macro_f1_sd'])} macro-F1; ensemble "
-        f"difference {f2(p_pt['delta_f1_ens'] * 100)} points, not significant after Holm "
-        f"correction). MobileNetV3-Small, the smallest pre-trained model, trails by "
-        f"{f2((s_r18['macro_f1'] - summary['mobilenet_v3_small']['macro_f1']) * 100)} "
-        f"points. From-scratch models rank strictly below every pre-trained one: MTD-Net "
-        f"reaches {f3(s_mtd['macro_f1'])} and the parameter-matched plain CNN "
-        f"{f3(s_small['macro_f1'])}. The gap between the best pre-trained and the best "
-        f"from-scratch configuration is "
-        f"{f2(p_pre['delta_f1_ens'] * 100)} macro-F1 points in favor of pre-training "
-        f"(bootstrap CI [{pct(p_pre['boot_ci_low'])}, {pct(p_pre['boot_ci_high'])}], exact McNemar "
-        f"p < 1e-4), nearly twice the entire architecture effect measured below.")
+        f"Table 2 summarizes the tracked six-epoch metrics. MTD-P has mean macro-F1 "
+        f"{f3(s_pt['macro_f1'])} ± {f3(s_pt['macro_f1_sd'])}, while ResNet-18 has "
+        f"{f3(s_r18['macro_f1'])} ± {f3(s_r18['macro_f1_sd'])}; their ensemble difference "
+        f"is {f2(p_pt['delta_f1_ens'] * 100)} points and is not significant after Holm "
+        f"correction. This is no detected difference, not proof of equivalence. The "
+        f"recorded pretrained configurations score higher than the scratch configurations, "
+        f"but initialization and learning rate differ between these groups (3e-4 versus "
+        f"1e-3), so the observed gap cannot be attributed to pre-training alone. MTD-Net "
+        f"and the parameter-matched plain CNN have mean macro-F1 {f3(s_mtd['macro_f1'])} "
+        f"and {f3(s_small['macro_f1'])}, respectively. All these historical estimates "
+        f"remain provisional because the validation-split audit cannot rule out test-set "
+        f"checkpoint selection."
+    )
     ms.p(
         "Training dynamics mirror the source-domain ordering in the recorded curves, but "
         "the longer-run comparison changes both epoch count and peak learning rate "
@@ -705,18 +708,11 @@ def build_results(ms):
             f"for external-domain evaluation."
         )
     else:
-        rob_pt = rob["mtdnet_pt_s0"]["robust_acc"]
-        rob_r18 = rob["resnet18_s0"]["robust_acc"]
-        rob_mtd = rob["mtdnet_s0"]["robust_acc"]
-        rob_small = rob["smallcnn_s0"]["robust_acc"]
         ms.p(
-            f"Under the eight synthetic degradations (Figure 7), the pre-trained pair is "
-            f"indistinguishable (MTD-P {f3(rob_pt)} versus ResNet-18 {f3(rob_r18)} mean "
-            f"accuracy, one corruption pass per seed, so no test applies), and both clearly "
-            f"exceed MTD-Net ({f3(rob_mtd)}) and the plain CNN ({f3(rob_small)}). MTD-Net "
-            f"beats its parameter-matched baseline by {pct((rob_mtd - rob_small) * 100)} "
-            f"points under corruption; the multi-seed version of this comparison is "
-            f"reported in the main text and is what the robustness claim rests on.")
+            "The multi-seed corruption aggregate is unavailable in this workspace. "
+            "The single-seed fallback is insufficient to support a comparative robustness "
+            "claim; regenerate and retain per-seed, per-condition corruption results first."
+        )
 
     ms.h("Zero-shot transfer to the mapped PlantDoc subset remains poor", 2)
     best = max(CD, key=lambda k: CD[k]["acc15"])
