@@ -3,7 +3,7 @@
 Question
 --------
 Zero-shot transfer to PlantDoc leaves every model both wrong and confident
-(ECE &gt; 0.4).  Fine-tuning repairs the calibration, but fine-tuning needs target
+(ECE > 0.4).  Fine-tuning repairs the calibration, but fine-tuning needs target
 labels.  Is any of the miscalibration repairable *without* a single target
 label?
 
@@ -18,8 +18,8 @@ ECE reduction is pure calibration gain, which makes the comparison clean.
 Three conditions are reported per seed:
 
   raw        no rescaling (the number quoted in crossdomain.json)
-  source-T   T fitted on PlantVillage test logits      &lt;- label-free
-  oracle-T   T fitted on PlantDoc labels               &lt;- upper bound only,
+  source-T   T fitted on PlantVillage test logits      <- label-free
+  oracle-T   T fitted on PlantDoc labels               <- upper bound only,
              included to show how much of the error is a pure scale problem
 
 Output: report/calibration.json  (per seed + mean/sd per model)
@@ -45,27 +45,27 @@ from models import build_model  # noqa: E402
 N_BINS = 15
 
 
-def ece(prob: np.ndarray, y: np.ndarray, n_bins: int = N_BINS) -&gt; float:
+def ece(prob: np.ndarray, y: np.ndarray, n_bins: int = N_BINS) -> float:
     conf = prob.max(1)
     pred = prob.argmax(1)
     acc = (pred == y).astype(np.float64)
     edges = np.linspace(0.0, 1.0, n_bins + 1)
     total = 0.0
     for lo, hi in zip(edges[:-1], edges[1:]):
-        m = (conf &gt; lo) &amp; (conf &lt;= hi)
+        m = (conf > lo) & (conf <= hi)
         if not m.any():
             continue
         total += m.mean() * abs(acc[m].mean() - conf[m].mean())
     return float(total)
 
 
-def nll(logits: np.ndarray, y: np.ndarray, T: float) -&gt; float:
+def nll(logits: np.ndarray, y: np.ndarray, T: float) -> float:
     z = torch.from_numpy(logits / T)
     return float(F.cross_entropy(z, torch.from_numpy(y)))
 
 
 def fit_temperature(logits: np.ndarray, y: np.ndarray,
-                    lo: float = 0.05, hi: float = 30.0, n: int = 600) -&gt; float:
+                    lo: float = 0.05, hi: float = 30.0, n: int = 600) -> float:
     """Grid search in log space: one parameter, convex enough that this is exact
     to 4 significant digits and avoids pulling in an optimiser dependency."""
     grid = np.exp(np.linspace(np.log(lo), np.log(hi), n))
@@ -73,7 +73,7 @@ def fit_temperature(logits: np.ndarray, y: np.ndarray,
     return float(grid[int(np.argmin(losses))])
 
 
-def summarise(logits: np.ndarray, y: np.ndarray, T: float) -&gt; dict:
+def summarise(logits: np.ndarray, y: np.ndarray, T: float) -> dict:
     p = softmax(logits / T)
     pred = p.argmax(1)
     return {
@@ -85,7 +85,7 @@ def summarise(logits: np.ndarray, y: np.ndarray, T: float) -&gt; dict:
     }
 
 
-def main() -&gt; None:
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", nargs="+", required=True)
     ap.add_argument("--cache", default="cache")
@@ -128,7 +128,7 @@ def main() -&gt; None:
                 "oracle_T": summarise(z_tgt, y_pd, T_orc),
             })
             print(f"{os.path.basename(r):16s} T_src={T_src:6.3f} "
-                  f"ECE {per_seed[-1]['raw']['ece']:.3f} -&gt; "
+                  f"ECE {per_seed[-1]['raw']['ece']:.3f} -> "
                   f"{per_seed[-1]['source_T']['ece']:.3f} "
                   f"(oracle {per_seed[-1]['oracle_T']['ece']:.3f})", flush=True)
 
@@ -137,7 +137,7 @@ def main() -&gt; None:
             for k in ("acc", "conf", "ece", "nll"):
                 v = np.array([s[cond][k] for s in per_seed], dtype=np.float64)
                 agg[f"{cond}_{k}_mean"] = float(v.mean())
-                agg[f"{cond}_{k}_sd"] = float(v.std(ddof=1)) if len(v) &gt; 1 else 0.0
+                agg[f"{cond}_{k}_sd"] = float(v.std(ddof=1)) if len(v) > 1 else 0.0
         out[model_name] = {
             "n_seeds": len(per_seed),
             "per_seed": per_seed,

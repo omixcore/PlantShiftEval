@@ -113,7 +113,7 @@ def main():
         cur["robust_acc"] = float(np.mean(vals))
         cur["drop"] = float(clean - cur["robust_acc"])
         results[name] = cur
-        print(f"==&gt; {name}: clean={clean:.3f} robust={cur['robust_acc']:.3f} "
+        print(f"==> {name}: clean={clean:.3f} robust={cur['robust_acc']:.3f} "
               f"drop={cur['drop']:.3f}", flush=True)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)

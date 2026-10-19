@@ -89,7 +89,7 @@ class MTDNet(nn.Module):
             nn.Conv2d(3, w, 3, 2, 1, bias=False), nn.BatchNorm2d(w), nn.SiLU(inplace=True),
             DSConv(w, w, 3, 2),
         )
-        # appearance path: H/8 -&gt; H/32
+        # appearance path: H/8 -> H/32
         self.app = nn.Sequential(
             DSBlock(w, 2 * w, s=2),
             DSBlock(2 * w, 4 * w, s=2),
@@ -159,9 +159,9 @@ class MTDNetPT(MTDNet):
     is the decoupled design *still* useful once both models start from the same
     pre-trained features?  MTD-P answers it by cutting ResNet18 at H/4:
 
-        conv1/bn/relu/maxpool/layer1 -&gt; H/4, 64ch  ---+--&gt; texture branch (H/4)
+        conv1/bn/relu/maxpool/layer1 -> H/4, 64ch  ---+--> texture branch (H/4)
                                                       |
-                                   layer2/layer3/layer4 -&gt; appearance path
+                                   layer2/layer3/layer4 -> appearance path
 
     Everything else (gate, species head, disease head) is identical to MTD-Net,
     so the only difference against ResNet18 is *where the high-resolution texture
@@ -177,7 +177,7 @@ class MTDNetPT(MTDNet):
         # those same tensors in place, which would silently destroy the weights
         pretrained = {k: v.detach().clone() for k, v in r.state_dict().items()}
         self.stem = nn.Sequential(r.conv1, r.bn1, r.relu, r.maxpool, r.layer1)
-        self.app = nn.Sequential(r.layer2, r.layer3, r.layer4)  # H/8 -&gt; H/32
+        self.app = nn.Sequential(r.layer2, r.layer3, r.layer4)  # H/8 -> H/32
         self.c_app = 512
         self.det = nn.Sequential(
             DSBlock(64, c_det, s=1, d=1),
@@ -274,7 +274,7 @@ class _OutWrap(nn.Module):
 
 
 def build_baseline(name: str, n_disease: int, n_species: int | None = None,
-                   pretrained: bool = True) -&gt; nn.Module:
+                   pretrained: bool = True) -> nn.Module:
     if name == "resnet18":
         m = models.resnet18(weights=models.ResNet18_Weights.DEFAULT if pretrained else None)
         m.fc = nn.Linear(m.fc.in_features, n_disease)
@@ -324,7 +324,7 @@ MODEL_ZOO = {
 }
 
 
-def build_model(name: str, n_disease: int, n_species: int) -&gt; nn.Module:
+def build_model(name: str, n_disease: int, n_species: int) -> nn.Module:
     if name == "mtdnet":
         return MTDNet(n_disease, n_species)
     if name == "mtdnet_pt":
@@ -338,5 +338,5 @@ def build_model(name: str, n_disease: int, n_species: int) -&gt; nn.Module:
     return build_baseline(name, n_disease, pretrained=(MODEL_ZOO[name] == "pretrained"))
 
 
-def count_params(m: nn.Module) -&gt; int:
+def count_params(m: nn.Module) -> int:
     return sum(p.numel() for p in m.parameters() if p.requires_grad)

@@ -3,13 +3,13 @@
 Two different questions are answered here, and they need different tests.
 
 1. "Is the ranking stable across random seeds?"
-   -&gt; per-model mean/std of macro-F1 over the 3 seeds, plus a paired t-test
+   -> per-model mean/std of macro-F1 over the 3 seeds, plus a paired t-test
       across seeds (same seed = same data order / augmentation stream, so the
       seeds are paired).  n=3 gives very little power, so this is reported as
       descriptive statistics plus an exact-ish p-value, never as proof.
 
 2. "Is the gap larger than test-set sampling noise?"
-   -&gt; each model is represented by the softmax average of its 3 seeds (a
+   -> each model is represented by the softmax average of its 3 seeds (a
      3-run ensemble, i.e. the same compute budget for every model), then
       (a) McNemar's exact test on the paired correctness vectors, and
       (b) a paired bootstrap over test images giving a 95% CI for the
@@ -32,14 +32,14 @@ import torch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
-def macro_f1(y: np.ndarray, p: np.ndarray, n_class: int) -&gt; float:
+def macro_f1(y: np.ndarray, p: np.ndarray, n_class: int) -> float:
     conf = np.bincount(y * n_class + p, minlength=n_class * n_class).reshape(n_class, n_class)
     tp = np.diag(conf).astype(np.float64)
     fp = conf.sum(0) - tp
     fn = conf.sum(1) - tp
-    used = (conf.sum(0) + conf.sum(1)) &gt; 0
+    used = (conf.sum(0) + conf.sum(1)) > 0
     denom = 2 * tp + fp + fn
-    f1 = np.where(denom &gt; 0, 2 * tp / np.maximum(denom, 1e-12), 0.0)
+    f1 = np.where(denom > 0, 2 * tp / np.maximum(denom, 1e-12), 0.0)
     return float(f1[used].mean())
 
 
@@ -69,7 +69,7 @@ def softmax(z):
     return e / e.sum(1, keepdims=True)
 
 
-def holm(pvals: list[float]) -&gt; list[float]:
+def holm(pvals: list[float]) -> list[float]:
     idx = np.argsort(pvals)
     m = len(pvals)
     adj = [0.0] * m
@@ -91,7 +91,7 @@ def main():
 
     runs = load_runs(args.runs)
     seeds_by_model = {m: sorted(v) for m, v in runs.items()}
-    models = [m for m, s in seeds_by_model.items() if len(s) &gt;= 3]
+    models = [m for m, s in seeds_by_model.items() if len(s) >= 3]
     models.sort(key=lambda m: -np.mean([runs[m][s]["metrics"]["test_macro_f1"] for s in seeds_by_model[m]]))
     print("replicated models:", {m: seeds_by_model[m] for m in models})
 
@@ -126,13 +126,13 @@ def main():
         ya, yb = stats[a]["labels"], stats[b]["labels"]
         assert (ya == yb).all()
         ca, cb = stats[a]["ens_correct"], stats[b]["ens_correct"]
-        b01 = int(np.sum(~ca &amp; cb))  # a wrong, b right
-        b10 = int(np.sum(ca &amp; ~cb))  # a right, b wrong
-        mcn = binomtest(b01, b01 + b10, 0.5).pvalue if (b01 + b10) &gt; 0 else 1.0
+        b01 = int(np.sum(~ca & cb))  # a wrong, b right
+        b10 = int(np.sum(ca & ~cb))  # a right, b wrong
+        mcn = binomtest(b01, b01 + b10, 0.5).pvalue if (b01 + b10) > 0 else 1.0
 
         fa = np.array(stats[a]["macro_f1_seeds"])
         fb = np.array(stats[b]["macro_f1_seeds"])
-        t_p = float(ttest_rel(fa, fb).pvalue) if len(fa) &gt; 1 else float("nan")
+        t_p = float(ttest_rel(fa, fb).pvalue) if len(fa) > 1 else float("nan")
 
         # paired bootstrap over test images on the ensembled predictions
         rng = np.random.default_rng(args.seed)
@@ -149,7 +149,7 @@ def main():
             "delta_f1_mean_seeds": float(fa.mean() - fb.mean()),
             "delta_f1_ens": float(stats[a]["ens_macro_f1"] - stats[b]["ens_macro_f1"]),
             "boot_ci_low": float(lo), "boot_ci_high": float(hi),
-            "boot_p_two_sided": float(2 * min((deltas &lt;= 0).mean(), (deltas &gt;= 0).mean())),
+            "boot_p_two_sided": float(2 * min((deltas <= 0).mean(), (deltas >= 0).mean())),
             "mcnemar_b_a_wrong_b_right": b01, "mcnemar_b_a_right_b_wrong": b10,
             "mcnemar_p": float(mcn),
             "ttest_seed_p": t_p,
@@ -160,8 +160,8 @@ def main():
     for p, pm, pb in zip(pairs, adj_mcn, adj_boot):
         p["mcnemar_p_holm"] = float(pm)
         p["boot_p_holm"] = float(pb)
-        p["significant_holm"] = bool(pm &lt; 0.05)
-        print(f"{p['a']:&gt;20s} vs {p['b']:&lt;20s} dF1={p['delta_f1_ens']:+.4f} "
+        p["significant_holm"] = bool(pm < 0.05)
+        print(f"{p['a']:>20s} vs {p['b']:<20s} dF1={p['delta_f1_ens']:+.4f} "
               f"CI[{p['boot_ci_low']:+.4f},{p['boot_ci_high']:+.4f}] "
               f"mcnemar p={p['mcnemar_p']:.2e} (holm {pm:.2e})")
 

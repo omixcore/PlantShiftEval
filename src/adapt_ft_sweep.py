@@ -42,7 +42,7 @@ CONFIGS = [
 ]
 
 
-def apply_freeze(model: nn.Module, mode: str | None) -&gt; None:
+def apply_freeze(model: nn.Module, mode: str | None) -> None:
     if mode == "stem_app":
         for p in model.stem.parameters():
             p.requires_grad = False
@@ -50,7 +50,7 @@ def apply_freeze(model: nn.Module, mode: str | None) -&gt; None:
             p.requires_grad = False
 
 
-def set_bn_eval(model: nn.Module) -&gt; None:
+def set_bn_eval(model: nn.Module) -> None:
     for m in model.modules():
         if isinstance(m, nn.BatchNorm2d):
             m.eval()
@@ -58,7 +58,7 @@ def set_bn_eval(model: nn.Module) -&gt; None:
                 p.requires_grad = False
 
 
-def main() -&gt; None:
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", default="runs/mtdnet_s0")
     ap.add_argument("--cache", default="cache")
@@ -110,7 +110,7 @@ def main() -&gt; None:
         summary[name] = {"macro_f1_mean": float(f1.mean()),
                          "macro_f1_sd": float(f1.std(ddof=1)),
                          "acc_mean": float(np.mean([r["acc15"] for r in rows]))}
-        print(f"==&gt; {name:9s} {f1.mean():.3f} +- {f1.std(ddof=1):.3f}")
+        print(f"==> {name:9s} {f1.mean():.3f} +- {f1.std(ddof=1):.3f}")
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

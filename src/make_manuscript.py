@@ -292,10 +292,10 @@ def build_front(ms):
                 _p12 = _q
     p12t = f3(_p12["ttest_seed_p"]) if _p12 else "0.03"
     p = ms.p(ABSTRACT.format(
-        mtd_sd=f2(stdev(seeds("mtdnet")) * 100) if len(seeds("mtdnet")) &gt; 1 else "0.0",
+        mtd_sd=f2(stdev(seeds("mtdnet")) * 100) if len(seeds("mtdnet")) > 1 else "0.0",
         mtd_gain=f2(pair("mtdnet", "smallcnn")["delta_f1_mean_seeds"] * 100),
         ens_gain=f2(pair("mtdnet", "smallcnn")["delta_f1_ens"] * 100),
-        mtd_p=("&lt; 0.001" if pair("mtdnet", "smallcnn")["mcnemar_p"] &lt; 1e-3
+        mtd_p=("< 0.001" if pair("mtdnet", "smallcnn")["mcnemar_p"] < 1e-3
                else "= " + f3(pair("mtdnet", "smallcnn")["mcnemar_p"])),
         pt_gap=f2(abs(pair("mtdnet_pt", "resnet18")["delta_f1_ens"]) * 100),
         pre_gain=f2(pair("mtdnet_pt", "mtdnet")["delta_f1_ens"] * 100),
@@ -564,7 +564,7 @@ def build_results(ms):
         f"from-scratch configuration is "
         f"{f2(p_pre['delta_f1_ens'] * 100)} macro-F1 points in favor of pre-training "
         f"(bootstrap CI [{pct(p_pre['boot_ci_low'])}, {pct(p_pre['boot_ci_high'])}], exact McNemar "
-        f"p &lt; 1e-4), nearly twice the entire architecture effect measured below.")
+        f"p < 1e-4), nearly twice the entire architecture effect measured below.")
     ms.p(
         "Training dynamics mirror the same ordering from the first epoch (Figure 2A): the "
         "pre-trained pair starts near 0.90 macro-F1 after one epoch, while both from-"
@@ -585,7 +585,7 @@ def build_results(ms):
         f"{f2(p_mtd['ttest_seed_p'])} at n = 3 per group). The soft-voting ensemble, which "
         f"integrates over seed noise, is {f2(p_mtd['delta_f1_ens'] * 100)} points better "
         f"(CI [{pct(p_mtd['boot_ci_low'])}, {pct(p_mtd['boot_ci_high'])}], exact McNemar p "
-        f"{'&lt; 1e-4' if p_mtd['mcnemar_p'] &lt; 1e-4 else f3(p_mtd['mcnemar_p'])}), and this "
+        f"{'< 1e-4' if p_mtd['mcnemar_p'] < 1e-4 else f3(p_mtd['mcnemar_p'])}), and this "
         f"is the one comparison that survives Holm correction within our contrast family. "
         f"We therefore conclude that the decoupled design does help in the from-scratch "
         f"regime, but that a single-seed comparison \u2014 the reporting standard in this "
@@ -616,7 +616,7 @@ def build_results(ms):
         f"Attaching the identical wiring to pre-trained weights removes the gain "
         f"altogether: MTD-P versus ResNet-18 differ by "
         f"{f2(abs(p_pt['delta_f1_ens']) * 100)} macro-F1 points "
-        f"({'in favor of MTD-P' if p_pt['delta_f1_ens'] &gt; 0 else 'in favor of ResNet-18'}, "
+        f"({'in favor of MTD-P' if p_pt['delta_f1_ens'] > 0 else 'in favor of ResNet-18'}, "
         f"p = {f2(p_pt['mcnemar_p'])}) while costing "
         f"{pct((s_pt['params(M)'] - s_r18['params(M)']) / s_r18['params(M)'], 1)} percent "
         f"more parameters and {f2(lat['mtdnet_pt_s0'] - lat['resnet18_s0'])} additional "
@@ -660,7 +660,7 @@ def build_results(ms):
                 f"from {p_mtd['delta_f1_ens'] * 100:+.2f} to "
                 f"{p12['delta_f1_ens'] * 100:+.2f} (CI "
                 f"[{pct(p12['boot_ci_low'])}, {pct(p12['boot_ci_high'])}], exact McNemar p "
-                f"{'&lt; 0.001' if p12['mcnemar_p'] &lt; 1e-3 else f3(p12['mcnemar_p'])}). The "
+                f"{'< 0.001' if p12['mcnemar_p'] < 1e-3 else f3(p12['mcnemar_p'])}). The "
                 f"plain CNN is the main beneficiary of the extra epochs, which is the "
                 f"pattern one expects if the decoupled pathway pays off most before the "
                 f"baseline has learned the texture statistics of the task. But those same "
@@ -695,7 +695,7 @@ def build_results(ms):
             "split) gives: " + "; ".join(base_parts) + ". Two observations follow. First, "
             "additional data lift every model, and the from-scratch models gain most, as "
             "expected; the gap between pre-trained and from-scratch models shrinks but "
-            "remains material at this scale. Second, the ordering pre-trained &gt; scratch "
+            "remains material at this scale. Second, the ordering pre-trained > scratch "
             "and the null result on the gate are unchanged, indicating that our "
             "conclusions are not artifacts of the 320-images-per-class cap.")
     else:
@@ -1058,7 +1058,7 @@ REFERENCES = [
     "Kapoor S, Narayanan A. Leakage and the reproducibility crisis in machine-learning-based science. Patterns. 2023;4(9):100804.",
     "McNemar Q. Note on the sampling error of the difference between correlated proportions or percentages. Psychometrika. 1947;12(2):153\u2013157.",
     "Holm S. A simple sequentially rejective multiple test procedure. Scand J Stat. 1979;6(2):65\u201370.",
-    "Efron B, Tibshirani RJ. An Introduction to the Bootstrap. New York: Chapman &amp; Hall; 1993.",
+    "Efron B, Tibshirani RJ. An Introduction to the Bootstrap. New York: Chapman & Hall; 1993.",
     "Dietterich TG. Approximate statistical tests for comparing supervised classification learning algorithms. Neural Comput. 1998;10(7):1895\u20131923.",
     "Dem\u0161ar J. Statistical comparisons of classifiers over multiple data sets. J Mach Learn Res. 2006;7:1\u201330.",
     "Selvaraju RR, Cogswell M, Das A, Vedantam R, Parikh D, Batra D. Grad-CAM: visual explanations from deep networks via gradient-based localization. In: ICCV. 2017. p 618\u2013626.",
@@ -1336,7 +1336,7 @@ def build_tables():
             f"[{p['boot_ci_low'] * 100:+.2f}, {p['boot_ci_high'] * 100:+.2f}]",
             f"{p['delta_f1_mean_seeds'] * 100:+.2f}",
             f"{p['ttest_seed_p']:.3f}",
-            ("&lt;1e-4" if p["mcnemar_p"] &lt; 1e-4 else f"{p['mcnemar_p']:.2e}"),
+            ("<1e-4" if p["mcnemar_p"] < 1e-4 else f"{p['mcnemar_p']:.2e}"),
             "yes" if p["significant_holm"] else "no",
         ])
     _add_table(d, ["Contrast", "\u0394 ens. macro-F1 (pt)", "bootstrap 95% CI (pt)",
@@ -1463,7 +1463,7 @@ def main():
               "references": len(REFERENCES), "cited_keys": len(cited),
               "uncited_references": uncited,
               "abstract_words": len(ABSTRACT.split()),
-              "limit": 7000, "within_limit": total &lt;= 7000}
+              "limit": 7000, "within_limit": total <= 7000}
     with open(os.path.join(SUB, "word_count.json"), "w", encoding="utf-8") as f:
         json.dump(counts, f, indent=2, ensure_ascii=False)
     print(json.dumps(counts, indent=2, ensure_ascii=False))

@@ -1,4 +1,4 @@
-"""Can the PlantVillage -&gt; PlantDoc collapse be repaired?
+"""Can the PlantVillage -> PlantDoc collapse be repaired?
 
 `crossdomain.py` measures the damage; this script asks what it takes to undo it.
 Four interventions are compared, ordered by the amount of target supervision
@@ -47,7 +47,7 @@ from train import LeafDS, ece_score  # noqa: E402
 # --------------------------------------------------------------------------- #
 # target cache that keeps PlantDoc's own train/test split
 # --------------------------------------------------------------------------- #
-def build_split_cache(out: str = "cache_pd_split", size: int = 144) -&gt; dict:
+def build_split_cache(out: str = "cache_pd_split", size: int = 144) -> dict:
     os.makedirs(out, exist_ok=True)
     buckets = {"train": ([], []), "test": ([], [])}
     for p in PD_FILES:
@@ -62,7 +62,7 @@ def build_split_cache(out: str = "cache_pd_split", size: int = 144) -&gt; dict:
                 if not cats:
                     continue
                 top, cnt = collections.Counter(cats).most_common(1)[0]
-                if cnt &lt; 0.5 * len(cats):
+                if cnt < 0.5 * len(cats):
                     continue
                 key = norm_cat(top)
                 if key not in CATEGORY_MAP:
@@ -103,7 +103,7 @@ def load_split_cache(d: str):
 # --------------------------------------------------------------------------- #
 # helpers
 # --------------------------------------------------------------------------- #
-def strip_head(model: nn.Module) -&gt; int:
+def strip_head(model: nn.Module) -> int:
     """Replace the final classifier with Identity; return feature width."""
     if hasattr(model, "disease_head"):           # MTD-Net family
         dim = model.disease_head[-1].in_features
@@ -127,7 +127,7 @@ def strip_head(model: nn.Module) -&gt; int:
 
 
 @torch.no_grad()
-def features(model, x, size=112) -&gt; np.ndarray:
+def features(model, x, size=112) -> np.ndarray:
     ds = LeafDS(x, np.zeros(len(x), dtype=np.int64), np.zeros(len(x), dtype=np.int64),
                 False, size)
     ld = DataLoader(ds, batch_size=128, shuffle=False, num_workers=0)
@@ -140,7 +140,7 @@ def features(model, x, size=112) -&gt; np.ndarray:
 
 
 @torch.no_grad()
-def logits_of(model, x, size=112) -&gt; np.ndarray:
+def logits_of(model, x, size=112) -> np.ndarray:
     ds = LeafDS(x, np.zeros(len(x), dtype=np.int64), np.zeros(len(x), dtype=np.int64),
                 False, size)
     ld = DataLoader(ds, batch_size=128, shuffle=False, num_workers=0)
@@ -151,13 +151,13 @@ def logits_of(model, x, size=112) -&gt; np.ndarray:
     return torch.cat(out).numpy()
 
 
-def softmax(z: np.ndarray) -&gt; np.ndarray:
+def softmax(z: np.ndarray) -> np.ndarray:
     z = z - z.max(1, keepdims=True)
     e = np.exp(z)
     return e / e.sum(1, keepdims=True)
 
 
-def bn_adapt(model, x, size=112, bs=16) -&gt; None:
+def bn_adapt(model, x, size=112, bs=16) -> None:
     """AdaBN: recompute BN statistics on unlabeled target images."""
     bns = [m for m in model.modules() if isinstance(m, nn.BatchNorm2d)]
     for m in bns:
@@ -177,8 +177,8 @@ def bn_adapt(model, x, size=112, bs=16) -&gt; None:
         model.eval()
 
 
-def metrics(logits_or_probs: np.ndarray, y: np.ndarray, present) -&gt; dict:
-    probs = logits_or_probs if logits_or_probs.min() &gt;= 0 and \
+def metrics(logits_or_probs: np.ndarray, y: np.ndarray, present) -> dict:
+    probs = logits_or_probs if logits_or_probs.min() >= 0 and \
         np.allclose(logits_or_probs.sum(1), 1, atol=1e-3) else softmax(logits_or_probs)
     pred = probs.argmax(1)
     p10 = probs[:, present]
@@ -197,7 +197,7 @@ def metrics(logits_or_probs: np.ndarray, y: np.ndarray, present) -&gt; dict:
     }
 
 
-def sample_k(y: np.ndarray, k: int, seed: int) -&gt; np.ndarray:
+def sample_k(y: np.ndarray, k: int, seed: int) -> np.ndarray:
     rs = np.random.RandomState(seed)
     idx = []
     for c in np.unique(y):
@@ -206,7 +206,7 @@ def sample_k(y: np.ndarray, k: int, seed: int) -&gt; np.ndarray:
     return np.array(sorted(idx))
 
 
-def finetune(model, x, y, size=112, epochs=3, lr=1e-4, bs=32, seed=0) -&gt; nn.Module:
+def finetune(model, x, y, size=112, epochs=3, lr=1e-4, bs=32, seed=0) -> nn.Module:
     torch.manual_seed(seed)
     ds = LeafDS(x, y, np.zeros(len(y), dtype=np.int64), True, size)
     ld = DataLoader(ds, batch_size=bs, shuffle=True, num_workers=0, drop_last=False)
@@ -312,7 +312,7 @@ def main():
             for key in ("acc15", "macro_f1", "crop_acc", "crop_macro", "conf", "ece"):
                 vals = [row[key] for row in rows]
                 entry[key] = float(np.mean(vals))
-                entry[key + "_sd"] = float(np.std(vals, ddof=1)) if len(vals) &gt; 1 else 0.0
+                entry[key + "_sd"] = float(np.std(vals, ddof=1)) if len(vals) > 1 else 0.0
             entry["n"] = len(rows)
             entry["feature_dim"] = 0
             if method.startswith("probe"):
@@ -321,7 +321,7 @@ def main():
             methods[method] = entry
         results[name] = {"model": mj["model"], "params": mj["params"],
                          "methods": methods}
-        print(f"==&gt; {name:22s} " + " | ".join(
+        print(f"==> {name:22s} " + " | ".join(
             f"{m}:{v['macro_f1']:.3f}" for m, v in methods.items()), flush=True)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)

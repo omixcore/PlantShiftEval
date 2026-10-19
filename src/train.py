@@ -37,7 +37,7 @@ class BgSwapField:
     1. estimate the backdrop colour from the 6-pixel border (PlantVillage
        backgrounds are near-uniform, so this is reliable),
     2. take the largest connected component of pixels far from that colour,
-       fill holes -&gt; leaf mask,
+       fill holes -> leaf mask,
     3. composite the leaf, scaled 0.7-1.0x and placed at a random offset, onto
        a blurred unlabeled PlantDoc frame.
 
@@ -52,33 +52,33 @@ class BgSwapField:
         self.p = p
         self.thr = thr
 
-    def _mask(self, arr: np.ndarray) -&gt; np.ndarray:
+    def _mask(self, arr: np.ndarray) -> np.ndarray:
         b = np.concatenate([arr[:6].reshape(-1, 3), arr[-6:].reshape(-1, 3),
                             arr[:, :6].reshape(-1, 3), arr[:, -6:].reshape(-1, 3)])
         bg = np.median(b.astype(np.float32), 0)
         d = np.linalg.norm(arr.astype(np.float32) - bg, axis=2)
-        m = ndimage.binary_closing(d &gt; self.thr, np.ones((5, 5)))
+        m = ndimage.binary_closing(d > self.thr, np.ones((5, 5)))
         m = ndimage.binary_fill_holes(m)
         lab, n = ndimage.label(m)
-        if n &gt; 1:
+        if n > 1:
             sizes = ndimage.sum(m, lab, range(1, n + 1))
             m = lab == (1 + int(np.argmax(sizes)))
         return m
 
-    def __call__(self, img: torch.Tensor) -&gt; torch.Tensor:
-        if random.random() &gt; self.p:
+    def __call__(self, img: torch.Tensor) -> torch.Tensor:
+        if random.random() > self.p:
             return img
         arr = img.permute(1, 2, 0).numpy()
         m = self._mask(arr)
         frac = float(m.mean())
-        if frac &lt; 0.12 or frac &gt; 0.97:
+        if frac < 0.12 or frac > 0.97:
             return img
         bg = self.bank[random.randrange(len(self.bank))].float()
         H, W = bg.shape[1], bg.shape[2]
         leaf = img.float()
         msk = torch.from_numpy(m).float().unsqueeze(0)
         s = random.uniform(0.7, 1.0)
-        if s &lt; 0.999:
+        if s < 0.999:
             nh, nw = max(8, int(round(H * s))), max(8, int(round(W * s)))
             leaf = F.interpolate(leaf.unsqueeze(0), size=(nh, nw), mode="bilinear",
                                  align_corners=False)[0]
@@ -131,8 +131,8 @@ def ece_score(probs, labels, bins=15):
     edges = np.linspace(0, 1, bins + 1)
     ece = 0.0
     for lo, hi in zip(edges[:-1], edges[1:]):
-        m = (conf &gt; lo) &amp; (conf &lt;= hi)
-        if m.sum() &gt; 0:
+        m = (conf > lo) & (conf <= hi)
+        if m.sum() > 0:
             ece += (m.mean()) * abs(acc[m].mean() - conf[m].mean())
     return float(ece)
 
@@ -170,7 +170,7 @@ def evaluate(model, loader, device):
     }
 
 
-def build_bg_bank(args, sigma: float = 2.5) -&gt; torch.Tensor:
+def build_bg_bank(args, sigma: float = 2.5) -> torch.Tensor:
     if getattr(args, "bg_gray", False):
         return _gray_bank(args, sigma)
     """Blurred, *unlabeled* PlantDoc frames used as field backdrops.
@@ -226,7 +226,7 @@ def train_one(args, meta, tr, te, va=None):
                                         num_samples=len(tr.species), replacement=True)
         tr_ld = DataLoader(tr_ds, batch_size=args.bs, sampler=sampler, num_workers=0,
                            drop_last=True)
-        print(f"[balance] crop counts {cnt.astype(int).tolist()} -&gt; per-crop "
+        print(f"[balance] crop counts {cnt.astype(int).tolist()} -> per-crop "
               f"weights {np.round(1.0 / cnt, 5).tolist()}", flush=True)
     else:
         tr_ld = DataLoader(tr_ds, batch_size=args.bs, shuffle=True, num_workers=0,
@@ -254,7 +254,7 @@ def train_one(args, meta, tr, te, va=None):
         for xb, yb, sb in tr_ld:
             out = model(xb)
             loss = crit(out["disease"], yb)
-            if out.get("species") is not None and args.aux_w &gt; 0:
+            if out.get("species") is not None and args.aux_w > 0:
                 loss = loss + args.aux_w * crit(out["species"], sb)
             opt.zero_grad(set_to_none=True)
             loss.backward()
@@ -271,7 +271,7 @@ def train_one(args, meta, tr, te, va=None):
         print(f"[{args.model} s{args.seed}] ep{ep:02d} loss={rec['train_loss']:.3f} "
               f"acc={res['acc']:.4f} f1={res['macro_f1']:.4f} ({rec['sec']}s)",
               flush=True)
-        if res["macro_f1"] &gt; best["macro_f1"]:
+        if res["macro_f1"] > best["macro_f1"]:
             best = {k: v for k, v in res.items()}
             best["epoch"] = ep
             torch.save(model.state_dict(), os.path.join(args.out, "model.pt"))
@@ -337,7 +337,7 @@ def main():
         tr.images, tr.labels, tr.species = tr.images[idx], tr.labels[idx], tr.species[idx]
 
     va = None
-    if args.val_frac &gt; 0:
+    if args.val_frac > 0:
         from data import Split
         rs = np.random.RandomState(1234)          # fixed, independent of --seed
         perm = rs.permutation(len(tr.labels))

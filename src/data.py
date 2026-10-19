@@ -29,7 +29,7 @@ class Split:
     species: np.ndarray  # (N,) int64
 
 
-def _class_names(pf: pq.ParquetFile) -&gt; List[str]:
+def _class_names(pf: pq.ParquetFile) -> List[str]:
     meta = pf.schema_arrow.metadata or {}
     raw = meta.get(b"huggingface")
     if raw:
@@ -43,7 +43,7 @@ def _class_names(pf: pq.ParquetFile) -&gt; List[str]:
     return []
 
 
-def _image_column(columns: List[str]) -&gt; str:
+def _image_column(columns: List[str]) -> str:
     for c in columns:
         if c in ("image", "img", "pixel_values"):
             return c
@@ -52,7 +52,7 @@ def _image_column(columns: List[str]) -&gt; str:
     return columns[0]
 
 
-def _decode(cell) -&gt; Image.Image:
+def _decode(cell) -> Image.Image:
     if isinstance(cell, dict):
         cell = cell.get("bytes") or cell.get("path")
     if isinstance(cell, (bytes, bytearray)):
@@ -63,7 +63,7 @@ def _decode(cell) -&gt; Image.Image:
 
 
 def read_split(path: str, size: int, per_class_cap: int | None = None,
-               class_names: List[str] | None = None) -&gt; Split:
+               class_names: List[str] | None = None) -> Split:
     pf = pq.ParquetFile(path)
     names = class_names or _class_names(pf)
     top = pf.schema_arrow.names
@@ -75,7 +75,7 @@ def read_split(path: str, size: int, per_class_cap: int | None = None,
         df = batch.to_pandas()
         for cell, lab in zip(df[col].values, df["label"].values):
             lab = int(lab)
-            if per_class_cap is not None and counts.get(lab, 0) &gt;= per_class_cap:
+            if per_class_cap is not None and counts.get(lab, 0) >= per_class_cap:
                 continue
             im = _decode(cell)
             if im.size != (size, size):
@@ -95,7 +95,7 @@ def read_split(path: str, size: int, per_class_cap: int | None = None,
 
 
 def build_cache(out_dir: str, size: int = 160, per_class_cap: int = 320,
-                seed: int = 0) -&gt; dict:
+                seed: int = 0) -> dict:
     os.makedirs(out_dir, exist_ok=True)
     root = os.path.dirname(out_dir.rstrip("/\\"))
     train_p = os.path.join(root, "data", "pv_train.parquet")
@@ -131,7 +131,7 @@ def build_cache(out_dir: str, size: int = 160, per_class_cap: int = 320,
     return meta
 
 
-def load_cache(cache_dir: str) -&gt; Tuple[dict, Split, Split]:
+def load_cache(cache_dir: str) -> Tuple[dict, Split, Split]:
     with open(os.path.join(cache_dir, "meta.json"), encoding="utf-8") as f:
         meta = json.load(f)
     tr = Split(np.load(os.path.join(cache_dir, "train_x.npy")),

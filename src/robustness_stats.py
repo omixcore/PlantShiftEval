@@ -28,11 +28,11 @@ CONDITIONS = ["clean", "noise_s1", "noise_s2", "blur_s1", "blur_s2",
               "brightness_s2", "contrast_s2", "occlusion_s1", "occlusion_s2"]
 
 
-def model_of(run: str) -&gt; str:
+def model_of(run: str) -> str:
     return re.sub(r"_s\d+$", "", run)
 
 
-def load() -&gt; dict[str, dict[int, dict]]:
+def load() -> dict[str, dict[int, dict]]:
     with open(RUNS, encoding="utf-8") as f:
         ms = json.load(f)
     out: dict[str, dict[int, dict]] = {}
@@ -52,12 +52,12 @@ def load() -&gt; dict[str, dict[int, dict]]:
     return out
 
 
-def mean_sd(vals: list[float]) -&gt; tuple[float, float]:
+def mean_sd(vals: list[float]) -> tuple[float, float]:
     a = np.asarray(vals, dtype=np.float64)
-    return float(a.mean()), float(a.std(ddof=1)) if len(a) &gt; 1 else 0.0
+    return float(a.mean()), float(a.std(ddof=1)) if len(a) > 1 else 0.0
 
 
-def main() -&gt; None:
+def main() -> None:
     data = load()
     summary = {"per_model": {}, "paired": {}, "n_seeds": {}}
 
@@ -86,7 +86,7 @@ def main() -&gt; None:
         if (a, b) in seen or a not in data or b not in data:
             continue
         seen.add((a, b))
-        common = sorted(set(data[a]) &amp; set(data[b]))
+        common = sorted(set(data[a]) & set(data[b]))
         if not common:
             continue
         rec = {"n_pairs": len(common), "seeds": common}
@@ -105,7 +105,7 @@ def main() -&gt; None:
                 "a_mean": float(np.mean(da)),
                 "b_mean": float(np.mean(db)),
                 "per_seed_pt": [float(v) * 100 for v in d],
-                "all_positive": bool((d &gt; 0).all()),
+                "all_positive": bool((d > 0).all()),
             }
         # clean-vs-corrupted amplification of the same contrast
         summary["paired"][f"{a}_minus_{b}"] = rec

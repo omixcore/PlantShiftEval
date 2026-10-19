@@ -41,7 +41,7 @@ LABEL = {"mtdnet": "MTD-Net (scratch)", "mtdnet_pt": "MTD-P (pretrained)",
          "smallcnn": "plain CNN (same budget)"}
 
 
-def nice(name: str) -&gt; str:
+def nice(name: str) -> str:
     return LABEL.get(name, name)
 
 
@@ -70,7 +70,7 @@ def fig_training(grouped, path):
         ep = np.arange(1, n + 1)
         c = PALETTE[i % len(PALETTE)]
         ax.plot(ep, mu, marker="o", ms=2.6, lw=1.4, color=c, label=nice(model))
-        if len(runs) &gt; 1:
+        if len(runs) > 1:
             ax.fill_between(ep, np.nanmin(mat, 0), np.nanmax(mat, 0), color=c, alpha=0.13, lw=0)
     ax.set_xlabel("epoch")
     ax.set_ylabel("val macro-F1")
@@ -241,14 +241,14 @@ def fig_seeds(sig, path):
 
 def fig_forest(sig, path, keep=None):
     pairs = [p for p in sig["pairs"]
-             if keep is None or {p["a"], p["b"]} &lt;= keep]
+             if keep is None or {p["a"], p["b"]} <= keep]
     if not pairs:
         return
     pairs.sort(key=lambda p: p["delta_f1_ens"])
     fig, ax = plt.subplots(figsize=(5.6, 0.5 * len(pairs) + 1.1))
     for i, p in enumerate(pairs):
         lo, hi = p["boot_ci_low"], p["boot_ci_high"]
-        sig_flag = (lo &gt; 0) or (hi &lt; 0)
+        sig_flag = (lo > 0) or (hi < 0)
         c = "#1D9E75" if sig_flag else "#B0483A"
         ax.plot([lo, hi], [i, i], lw=1.8, color=c, solid_capstyle="round")
         ax.plot(p["delta_f1_ens"], i, "o", ms=5.5, color=c, zorder=3)

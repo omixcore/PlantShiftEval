@@ -16,9 +16,9 @@ Protocol
    acc15      full 15-way accuracy (includes classes absent from PlantDoc)
    acc10      renormalised over the 10 classes that actually occur in the
               mapped PlantDoc subset -- removes the "can never be right" penalty
-   within     decision restricted to the true crop's classes -&gt; measures lesion
+   within     decision restricted to the true crop's classes -> measures lesion
               recognition given that the crop is known
-   crop_acc   accuracy of the *crop* implied by the predicted class -&gt; measures
+   crop_acc   accuracy of the *crop* implied by the predicted class -> measures
               whether the model still knows what plant it is looking at
 
 If a model's acc15 collapses but crop_acc stays high, the failure is in lesion
@@ -53,7 +53,7 @@ PD_FILES = [
     "data/pd_test-00000.parquet",
 ]
 
-# PlantDoc category (normalised) -&gt; PlantVillage class index
+# PlantDoc category (normalised) -> PlantVillage class index
 CATEGORY_MAP = {
     "apple scab leaf": 0,
     "apple rust leaf": 2,
@@ -70,17 +70,17 @@ CROP_OF = {0: 0, 1: 0, 2: 0, 3: 0, 4: 1, 5: 2, 6: 2,
            7: 3, 8: 3, 9: 3, 10: 3, 11: 4, 12: 4, 13: 4, 14: 4}
 
 
-def norm_cat(s: str) -&gt; str:
+def norm_cat(s: str) -> str:
     return " ".join(s.replace("_", " ").lower().split())
 
 
-def softmax(z: np.ndarray) -&gt; np.ndarray:
+def softmax(z: np.ndarray) -> np.ndarray:
     z = z - z.max(1, keepdims=True)
     e = np.exp(z)
     return e / e.sum(1, keepdims=True)
 
 
-def build_pd_cache(out: str = "cache_pd", size: int = 144) -&gt; dict:
+def build_pd_cache(out: str = "cache_pd", size: int = 144) -> dict:
     os.makedirs(out, exist_ok=True)
     xs, ys, kept_cat = [], [], []
     unmapped = collections.Counter()
@@ -96,7 +96,7 @@ def build_pd_cache(out: str = "cache_pd", size: int = 144) -&gt; dict:
                 if not cats:
                     continue
                 top, cnt = collections.Counter(cats).most_common(1)[0]
-                if cnt &lt; 0.5 * len(cats):
+                if cnt < 0.5 * len(cats):
                     multi += 1
                     continue
                 key = norm_cat(top)
@@ -172,7 +172,7 @@ def main():
     present = sorted(set(int(v) for v in y))
     print(f"PlantDoc mapped subset: {len(y)} images, classes {present}")
 
-    # group runs by model, then average the softmax over seeds -&gt; one entry per
+    # group runs by model, then average the softmax over seeds -> one entry per
     # model, computed with the same "3 runs" budget as the significance study
     groups: dict[str, list[str]] = {}
     for r in args.runs:
@@ -201,12 +201,12 @@ def main():
         p10 = probs[:, present]
         pred10 = np.asarray(present)[p10.argmax(1)]
         acc10 = float((pred10 == y).mean())
-        # within-crop, but only for crops that have &gt;1 class in this subset
+        # within-crop, but only for crops that have >1 class in this subset
         # (otherwise the metric is trivially 1.0 and inflates the mean)
         ok, n_w, chance = 0, 0, 0.0
         for i, yi in enumerate(y):
             cand = [c for c in present if CROP_OF.get(c) == CROP_OF[yi]]
-            if len(cand) &lt; 2:
+            if len(cand) < 2:
                 continue
             n_w += 1
             chance += 1.0 / len(cand)
@@ -236,11 +236,11 @@ def main():
             "within_n": int(n_w), "within_chance": within_chance,
             "crop_acc": crop_acc, "crop_macro": crop_macro,
             "acc15_seeds": seed_acc15,
-            "acc15_seed_sd": float(np.std(seed_acc15, ddof=1)) if len(seed_acc15) &gt; 1 else 0.0,
+            "acc15_seed_sd": float(np.std(seed_acc15, ddof=1)) if len(seed_acc15) > 1 else 0.0,
             "per_class": per_class,
             "mean_conf": float(probs.max(1).mean()),
         }
-        print(f"==&gt; {name:22s} n={len(dirs)} acc15={acc15:.3f} acc10={acc10:.3f} "
+        print(f"==> {name:22s} n={len(dirs)} acc15={acc15:.3f} acc10={acc10:.3f} "
               f"within={within:.3f}(ch={within_chance:.2f},n={n_w}) "
               f"crop={crop_macro:.3f} conf={results[name]['mean_conf']:.3f}",
               flush=True)
