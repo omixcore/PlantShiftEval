@@ -1073,10 +1073,7 @@ TABLE_LEGENDES = [
     ("Table 4", "Cross-dataset evaluation: zero-shot transfer and graded target-domain "
      "adaptation (batch-normalization re-estimation, linear probes at 1/5/10/25 labels "
      "per class, full fine-tuning), averaged over five stratified folds."),
-    ("Table 5", "Training-budget control. The two from-scratch configurations retrained "
-     "for twelve epochs at the same peak learning rate, three seeds each, with per-seed "
-     "macro-F1, seed mean and standard deviation, ensemble macro-F1 and expected "
-     "calibration error; the final row is the single-seed gate-initialisation control."),
+    ("Table 5", "Training-recipe comparison. The recorded six-epoch arm uses peak LR 1e-3, while the twelve-epoch arm uses peak LR 2e-3; because epoch count and learning rate change together, this is not an isolated training-budget control. Per-seed macro-F1, seed mean and standard deviation, ensemble macro-F1 and expected calibration error are reported; the final row is a single-seed gate-initialisation screen."),
 ]
 
 
