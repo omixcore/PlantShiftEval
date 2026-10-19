@@ -43,5 +43,29 @@ class SummaryConsistencyTests(unittest.TestCase):
             self.assertAlmostEqual(float(csv_by_model[model]["robust_acc"]), row["robust_acc"], places=4)
 
 
+class ProtocolAuditTests(unittest.TestCase):
+    def test_training_requires_internal_validation(self):
+        source = (ROOT / "src" / "train.py").read_text(encoding="utf-8")
+        self.assertIn("default=0.1", source)
+        self.assertIn("if not 0 < args.val_frac < 0.5:", source)
+        self.assertIn("A validation split from the training data is required", source)
+        self.assertNotIn("va_ld = te_ld", source)
+
+    def test_manuscript_qualifies_historical_claims(self):
+        source = (ROOT / "src" / "make_manuscript.py").read_text(encoding="utf-8")
+        self.assertIn("historical run metrics", source)
+        self.assertIn("scores are provisional", source)
+        self.assertNotIn("The two mechanisms show no measurable contribution", source)
+        self.assertNotIn("same peak learning rate", source)
+        self.assertNotIn("fully reproducible: code, per-run configurations, seeds, logs, trained weights", source)
+
+    def test_reproducibility_gaps_are_explicit(self):
+        docs = (ROOT / "docs" / "REPRODUCIBILITY.md").read_text(encoding="utf-8")
+        self.assertIn("runs/robustness_ms.json", docs)
+        self.assertIn("prediction logits", docs)
+        self.assertTrue((ROOT / "runs" / "latency.json").is_file())
+        self.assertTrue((ROOT / "runs" / "robustness.json").is_file())
+
+
 if __name__ == "__main__":
     unittest.main()
