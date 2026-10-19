@@ -787,8 +787,9 @@ def build_results(ms):
                 f"stays {(p25 - max(sw[k]['macro_f1_mean'] for k in sw)) * 100:.1f} points "
                 f"below the 25-shot probe on the same folds, and the spread across recipes "
                 f"is smaller than the fold-to-fold spread within any single recipe. The "
-                f"deficit is therefore a property of the representation and of the size of "
-                f"the labelled target split, not of the optimization schedule."
+                f"These results do not isolate representation, target-sample size, label "
+                f"mapping, or optimization as the cause of the deficit; the pooled-CV "
+                f"protocol is exploratory and requires independent validation."
                 )
     else:
         ms.p("Adaptation results pending.")
@@ -815,45 +816,28 @@ def build_results(ms):
         cm = cal["results"]
         g_pt, g_mtd, g_r18 = (cm["mtdnet_pt"]["mean"], cm["mtdnet"]["mean"],
                               cm["resnet18"]["mean"])
-        t_lo = min(s["source_T"]["T"] for m in cm for s in cm[m]["per_seed"])
-        t_hi = max(s["source_T"]["T"] for m in cm for s in cm[m]["per_seed"])
-        o_lo = min(s["oracle_T"]["ece"] for m in cm for s in cm[m]["per_seed"])
-        o_hi = max(s["oracle_T"]["ece"] for m in cm for s in cm[m]["per_seed"])
+        o_lo = min(s["oracle_T"]["ece"] for model in cm for s in cm[model]["per_seed"])
+        o_hi = max(s["oracle_T"]["ece"] for model in cm for s in cm[model]["per_seed"])
         ms.p(
-            f"We then asked whether any of this is repairable without a single target "
-            f"label. Temperature scaling fits one scalar by minimising negative "
-            f"log-likelihood on data whose labels we do have \u2014 the source test split "
-            f"\u2014 and applies it unchanged to the target. Because "
-            f"argmax(z/T) = argmax(z), accuracy cannot move, so any change in ECE is pure "
-            f"calibration effect. The intervention backfires in every seed of every model. "
-            f"The source-fitted temperature is below one throughout ({f2(t_lo)} to "
-            f"{f2(t_hi)}): the source models are slightly under-confident, so the transform "
-            f"sharpens exactly the domain where over-confidence is the problem. Target ECE "
-            f"rises from {f3(g_mtd['raw_ece_mean'])} to {f3(g_mtd['source_T_ece_mean'])} "
-            f"for MTD-Net, {f3(g_pt['raw_ece_mean'])} to "
-            f"{f3(g_pt['source_T_ece_mean'])} for MTD-P and {f3(g_r18['raw_ece_mean'])} to "
-            f"{f3(g_r18['source_T_ece_mean'])} for ResNet-18. An oracle temperature fitted "
-            f"on target labels, in contrast, brings ECE down to {f3(o_lo)}\u2013{f3(o_hi)} "
-            f"without touching accuracy. The residual miscalibration is therefore a single "
-            f"scalar wide, yet that scalar is not estimable from the source distribution: "
-            f"confidence does not transfer any better than the features do. The practical "
-            f"consequence is that a source-trained model should not be trusted to report "
-            f"its own reliability on a new domain, and that target labels, not a cleverer "
-            f"post-hoc estimator, are what buys calibration \u2014 fine-tuning reaches "
-            f"ECE {f3(adapt['results']['mtdnet_pt_s0']['methods']['finetune']['ece'])}.")
-
+            f"On the mapped PlantDoc subset, source-fitted temperature scaling increases "
+            f"ECE for MTD-Net ({f3(g_mtd['raw_ece_mean'])} to {f3(g_mtd['source_T_ece_mean'])}), "
+            f"MTD-P ({f3(g_pt['raw_ece_mean'])} to {f3(g_pt['source_T_ece_mean'])}), and "
+            f"ResNet-18 ({f3(g_r18['raw_ece_mean'])} to {f3(g_r18['source_T_ece_mean'])}). "
+            f"The target-label-fitted oracle reduces ECE to {f3(o_lo)}–{f3(o_hi)}, but it is "
+            f"a diagnostic upper bound, not a label-free deployment method. Adaptation and "
+            f"calibration numbers are based on pooled-target cross-validation and remain "
+            f"exploratory rather than independent held-out estimates."
+        )
 
     ms.h("What the models look at", 2)
     ms.p(
-        "Grad-CAM overlays (Figure 8) are consistent with the quantitative error "
-        "structure. On source images all three networks concentrate on lesions. On the "
-        "architecture side, MTD-Net's high-resolution path produces more spatially "
-        "contour-hugging maps than the plain CNN's diffuse blobs, which is the intended "
-        "effect of retaining H/4 resolution. But no network is spared the crop-level "
-        "confusions of Figure 5, which the maps localize to whole-leaf and background "
-        "context rather than to lesion morphology \u2014 visual confirmation that the "
-        "binding constraint under shift is crop identity, not lesion representation.")
-
+        "Grad-CAM overlays are qualitative diagnostics. The recorded maps may suggest "
+        "differences in spatial focus between MTD-Net and the plain CNN, but they do not "
+        "establish causal feature reliance or prove that crop identity is the binding "
+        "constraint under domain shift. Any crop-versus-lesion interpretation remains "
+        "conditional on the mapped PlantDoc subset and should be tested with independent "
+        "annotations or controlled interventions."
+    )
 
 # --------------------------------------------------------------------------- #
 # discussion
@@ -862,90 +846,64 @@ def build_discussion(ms):
     p_pre = pair("resnet18", "mtdnet")
     p_mtd = pair("mtdnet", "smallcnn")
     ms.h("Discussion", 1)
+    p_pt = pair("mtdnet_pt", "resnet18")
+    mtd_mean = summary["mtdnet"]["macro_f1"]
+    cnn_mean = summary["smallcnn"]["macro_f1"]
+    mtd_sd = summary["mtdnet"]["macro_f1_sd"]
     ms.p(
-        "The headline finding is a conditional asymmetry. Texture\u2013appearance "
-        "decoupling, motivated by the texture bias of ImageNet-trained networks and by the "
-        "crop-identity confound of laboratory leaf datasets, produces a real gain "
-        f"({f2(p_mtd['delta_f1_ens'] * 100)} ensemble points at six epochs"
-        + (f", {f2(D12_ENS)} at twelve" if D12_ENS is not None else "")
-        + ") when both competitors are trained from scratch, and no measurable gain once "
-        "both start from the same ImageNet weights. The magnitude of the first gain depends "
-        "on the budget; its existence does not; the second is null at either budget we "
-        "tested. Pre-training itself is worth "
-        f"{f2(PRE6 if PRE6 is not None else p_pre['delta_f1_ens'] * 100)} points over the "
-        "same architecture trained from scratch at six epochs"
-        + (f", and {f2(PRE12)} points once that model is trained for twelve"
-           if PRE12 is not None else "")
-        + ", so a large part of what reads as an initialization effect is a budget effect. "
-        "This ordering is the plant-pathology instantiation of a pattern documented on "
-        "natural images and medical "
-        "imaging:[[kornblith2019]][[raghu2019]][[zoph2020]] at small data scales, the "
-        "initialization dominates the inductive bias supplied by the architecture. We do "
-        "not read this as an argument against domain-informed design; we read it as a "
-        "measurement instruction \u2014 architectural claims in this field should be "
-        "quantified in the from-scratch regime with matched budgets, matched initialization "
-        "and multiple seeds, or they are confounded with one of the two.")
+        f"The recorded six-epoch results do not justify a universal architecture-superiority "
+        f"claim. MTD-Net's mean macro-F1 is {f3(mtd_mean)} (SD {f3(mtd_sd)}) versus "
+        f"{f3(cnn_mean)} for the parameter-matched plain CNN, a mean difference of "
+        f"{f2(p_mtd['delta_f1_mean_seeds'] * 100)} points. The paired seed-level test is "
+        f"inconclusive at n = 3 (p = {f3(p_mtd['ttest_seed_p'])}), even though the "
+        f"image-level ensemble comparison is positive on the recorded test set. MTD-P and "
+        f"ResNet-18 are nearly tied on in-domain macro-F1. The evidence is therefore "
+        f"consistent with a conditional texture/appearance-decoupling hypothesis, not "
+        f"with an established general benefit from the new architecture."
+    )
     ms.p(
-        "The seed-variance result deserves equal emphasis. MTD-Net's across-seed standard "
-        "deviation (4.7 macro-F1 points) exceeded its own mean advantage (3.1 points); "
-        "had we run a single seed \u2014 the field's default \u2014 we could have reported "
-        "anything between +1 and +8.6 points. Single-run leaderboard papers in plant "
-        "disease classification are therefore operating well below the noise floor of "
-        "their own experimental setup.[[roberts2021]][[kapoor2023]] Ensembles, multi-seed reporting, and paired "
-        "image-level tests are cheap on modern hardware and change conclusions, not "
-        "merely error bars.")
+        f"Seed variation is important: MTD-Net's across-seed SD ({f2(mtd_sd * 100)} "
+        f"points) exceeds the mean difference from the plain CNN "
+        f"({f2(p_mtd['delta_f1_mean_seeds'] * 100)} points). With only three seeds, both "
+        f"quantities are imprecise; a single run could give a materially different "
+        f"impression. This supports reporting seed variation for this experiment, but does "
+        f"not quantify how common the problem is across the plant-disease literature."
+    )
     ms.p(
-        "The transfer experiments locate the practical bottleneck. Zero-shot collapse to "
-        "roughly 24 percent is driven mainly by crop misidentification, with within-crop "
-        "lesion recognition preserved at roughly 1.4 times chance; models remain "
-        "confident throughout. This decomposes the problem into two targets: crop-level "
-        "covariate shift, which batch-normalization re-estimation partially repairs for "
-        "free, and lesion-level semantics, which requires labeled target data at rates "
-        "consistent with the few-shot literature. A crop-first, disease-second pipeline, "
-        "or explicit crop conditioning, follows directly from this decomposition and is "
-        "testable within the same protocol. Statistic-level repairs such as AdaBN and "
-        "test-time entropy minimisation offer complementary label-free "
-        "routes.[[schneider2020]][[tent2021]]")
+        "The mapped PlantDoc results show a large source-to-target drop, but the current "
+        "category mapping and dominant-object filter narrow the field-image problem. "
+        "Within-crop and crop-accuracy metrics provide a descriptive decomposition rather "
+        "than causal proof that crop identity is the sole source of error. Adaptation results "
+        "use five-fold cross-validation over pooled target shards and are exploratory; they "
+        "must not be described as an independent held-out target evaluation."
+    )
     ms.p(
-        "Limitations. Our source domain is one laboratory dataset and one family of "
-        "architectures; the decoupling hypothesis is tested at one data scale per arm, "
-        "three seeds per configuration, and one input resolution. The corruption "
-        "benchmark is synthetic and its severities, chosen to stress models, do not span "
-        "the natural range. The PlantDoc subset is mapped by category name and dominant-"
-        "object filtering, which removes novel-crop shift but also removes part of the "
-        "real deployment problem. Statistical power at three seeds is limited; we "
-        "mitigate it with image-level paired tests and ensembles rather than claiming "
-        "seed-level significance. Finally, all experiments ran on CPU at 112-pixel "
-        "resolution for tractability; modern pipelines operate at higher resolution, and "
-        "we cannot exclude that the texture path's advantage grows with resolution.")
+        "Limitations and audit status. The main comparisons have three seeds, one input "
+        "resolution, and one capped-data protocol in the tracked results. The full uncapped "
+        "data-scaling arm is not included in this snapshot. Synthetic corruptions do not "
+        "replace real external-domain testing. The exact PlantDoc Parquet revision, license, "
+        "checksums, package lock, trained weights, logits, and full training logs are not "
+        "included. Most importantly, the historical metric files lack validation-split "
+        "metadata, and the mirrored training script previously allowed test-set checkpoint "
+        "selection when no internal validation split was supplied. Therefore, the reported "
+        "scores are provisional and should be regenerated with the corrected validation "
+        "protocol before any definitive paper claim."
+    )
     if opt is not None and "mtdnet" in opt and "smallcnn" in opt:
-        om, oc = opt["mtdnet"], opt["smallcnn"]
         ms.p(
-            f"The budget control changes how two of our own findings should be read, and "
-            f"that is the most transferable lesson here. At twelve epochs the from-scratch "
-            f"models reach {f3(om['opt_mean'])} and {f3(oc['opt_mean'])} "
-            f"macro-F1 with seed spreads of {f2(om['opt_sd'] * 100)} and "
-            f"{f2(oc['opt_sd'] * 100)} points, against {f3(om['base_mean'])} and "
-            f"{f3(oc['base_mean'])} with spreads of {f2(om['base_sd'] * 100)} and "
-            f"{f2(oc['base_sd'] * 100)} at six. A reader of the six-epoch table alone would "
-            f"conclude that from-scratch training of this family is unstable and that "
-            f"decoupling is worth several points; a reader of the twelve-epoch table would "
-            f"conclude that the instability was an artifact and that the architectural "
-            f"effect, while real, is worth about one point. Both readings come from the "
-            f"same architecture, dataset and seeds. Budget is therefore a hidden moderator "
-            f"in this literature alongside pre-training, and single-budget, single-seed "
-            f"comparisons cannot distinguish the two.")
-        ms.p(
-            f"The same logic applies to the repair experiments. Neither a lower learning "
-            f"rate, a longer fine-tune, frozen batch normalization nor head-only training "
-            f"moves the from-scratch model past the 25-shot linear probe on the target "
-            f"domain, and no source-fitted temperature improves target calibration. What "
-            f"separates the arms that work from the arms that do not is information from "
-            f"the target domain \u2014 labels, or at minimum its unlabeled statistics in "
-            f"the case of batch-normalization re-estimation \u2014 not optimization "
-            f"effort. This is a compact statement of what transfer can and cannot be "
-            f"tuned into a model, and it argues for budgeting annotation rather than "
-            f"compute when a plant-disease model leaves the dataset it was trained on.")
+            "The twelve-epoch comparison also changes peak learning rate from 1e-3 to "
+            "2e-3. Both scratch models improve under that combined recipe, but the available "
+            "comparison cannot separate the effect of epoch count from learning rate. It "
+            "should be described as training-recipe sensitivity, not as a causal training-"
+            "budget effect."
+        )
+    ms.p(
+        "Before drawing conclusions about deployment, the experiment should be rerun with "
+        "a validation split drawn only from the training data, checkpoint selection based "
+        "only on that validation split, and one final evaluation on the untouched test set. "
+        "A separate PlantDoc holdout and pinned data/software provenance are also required "
+        "for a stronger generalization claim."
+    )
     ms.p(
         "Beyond classification, the same reporting discipline matters across plant "
         "phenotyping[[pound2017]][[ubbens2017]][[singh2018stress]] and genomic "
@@ -966,15 +924,18 @@ def build_discussion(ms):
 def build_conclusion(ms):
     ms.h("Conclusion", 1)
     ms.p(
-        "In a seed-replicated, two-dataset evaluation, a purpose-built decoupled "
-        "architecture improved leaf-disease classification only before pre-training was "
-        "introduced, its individual mechanisms contributed nothing measurable, and "
-        "neither structure nor pre-training preserved accuracy under zero-shot field "
-        "shift \u2014 which batch-normalization re-estimation and modest numbers of "
-        "target labels repaired to a practically useful degree. The binding constraints "
-        "in this domain are pre-training and target adaptation, not novel architectures. "
-        "We release all code, configurations, seeds and result files so that the "
-        "protocol, not only the numbers, can be reused.")
+        "The tracked results make texture/appearance decoupling a useful hypothesis to "
+        "test, not an established advantage. At six epochs, the mean macro-F1 difference "
+        "from a parameter-matched CNN is modest relative to MTD-Net's seed variation; "
+        "the gate and auxiliary-head ablations do not establish independent benefits, and "
+        "the pretrained model is effectively tied with ResNet-18 in-domain. Synthetic "
+        "corruption and mapped PlantDoc transfer answer different questions, with poor "
+        "zero-shot transfer under the current mapping. Because the historical metrics lack "
+        "validation-split metadata and the prior training entry point could select "
+        "checkpoints on the test split, these scores remain provisional. The headline "
+        "experiments must be rerun with training-internal validation and a single final "
+        "test evaluation before definitive conclusions are drawn."
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -1128,23 +1089,24 @@ TABLE_LEGENDES = [
 # --------------------------------------------------------------------------- #
 def build_backmatter(ms):
     ms.h("Acknowledgments", 1)
-    ms.p("The authors thank the maintainers of the PlantVillage and PlantDoc datasets "
-         "and of PyTorch, and the anonymous reviewers for comments that improved the "
-         "statistical protocol. This research received no specific grant.")
+    ms.p("[Add verified acknowledgments and funding information before submission. Do not retain unverified funding or reviewer statements.]")
     ms.h("Author Contributions", 1)
-    ms.p("First A. Author: conceptualization, methodology, software, investigation, "
-         "writing \u2013 original draft. Second B. Author: data curation, validation, "
-         "writing \u2013 review and editing. Third C. Author: supervision, statistical "
-         "analysis, writing \u2013 review and editing.")
+    ms.p("[Replace author placeholders and assign contributions only after confirmation by all authors.]")
     ms.h("Competing Interests", 1)
-    ms.p("The authors declare no competing interests.")
+    ms.p("[Authors must confirm and complete the competing-interests declaration before submission.]")
     ms.h("Data Availability Statement", 1)
-    ms.p("All data used are publicly available: PlantVillage "
-         "(https://github.com/spMohanty/PlantVillage-Dataset) and PlantDoc "
-         "(https://github.com/pratikkayal/PlantDoc-Dataset). The complete code base, "
-         "per-run configurations, seeds, logs, trained weights and result files are "
-         "provided in the accompanying repository (data and code: see Supporting "
-         "Information). No new data were generated.")
+    ms.p(
+        "Source code, run-level classification metrics, and aggregate numeric summaries "
+        "are available at https://github.com/omixcore/PlantShiftEval. The current repository "
+        "snapshot does not include raw images, tensor caches, trained weights, all prediction "
+        "logits, complete training logs, or the raw per-seed per-condition corruption records "
+        "needed to rebuild every aggregate. The exact PlantDoc Parquet revision, license, "
+        "checksums, and a locked software environment remain to be supplied. The dataset "
+        "sources and unresolved provenance items are documented in docs/DATA_PROVENANCE.md. "
+        "The reported metrics are historical and should be regenerated after correcting the "
+        "validation protocol before publication."
+    )
+
 
 
 def build_references(ms):
@@ -1380,20 +1342,22 @@ def build_tables():
 # --------------------------------------------------------------------------- #
 # cover letter
 # --------------------------------------------------------------------------- #
-COVER = """Dear Editors,
+COVER = """[DRAFT ONLY — DO NOT SUBMIT UNTIL THE VALIDATION-SPLIT AUDIT IS RESOLVED AND ALL AUTHOR METADATA IS VERIFIED.]
 
-We submit our manuscript, "{title}", for consideration as an Original Article in the Annals of the New York Academy of Sciences.
+Dear Editors,
 
-Plant-disease classification is one of the most active application areas of deep learning, yet its reporting standards lag behind its volume: single-run evaluations on laboratory datasets are common, and architectural novelty is frequently credited for gains that are confounded with ImageNet pre-training. Our manuscript provides the controlled, seed-replicated evaluation that this literature lacks.
+We are preparing the manuscript, "{title}", as an original methodological study of texture-oriented representations in plant disease recognition. Rather than claiming universal superiority for MTD-Net, the study asks whether texture/appearance decoupling produces a repeatable gain once seed variation, training recipe, pre-training, synthetic corruption, and cross-domain transfer are considered.
 
-The study makes five contributions. (1) A purpose-built, texture-appearance decoupled network is compared against parameter-matched and pre-trained controls with three seeds per configuration, soft-voting ensembles, exact McNemar tests, paired-bootstrap confidence intervals and Holm correction. (2) A training-budget control shows that the seed-level variance which obscures the architectural effect at six epochs is an artifact of the budget: at twelve epochs the spread collapses by an order of magnitude and the effect becomes seed-detectable, while most of the apparent advantage of pre-training disappears - a direct warning for single-run, single-budget studies in this field. (3) The remaining architectural gain is conditional: it is null once both models start from the same ImageNet weights, and it widens, rather than shrinks, under synthetic image corruption. (4) Zero-shot transfer to the field-image dataset PlantDoc collapses all models; we localize the failure to crop identity rather than lesion recognition, and show that neither source-fitted temperature scaling nor any fine-tuning recipe we tried repairs either the accuracy or the calibration without target labels. (5) A graded set of target-domain adaptations (unlabeled batch-normalization re-estimation, few-shot linear probes, fine-tuning), evaluated by five-fold cross-validation, quantifies how many target labels repair the gap.
+The recorded six-epoch results show a modest mean macro-F1 difference between MTD-Net and a parameter-matched plain CNN, but the paired seed-level comparison is inconclusive with three seeds. The gate and auxiliary-head ablations do not establish independent benefits, and MTD-P is effectively tied with ResNet-18 on in-domain macro-F1. The mapped PlantDoc results show a substantial source-to-target gap; the adaptation analyses use pooled five-fold cross-validation and are exploratory.
 
-All experiments ran on CPU-only hardware and are fully reproducible: code, per-run configurations, seeds, logs, trained weights and every result file are included in the submission. All quantitative statements in the manuscript are generated programmatically from those files. The datasets used are public; no new data were collected and no ethical approval was required.
+A post hoc code audit identified a material limitation: the historical metric files do not preserve validation-split metadata, while the mirrored training entry point previously allowed test-set checkpoint selection when no training-internal validation split was supplied. We have changed the current entry point to require a nonzero validation split, but the historical experiments have not yet been rerun. We therefore do not present the recorded scores as definitive, unbiased held-out estimates and will not submit the manuscript until the headline comparisons are regenerated under the corrected protocol.
 
-We confirm that this manuscript is original, is not under consideration elsewhere, and that all authors have approved the submission. We suggest no reviewers with conflicts of interest.
+The public repository currently contains source code, run-level classification metrics, and aggregate summaries, but not the raw datasets, caches, trained weights, complete logits, full training logs, or all per-seed corruption inputs. Dataset provenance and software-environment pinning also require completion before a full reproducibility claim is appropriate.
+
+[Before submission, replace all author and affiliation placeholders and verify author approval, funding, ethics, competing-interests, originality, and reviewer-conflict statements.]
 
 Sincerely,
-The Authors
+[Corresponding author]
 """
 
 
