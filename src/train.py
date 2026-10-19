@@ -21,21 +21,21 @@ from torchvision.transforms import v2 as T
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import load_cache  # noqa: E402
 from models import build_model, count_params  # noqa: E402
+from run_provenance import complete_manifest, split_record, write_manifest  # noqa: E402
 
 
 class BgSwapField:
     """Paste the leaf onto a field background (copy-paste augmentation).
 
-    Why: on PlantVillage the background is a uniform studio backdrop, so the
-    crop head can learn "grey backdrop + leaf fills frame" instead of leaf
-    morphology.  That shortcut is what collapses on PlantDoc, where apple leaves
-    get predicted as maize.  Replacing the backdrop with an actual field scene
-    (and jittering scale/position) removes the shortcut at training time.
+    Motivation: backdrop and framing differences are potential shortcuts, but
+    their causal contribution to PlantDoc errors has not been isolated.
+    Compositing field scenes tests one augmentation hypothesis; it does not
+    establish that shortcuts are removed. Target-image access is transductive.
 
     Procedure
     ---------
-    1. estimate the backdrop colour from the 6-pixel border (PlantVillage
-       backgrounds are near-uniform, so this is reliable),
+    1. estimate the backdrop colour from the 6-pixel border (a heuristic that
+       can fail on nonuniform backgrounds),
     2. take the largest connected component of pixels far from that colour,
        fill holes -> leaf mask,
     3. composite the leaf, scaled 0.7-1.0x and placed at a random offset, onto
@@ -171,19 +171,18 @@ def evaluate(model, loader, device):
 
 
 def build_bg_bank(args, sigma: float = 2.5) -> torch.Tensor:
-    if getattr(args, "bg_gray", False):
-        return _gray_bank(args, sigma)
     """Blurred, *unlabeled* PlantDoc frames used as field backdrops.
 
-    Only the pixels are used, never the labels: this is transductive
-    augmentation, equivalent to collecting a pile of background photographs.
+    Only pixels are used. This is transductive target-image access, which must
+    be disclosed even when no target labels are read.
     """
+    if getattr(args, "bg_gray", False):
+        return _gray_bank(args, sigma)
     return _color_bank(args, sigma)
 
 
 def _gray_bank(args, sigma):
-    """Grayscale backdrops: removes the vegetation-colour shortcut that the
-    blurred field frames otherwise reintroduce (see report/bg_aug_compare)."""
+    """Grayscale backdrop ablation; any shortcut reduction is a hypothesis."""
     x = np.load(os.path.join(args.bg_cache, "x.npy"))
     out = np.empty_like(x)
     for i in range(len(x)):
@@ -196,6 +195,7 @@ def _gray_bank(args, sigma):
 
 
 def _color_bank(args, sigma):
+    p = os.path.join(args.bg_cache, "x.npy")
     x = np.load(p)
     out = np.empty_like(x)
     for i in range(len(x)):
@@ -207,6 +207,7 @@ def _color_bank(args, sigma):
 
 
 def train_one(args, meta, tr, te, va=None):
+    random.seed(args.seed)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
     torch.set_num_threads(args.threads)
@@ -286,6 +287,9 @@ def train_one(args, meta, tr, te, va=None):
     out = {
         "model": args.model, "seed": args.seed, "params": n_par,
         "val_split": va is not None,
+        "val_frac": args.val_frac, "split_seed": 1234,
+        "selection_metric": "validation_macro_f1",
+        "test_evaluations": 1, "protocol_version": 1,
         "epochs": args.epochs, "lr": args.lr, "batch": args.bs,
         "bg_aug": bool(args.bg_aug), "bg_p": args.bg_p,
         "crop_balance": bool(args.crop_balance),
@@ -324,17 +328,24 @@ def main():
     p.add_argument("--bg-p", type=float, default=0.7, help="probability of background swap")
     p.add_argument("--bg-sigma", type=float, default=2.5, help="blur applied to backgrounds")
     p.add_argument("--bg-gray", action="store_true",
-                   help="grayscale the background frames (kill the colour shortcut)")
+                   help="grayscale the background frames (colour ablation)")
     p.add_argument("--crop-balance", action="store_true",
                    help="sample crops with equal probability")
     args = p.parse_args()
     if not 0 < args.val_frac < 0.5:
         p.error("--val-frac must be greater than 0 and less than 0.5; checkpoint selection must use training-internal validation, not the test split.")
 
+    if args.epochs < 1 or args.bs < 1 or args.limit < 0:
+        p.error("--epochs and --bs must be positive; --limit must be nonnegative")
+    if os.path.exists(args.out) and os.listdir(args.out):
+        p.error("--out must be empty or new; preserve previous experiment artifacts")
     os.makedirs(args.out, exist_ok=True)
     meta, tr, te = load_cache(args.cache)
+    source_size = len(tr.labels)
+    source_indices = np.arange(source_size)
     if args.limit:
         idx = np.random.RandomState(0).permutation(len(tr.labels))[:args.limit]
+        source_indices = source_indices[idx]
         tr.images, tr.labels, tr.species = tr.images[idx], tr.labels[idx], tr.species[idx]
 
     va = None
@@ -344,10 +355,15 @@ def main():
         perm = rs.permutation(len(tr.labels))
         n_va = int(round(args.val_frac * len(perm)))
         va_idx, tr_idx = perm[:n_va], perm[n_va:]
+        split = split_record(source_indices[tr_idx], source_indices[va_idx], source_size)
+        if len(tr_idx) < args.bs:
+            p.error("Training partition is smaller than --bs; drop_last would produce zero optimizer steps")
         va = Split(tr.images[va_idx], tr.labels[va_idx], tr.species[va_idx])
         tr = Split(tr.images[tr_idx], tr.labels[tr_idx], tr.species[tr_idx])
         print(f"[split] train={len(tr.labels)} val={len(va.labels)} test={len(te.labels)}", flush=True)
+    manifest_path = write_manifest(args, split, sys.argv)
     res = train_one(args, meta, tr, te, va)
+    complete_manifest(manifest_path)
     print(json.dumps({k: v for k, v in res.items()
                       if k not in ("history", "confusion")}, ensure_ascii=False))
 

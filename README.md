@@ -40,6 +40,8 @@ Source-fitted temperature scaling worsens target-domain ECE in the recorded anal
 
 ## Contents and remaining gaps
 
+The [corrected experiment plan](docs/CORRECTED_EXPERIMENT_PLAN.md) translates the three research questions into matched controls, a five-seed epoch-by-learning-rate factorial study, reporting rules, and an explicit evidence-status table. It is a prospective plan, not a report of completed training. New training runs preserve original-cache validation indices, complete arguments, input/source/output SHA-256 fingerprints and environment metadata in `run_manifest.json`; existing output directories cannot be overwritten.
+
 - `src/`: training, evaluation, reporting, and manuscript-generation scripts.
 - `runs/*/metrics.json`, `runs12/*/metrics.json`: run-level classification metrics; no weights or logits.
 - `runs/latency.json`, `runs/robustness.json`: recorded latency and single-seed corruption inputs.

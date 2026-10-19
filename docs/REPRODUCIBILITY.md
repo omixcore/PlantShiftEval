@@ -8,6 +8,8 @@ This repository includes Python source, run-level classification metric JSONs, a
 
 The current `src/train.py` defaults to `--val-frac 0.1`, rejects zero, and refuses to run checkpoint selection without a training-internal validation split. This protects future runs; it does not retroactively fix the historical metrics.
 
+For the corrected control matrix and reporting decisions, see [CORRECTED_EXPERIMENT_PLAN.md](CORRECTED_EXPERIMENT_PLAN.md). Each new run saves `run_manifest.json` before training and marks it completed only after hashing the checkpoint, metrics and logits. It records full arguments, original-cache training/validation indices, input and source hashes, Git revision/dirty status, Python/package versions and target-background access. It is a local audit record, not upstream dataset verification. Console logs and an environment lock must still be archived separately. Output directories must be new or empty to prevent overwriting previous runs. Background augmentation uses target images and must be reported as transductive, even without target labels.
+
 ## Environment
 
 Python 3.10 or newer is required.
