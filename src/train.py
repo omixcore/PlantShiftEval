@@ -234,11 +234,10 @@ def train_one(args, meta, tr, te, va=None):
     te_ld = DataLoader(te_ds, batch_size=128, shuffle=False, num_workers=0)
     # When a validation split is available, epoch selection uses it and the test
     # split is touched exactly once, after training.
-    if va is not None:
-        va_ld = DataLoader(LeafDS(va.images, va.labels, va.species, False, args.size),
-                           batch_size=128, shuffle=False, num_workers=0)
-    else:
-        va_ld = te_ld
+    if va is None:
+        raise ValueError("A validation split from the training data is required; never select checkpoints on the test split.")
+    va_ld = DataLoader(LeafDS(va.images, va.labels, va.species, False, args.size),
+                       batch_size=128, shuffle=False, num_workers=0)
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
     steps = max(1, len(tr_ld) * args.epochs)
@@ -317,8 +316,8 @@ def main():
     p.add_argument("--threads", type=int, default=16)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--limit", type=int, default=0, help="cap training set (debug)")
-    p.add_argument("--val-frac", type=float, default=0.0,
-                   help="hold out this fraction of the training split for epoch selection")
+    p.add_argument("--val-frac", type=float, default=0.1,
+                   help="hold out this fraction of the training split for epoch selection (required to protect the test split)")
     p.add_argument("--bg-aug", action="store_true",
                    help="paste leaves onto unlabeled field backgrounds (copy-paste aug)")
     p.add_argument("--bg-cache", default="cache_pd", help="source of background frames")
@@ -329,6 +328,8 @@ def main():
     p.add_argument("--crop-balance", action="store_true",
                    help="sample crops with equal probability")
     args = p.parse_args()
+    if not 0 < args.val_frac < 0.5:
+        p.error("--val-frac must be greater than 0 and less than 0.5; checkpoint selection must use training-internal validation, not the test split.")
 
     os.makedirs(args.out, exist_ok=True)
     meta, tr, te = load_cache(args.cache)

@@ -1,0 +1,9 @@
+{
+  "mobilenet_v3_small_s0": 7.54,
+  "mtd_concat_s0": 10.01,
+  "mtd_single_s0": 9.26,
+  "mtdnet_pt_s0": 16.28,
+  "mtdnet_s0": 8.84,
+  "resnet18_s0": 10.85,
+  "smallcnn_s0": 5.31
+}
