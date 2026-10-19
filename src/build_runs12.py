@@ -20,7 +20,7 @@ SRC = {
 DST = "runs12"
 
 
-def main() -&gt; None:
+def main() -> None:
     os.makedirs(DST, exist_ok=True)
     n = 0
     for model, tpl in SRC.items():
@@ -34,7 +34,7 @@ def main() -&gt; None:
                 shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
             with open(os.path.join(dst, "metrics.json"), encoding="utf-8") as fh:
                 m = json.load(fh)
-            print(f"{src} -&gt; {dst}  f1={m['test_macro_f1']:.4f} epochs={m['epochs']}")
+            print(f"{src} -> {dst}  f1={m['test_macro_f1']:.4f} epochs={m['epochs']}")
             n += 1
     print(f"copied {n} runs into {DST}")
 

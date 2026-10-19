@@ -46,9 +46,9 @@ def main():
     with open("report/bg_aug_compare.json", "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
-    print(f"source test macro-F1 : {f1b:.4f} +- {sdb:.4f}  -&gt;  {f1n:.4f} +- {sdn:.4f}")
-    print(f"source test acc      : {accb:.4f}  -&gt;  {accn:.4f}")
-    print(f"{'metric':22s}{'baseline':&gt;10s}{'bg_aug':&gt;10s}{'delta':&gt;9s}")
+    print(f"source test macro-F1 : {f1b:.4f} +- {sdb:.4f}  ->  {f1n:.4f} +- {sdn:.4f}")
+    print(f"source test acc      : {accb:.4f}  ->  {accn:.4f}")
+    print(f"{'metric':22s}{'baseline':>10s}{'bg_aug':>10s}{'delta':>9s}")
     for k, v in out["plantdoc"].items():
         print(f"{k:22s}{v['baseline']:10.3f}{v['bg_aug']:10.3f}{v['delta']:+9.3f}")
     print("per-crop crop-identity recall:")

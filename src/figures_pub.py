@@ -117,7 +117,7 @@ def fig1_arch(outdir):
                 fontsize=fs, zorder=4, linespacing=1.3)
 
     def arrow(x1, y1, x2, y2, lw=0.7, color=C["black"], ls="-", rad=0.0):
-        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|&gt;",
+        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>",
                                      mutation_scale=7, lw=lw, color=color,
                                      linestyle=ls, shrinkA=1.5, shrinkB=1.5,
                                      connectionstyle=f"arc3,rad={rad}", zorder=2))
@@ -292,7 +292,7 @@ def fig3_classes(outdir):
         gap = per["mtdnet_pt"] - per["mtdnet"]
         worst = np.argsort(gap)[:3]
         for i in worst:
-            if gap[i] &lt; 0.06:
+            if gap[i] < 0.06:
                 ax.annotate("", xy=(i, 1.0), xytext=(i, 1.0),
                             arrowprops=None)
         ax.set_title("per-class F1, 3-seed ensemble", fontsize=7.2)
@@ -407,9 +407,9 @@ def fig5_cross(outdir):
         ax.set_yticklabels(crops, fontsize=6)
         for i in range(cm.shape[0]):
             for j in range(cm.shape[1]):
-                if cm[i, j] &gt; 0.02:
+                if cm[i, j] > 0.02:
                     ax.text(j, i, f"{cm[i, j]:.2f}", ha="center", va="center",
-                            fontsize=5.2, color="white" if cm[i, j] &gt; 0.55 else C["black"])
+                            fontsize=5.2, color="white" if cm[i, j] > 0.55 else C["black"])
         ax.set_xlabel("predicted crop")
         ax.set_ylabel("true crop")
         ax.set_title("where the errors go (MTD-P)", fontsize=7.2)
@@ -500,7 +500,7 @@ def fig7_robust(outdir):
         return None
     M = np.array([[float(np.mean(cells[m][c])) if cells[m].get(c) else np.nan
                    for c in conds] for m in order])
-    SD = np.array([[float(np.std(cells[m][c], ddof=1)) if len(cells[m].get(c, [])) &gt; 1
+    SD = np.array([[float(np.std(cells[m][c], ddof=1)) if len(cells[m].get(c, [])) > 1
                     else 0.0 for c in conds] for m in order])
 
     fig, (ax, bx) = plt.subplots(
@@ -514,9 +514,9 @@ def fig7_robust(outdir):
     for i in range(M.shape[0]):
         for j in range(M.shape[1]):
             if not np.isnan(M[i, j]):
-                txt = f"{M[i, j]:.2f}" + (f"\n±{SD[i, j]:.2f}" if SD[i, j] &gt; 0.0005 else "")
+                txt = f"{M[i, j]:.2f}" + (f"\n±{SD[i, j]:.2f}" if SD[i, j] > 0.0005 else "")
                 ax.text(j, i, txt, ha="center", va="center", fontsize=4.9,
-                        color="white" if M[i, j] &lt; 0.5 else C["black"])
+                        color="white" if M[i, j] < 0.5 else C["black"])
     cb = fig.colorbar(im, ax=ax, fraction=0.028, pad=0.012)
     cb.set_label("mean accuracy", fontsize=6.4)
     cb.ax.tick_params(labelsize=5.8)
@@ -529,13 +529,13 @@ def fig7_robust(outdir):
     for m in order:
         cl = cells[m]["clean"]
         clean_mu.append(float(np.mean(cl)))
-        clean_sd.append(float(np.std(cl, ddof=1)) if len(cl) &gt; 1 else 0.0)
+        clean_sd.append(float(np.std(cl, ddof=1)) if len(cl) > 1 else 0.0)
         n_seed = max(len(v) for v in cells[m].values())
         per_seed = [np.mean([cells[m][c][k] for c in conds[1:]
-                             if c in cells[m] and k &lt; len(cells[m][c])])
+                             if c in cells[m] and k < len(cells[m][c])])
                     for k in range(n_seed)]
         rob_mu.append(float(np.mean(per_seed)))
-        rob_sd.append(float(np.std(per_seed, ddof=1)) if n_seed &gt; 1 else 0.0)
+        rob_sd.append(float(np.std(per_seed, ddof=1)) if n_seed > 1 else 0.0)
     bx.barh(y + 0.19, clean_mu, height=0.34, color=[MODEL_STYLE[m][1] for m in order],
             alpha=0.35, edgecolor="none")
     bx.barh(y - 0.19, rob_mu, height=0.34, color=[MODEL_STYLE[m][1] for m in order],
@@ -639,7 +639,7 @@ def graphical_abstract(outdir):
     card(69, 3, 30, 24, "Answer",
          "Structure helps only without\npre-training (+4.2 pt); the gain\nvanishes on a pre-trained trunk\nand does not survive field shift", C["verm"])
     for x in (31, 65):
-        ax.add_patch(FancyArrowPatch((x + 0.4, 15), (x + 3.6, 15), arrowstyle="-|&gt;",
+        ax.add_patch(FancyArrowPatch((x + 0.4, 15), (x + 3.6, 15), arrowstyle="-|>",
                                      mutation_scale=9, lw=0.9, color=C["grey"]))
     return save(fig, "Graphical_Abstract", outdir)
 

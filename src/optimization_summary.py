@@ -28,7 +28,7 @@ def jload(p):
         return json.load(f)
 
 
-def main() -&gt; None:
+def main() -> None:
     out = {}
     for model, (base_tpl, opt_tpl) in PAIRS.items():
         rows = []
@@ -52,9 +52,9 @@ def main() -&gt; None:
         out[model] = {
             "n_seeds": len(rows),
             "base_mean": float(np.mean(bf)),
-            "base_sd": float(np.std(bf, ddof=1)) if len(bf) &gt; 1 else 0.0,
+            "base_sd": float(np.std(bf, ddof=1)) if len(bf) > 1 else 0.0,
             "opt_mean": float(np.mean(of)),
-            "opt_sd": float(np.std(of, ddof=1)) if len(of) &gt; 1 else 0.0,
+            "opt_sd": float(np.std(of, ddof=1)) if len(of) > 1 else 0.0,
             "gain_mean_pt": float(np.mean([r["delta_f1_pt"] for r in rows])),
             "per_seed": rows,
             "opt_latency_ms": jload(rows[0] and opt_tpl % rows[0]["seed"] + "/metrics.json")["ms_per_image"],

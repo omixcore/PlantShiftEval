@@ -102,7 +102,7 @@ def extract(runs, out_npz, size=144, threads=16):
         store[f"src_f_{name}"] = fs
         store[f"src_y_{name}"] = te.labels
         yc = CROP_OF_arr(y)
-        print(f"==&gt; {name:18s} pd crop_acc(aux head)={(q.argmax(1) == yc).mean():.3f} "
+        print(f"==> {name:18s} pd crop_acc(aux head)={(q.argmax(1) == yc).mean():.3f} "
               f"crop_acc(15-way)={(CROP_OF_arr(p.argmax(1)) == yc).mean():.3f}")
     np.savez_compressed(out_npz, y=y, **store)
     print("saved", out_npz)
@@ -156,9 +156,9 @@ def decompose(p15, y):
         if not m.any():
             continue
         crop_rec = float((pc[m] == c).mean())
-        right = m &amp; (pc == c) &amp; (p15.argmax(1) == y)
+        right = m & (pc == c) & (p15.argmax(1) == y)
         lesion_given = float(right.sum() / max(m.sum(), 1))
-        lesion_given_crop = float(right.sum() / max((m &amp; (pc == c)).sum(), 1))
+        lesion_given_crop = float(right.sum() / max((m & (pc == c)).sum(), 1))
         rows[name] = {
             "n": int(m.sum()), "crop_recall": crop_rec,
             "acc15": float((p15.argmax(1)[m] == y[m]).mean()),
@@ -178,7 +178,7 @@ def ece(conf, correct, bins=15):
     edges = np.linspace(0, 1, bins + 1)
     e = 0.0
     for lo, hi in zip(edges[:-1], edges[1:]):
-        m = (conf &gt; lo) &amp; (conf &lt;= hi)
+        m = (conf > lo) & (conf <= hi)
         if m.sum():
             e += m.mean() * abs(correct[m].mean() - conf[m].mean())
     return float(e)
@@ -287,7 +287,7 @@ def analyse(npz, models, folds=5):
                              for c in range(5)}}
         row["crop_ece"] = ece(q.max(1), (q.argmax(1) == yc).astype(float))
         out["models"][name] = row
-        print(f"==&gt; {name:16s} acc15={acc:.3f} crop={crop_acc:.3f} "
+        print(f"==> {name:16s} acc15={acc:.3f} crop={crop_acc:.3f} "
               f"oracle_crop={row['oracle_crop_acc']:.3f} hier={row['hier_raw']:.3f} "
               f"uniform={row.get('hier_uniform_prior', float('nan')):.3f} "
               f"bbse={row.get('hier_bbse', float('nan')):.3f} "
@@ -364,9 +364,9 @@ def adabn_sweep(runs, size=144, threads=16):
                 "head_crop_acc": float((q.argmax(1) == yc).mean()),
             }
         out[name] = row
-        print(f"{name:16s} crop {row['source_stats']['crop_acc']:.3f} -&gt; "
-              f"{row['adabn']['crop_acc']:.3f} | acc15 {row['source_stats']['acc15']:.3f} -&gt; "
-              f"{row['adabn']['acc15']:.3f} | aux head {row['source_stats']['head_crop_acc']:.3f} -&gt; "
+        print(f"{name:16s} crop {row['source_stats']['crop_acc']:.3f} -> "
+              f"{row['adabn']['crop_acc']:.3f} | acc15 {row['source_stats']['acc15']:.3f} -> "
+              f"{row['adabn']['acc15']:.3f} | aux head {row['source_stats']['head_crop_acc']:.3f} -> "
               f"{row['adabn']['head_crop_acc']:.3f}")
     with open("report/crop_adabn.json", "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)

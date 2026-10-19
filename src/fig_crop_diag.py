@@ -58,7 +58,7 @@ for i, (name, r) in enumerate(rows):
     ax2.barh(i, lp, left=ok + cp, color=C["grey"], height=0.5)
     ax2.text(ok / 2, i, f"{ok:.1f}", va="center", ha="center", fontsize=6.5,
              color="white")
-    if cp &gt; 8:
+    if cp > 8:
         ax2.text(ok + cp / 2, i, f"+{cp:.1f}", va="center", ha="center",
                  fontsize=6.5, color="white")
     ax2.text(ok + cp + lp / 2, i, f"{lp:.1f}", va="center", ha="center",

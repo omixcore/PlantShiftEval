@@ -45,7 +45,7 @@ def infer(model, x, size=112):
 
 
 def main():
-    torch.set_num_threads(int(sys.argv[1]) if len(sys.argv) &gt; 1 else 8)
+    torch.set_num_threads(int(sys.argv[1]) if len(sys.argv) > 1 else 8)
     meta, _, _ = load_cache("cache")
     _, x, y = load_pd("cache_pd")
     probs = []

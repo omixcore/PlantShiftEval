@@ -28,15 +28,15 @@ def main():
 
     check("Article type declared: Original Article",
           True, "COI, DAS, AC required and present")
-    check("Abstract &lt;= 200 words, unstructured",
-          wc["abstract_words"] &lt;= 200, f"{wc['abstract_words']} words")
-    check("Keywords &lt;= 7", True, "7 keywords")
-    check("Graphical abstract summary &lt;= 70 words + figure",
+    check("Abstract <= 200 words, unstructured",
+          wc["abstract_words"] <= 200, f"{wc['abstract_words']} words")
+    check("Keywords <= 7", True, "7 keywords")
+    check("Graphical abstract summary <= 70 words + figure",
           os.path.exists(os.path.join(FIG, "Graphical_Abstract.png")),
           "Graphical_Abstract.png/pdf")
-    check("Main text &lt;= 7,000 words",
+    check("Main text <= 7,000 words",
           wc["within_limit"], f"{wc['total_main_text']} words (excl. abstract/refs)")
-    check("Structure: Intro / M&amp;M / Results / Discussion / Conclusion", True)
+    check("Structure: Intro / M&M / Results / Discussion / Conclusion", True)
     check("Declarations: COI, Author Contributions, Data Availability", True)
     check("Figure legends listed in main text", True, "8 figures")
     check("References in Chicago numeric style, cited in order", True,

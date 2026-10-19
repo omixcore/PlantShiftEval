@@ -2,7 +2,7 @@
 
 Reads the two feature dumps produced by `crop_diagnosis.py --extract` and writes
 the row-normalised 5x5 crop confusion matrices plus the mass that lands on a
-semantically impossible cell (apple/cherry/blueberry -&gt; maize or grape, which
+semantically impossible cell (apple/cherry/blueberry -> maize or grape, which
 differ in leaf shape, not just colour).
 
 Output: report/bg_confusion.json

@@ -63,7 +63,7 @@ ax2.set_ylabel("share of 956 predictions")
 ax2.set_ylim(0, 0.80)
 ax2.legend(frameon=False, fontsize=6.2, loc="upper left")
 ax2.annotate("", xy=(3.19, 0.645), xytext=(3.19, 0.562),
-             arrowprops=dict(arrowstyle="-|&gt;", color=C["red"], lw=0.9))
+             arrowprops=dict(arrowstyle="-|>", color=C["red"], lw=0.9))
 ax2.text(3.30, 0.60, "+8.3", color=C["red"], fontsize=6.2, va="center")
 ax2.set_title("B  …and piles even more mass onto maize", fontsize=7.5,
               loc="left", color=C["black"])

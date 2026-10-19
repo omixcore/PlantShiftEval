@@ -14,7 +14,7 @@ Variants
 src            linear crop head fitted on source features (reference)
 zscore_t       target features standardised with *target* mean/std (label-free)
 coral          source features recoloured to target second-order statistics
-               (CORAL, Sun &amp; Saenko 2016), then the head is refitted
+               (CORAL, Sun & Saenko 2016), then the head is refitted
 coral+st       CORAL followed by transductive self-training on target pseudo-labels
 st             self-training alone, from the *source* head
 
@@ -85,7 +85,7 @@ def pick_c(x, y, grid=(0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0), seed=0):
     best, best_c = -1.0, grid[0]
     for c in grid:
         s = fit_lr(xtr, ytr, c).score(xva, yva)
-        if s &gt; best:
+        if s > best:
             best, best_c = s, c
     return best_c, best
 
@@ -167,10 +167,10 @@ def run(npz, models, out_path):
               f"src-val={res['models'][name]['src_val_acc']:.3f}")
         for k in ("src", "zscore_t", "coral", "st", "coral+st"):
             a = agg[k]["crop_acc"]
-            print(f"   {k:&lt;10s} crop={a:.3f} ({agg[k]['crop_acc_sd']:.3f})  "
+            print(f"   {k:<10s} crop={a:.3f} ({agg[k]['crop_acc_sd']:.3f})  "
                   f"macroF1={agg[k]['crop_macro_f1']:.3f}  d={a - base:+.3f}")
         # transductive ensemble over seeds (what the paper reports)
-        if len(seeds) &gt; 1:
+        if len(seeds) > 1:
             pass
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(res, f, indent=2)
