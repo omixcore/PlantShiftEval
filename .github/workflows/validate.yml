@@ -1,0 +1,30 @@
+name: Validate repository
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile Python source
+        run: python -m compileall -q src
+      - name: Check tracked result consistency
+        run: python -m unittest discover -s tests -v
+      - name: Validate JSON artifacts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for root in ("report", "runs", "runs12"):
+              for path in Path(root).rglob("*.json"):
+                  json.loads(path.read_text(encoding="utf-8"))
+          print("All tracked JSON artifacts are valid.")
+          PY

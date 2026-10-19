@@ -218,3 +218,18 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# PlantShiftEval: source datasets, derived caches, and model weights
+data/
+cache/
+cache_full/
+cache_pd/
+cache_pd_split/
+*.parquet
+*.npy
+*.npz
+runs/*/*.pt
+runs/*/*.pth
+runs12/*/*.pt
+runs12/*/*.pth
+checkpoints/
