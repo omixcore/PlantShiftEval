@@ -233,3 +233,16 @@ runs/*/*.pth
 runs12/*/*.pt
 runs12/*/*.pth
 checkpoints/
+
+# Generated study caches/checkpoints stay outside source control.
+cache_leafonly_diagnostic/
+runs_corrected/*/model.pt
+runs_corrected/*/logits.pt
+provenance/sources/canonical_pv_git_blobs.json
+provenance/sources/leaf-map.json
+cache_corrected/
+cache_pd_corrected/
+provenance/source_rows.json
+provenance/target_rows.json
+cache_pd_before_overlap_filter/
+runs_corrected/

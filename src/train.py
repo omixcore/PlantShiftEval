@@ -215,6 +215,7 @@ def train_one(args, meta, tr, te, va=None):
     n_dis, n_sp = meta["n_classes"], meta["n_species"]
     model = build_model(args.model, n_dis, n_sp).to("cpu")
     n_par = count_params(model)
+    data_generator = torch.Generator().manual_seed(args.seed)
     crit = nn.CrossEntropyLoss(label_smoothing=0.05)
 
     bg = BgSwapField(build_bg_bank(args, args.bg_sigma), p=args.bg_p) if args.bg_aug else None
@@ -226,12 +227,12 @@ def train_one(args, meta, tr, te, va=None):
         sampler = WeightedRandomSampler(torch.as_tensor(w, dtype=torch.double),
                                         num_samples=len(tr.species), replacement=True)
         tr_ld = DataLoader(tr_ds, batch_size=args.bs, sampler=sampler, num_workers=0,
-                           drop_last=True)
+                           drop_last=True, generator=data_generator)
         print(f"[balance] crop counts {cnt.astype(int).tolist()} -> per-crop "
               f"weights {np.round(1.0 / cnt, 5).tolist()}", flush=True)
     else:
         tr_ld = DataLoader(tr_ds, batch_size=args.bs, shuffle=True, num_workers=0,
-                           drop_last=True)
+                           drop_last=True, generator=data_generator)
     te_ld = DataLoader(te_ds, batch_size=128, shuffle=False, num_workers=0)
     # When a validation split is available, epoch selection uses it and the test
     # split is touched exactly once, after training.
@@ -349,7 +350,28 @@ def main():
         tr.images, tr.labels, tr.species = tr.images[idx], tr.labels[idx], tr.species[idx]
 
     va = None
-    if args.val_frac > 0:
+    frozen_split_path = os.path.join(args.cache, "split_indices.json")
+    if os.path.exists(frozen_split_path):
+        if args.limit:
+            p.error("--limit cannot be combined with a frozen group split")
+        frozen = json.load(open(frozen_split_path, encoding="utf-8"))
+        if args.val_frac != frozen["val_frac"]:
+            p.error("--val-frac must match the frozen cache split")
+        from data import Split
+        tr_idx = np.array(frozen["train_indices"], dtype=np.int64)
+        va_idx = np.array(frozen["validation_indices"], dtype=np.int64)
+        split = split_record(tr_idx, va_idx, source_size)
+        if set(tr_idx) | set(va_idx) != set(range(source_size)):
+            p.error("Frozen split must cover every source training row exactly once")
+        groups = frozen["group_ids"]
+        if {groups[i] for i in tr_idx} & {groups[i] for i in va_idx}:
+            p.error("Frozen validation groups overlap optimizer training groups")
+        split["method"] = frozen["method"]
+        if len(tr_idx) < args.bs:
+            p.error("Frozen training partition is smaller than --bs")
+        va = Split(tr.images[va_idx], tr.labels[va_idx], tr.species[va_idx])
+        tr = Split(tr.images[tr_idx], tr.labels[tr_idx], tr.species[tr_idx])
+    elif args.val_frac > 0:
         from data import Split
         rs = np.random.RandomState(1234)          # fixed, independent of --seed
         perm = rs.permutation(len(tr.labels))

@@ -1,0 +1,6 @@
+{
+  "canonical_commit": "7f7ecc7e1eaca78107e3affe7cb5abd9427e139a",
+  "subset_total_images": 14238,
+  "byte_identical_original_git_blobs": 14238,
+  "license_context": "subset card omits license; canonical mohanty/PlantVillage revision 9e97599868962bd0079b8db4b7f1efa9185fa1e7 declares cc-by-sa-3.0; original image bytes verified against original repository"
+}

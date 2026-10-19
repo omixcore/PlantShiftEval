@@ -4,8 +4,8 @@ MTD-Net (Multi-scale Texture-Decoupled Network)
 ------------------------------------------------
 Motivation.  In leaf-disease images two factors are entangled: *crop identity*
 (global shape, colour, background) and *disease* (local, multi-scale lesion
-texture).  A single-branch CNN tends to solve the task with the easiest cue
-(crop/background), which is exactly the cue that breaks under field conditions.
+texture).  Crop/background shortcuts are one hypothesis for transfer errors; the present
+architecture and diagnostics do not by themselves establish that mechanism.
 
 Design.
   1. Appearance path  -- aggressively downsampled, small receptive-field stack,
@@ -17,7 +17,7 @@ Design.
      a coarse spatial prior that modulate the texture features, i.e. species-
      conditioned lesion attention.
   4. Disease head sees the gated texture descriptor concatenated with the
-     appearance descriptor, so evidence is fused but never fully mixed.
+     appearance descriptor, so both descriptors enter the classifier; semantic disentanglement is not guaranteed.
 """
 
 from __future__ import annotations
@@ -112,9 +112,9 @@ class MTDNet(nn.Module):
         self._init_weights()
         # The gate ends in sigmoid(Linear(.)) with trunc_normal(std=0.02)
         # weights, i.e. it starts at a flat 0.25 multiplier with almost no
-        # channel selectivity.  On a 6-epoch budget it never leaves that
-        # plateau -- which is exactly what "the gate does nothing" measures.
-        # A larger init gives the gate real dynamic range from step one.
+        # channel selectivity.  Whether a short training budget changes this
+        # initial scaling requires direct measurement.
+        # A larger init is a sensitivity control, not a proven improvement.
         if g_init != 0.02:
             for lin in (self.gate.ch[0], self.gate.sp):
                 nn.init.trunc_normal_(lin.weight, std=g_init)
@@ -154,8 +154,8 @@ class MTDNetPT(MTDNet):
 
     Why this variant exists
     -----------------------
-    The first round showed that ImageNet pre-training beats architectural
-    cleverness when the labelled set is small.  That raises a fair question:
+    Historical cross-architecture comparisons did not isolate pretraining.
+    This variant instead asks a conditional question:
     is the decoupled design *still* useful once both models start from the same
     pre-trained features?  MTD-P answers it by cutting ResNet18 at H/4:
 
@@ -164,8 +164,8 @@ class MTDNetPT(MTDNet):
                                    layer2/layer3/layer4 -> appearance path
 
     Everything else (gate, species head, disease head) is identical to MTD-Net,
-    so the only difference against ResNet18 is *where the high-resolution texture
-    path is branched off* and the extra gate.  Pre-trained weights are restored
+    against ResNet18 this adds a high-resolution branch, gate, auxiliary head
+    and a different disease classifier, changing capacity and compute.  Pre-trained weights are restored
     after initialisation, so the comparison is "same init, different wiring".
     """
 
@@ -242,6 +242,24 @@ class MTDSingle(MTDNet):
         out = super().forward(x)
         out["species"] = None
         return out
+
+
+class MTDAppearanceOnly(MTDNet):
+    """Remove the high-resolution branch; capacity also changes and is reported."""
+
+    def __init__(self, n_disease, n_species):
+        super().__init__(n_disease, n_species)
+        self.det = None
+        self.gate = None
+        self.disease_head = nn.Sequential(
+            nn.Linear(self.c_app, 256), nn.SiLU(inplace=True),
+            nn.Dropout(0.2), nn.Linear(256, n_disease))
+
+    def forward(self, x):
+        app = self.app(self.stem(x))
+        g = F.adaptive_avg_pool2d(app, 1).flatten(1)
+        return {"disease": self.disease_head(g), "species": self.species_head(g),
+                "gate": None, "detail_feat": None, "app_feat": g}
 
 
 class MTDNetGate(MTDNet):
@@ -333,6 +351,8 @@ def build_model(name: str, n_disease: int, n_species: int) -> nn.Module:
         return MTDConcat(n_disease, n_species)
     if name == "mtd_single":
         return MTDSingle(n_disease, n_species)
+    if name == "mtd_appearance":
+        return MTDAppearanceOnly(n_disease, n_species)
     if name == "mtdnet_g":
         return MTDNetGate(n_disease, n_species)
     return build_baseline(name, n_disease, pretrained=(MODEL_ZOO[name] == "pretrained"))

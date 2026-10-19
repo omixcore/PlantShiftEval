@@ -1,0 +1,124 @@
+name: Corrected 65-run methodological study
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/corrected-study.yml]
+permissions:
+  contents: read
+concurrency:
+  group: corrected-study-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install numpy==2.3.5 pyarrow==26.0.0 Pillow==12.3.0
+      - run: python src/fetch_study_data.py
+      - name: Fetch pinned biological group metadata
+        run: |
+          curl --fail --location --retry 3 https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/leaf_grouping/leaf-map.json -o provenance/sources/leaf-map.json
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          raw=Path('provenance/sources/leaf-map.json').read_bytes()
+          assert hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()=='cb04e3723d2ce15b0411483d71a60b5d536bc7f6'
+          PY
+      - run: python src/prepare_corrected_data.py
+      - run: python src/prepare_corrected_data.py --target
+      - id: matrix
+        run: |
+          python src/run_corrected_study.py
+          python - <<'PY'
+          import json,os
+          rows=json.load(open('experiments/corrected_matrix.json'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('value='+json.dumps({'include':rows},separators=(',',':'))+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corrected-data-and-audit
+          retention-days: 7
+          path: |
+            cache_corrected/
+            cache_pd_corrected/
+            provenance/
+            experiments/corrected_matrix.json
+            DATASET_NOTICE.md
+  experiment:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install numpy==2.3.5 scipy==1.17.0 scikit-learn==1.8.0 pyarrow==26.0.0 Pillow==12.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: corrected-data-and-audit
+      - name: Execute one fixed experiment and held-out evaluation
+        env:
+          RUN_ID: ${{ matrix.run_id }}
+        run: |
+          python - <<'PY'
+          import json,os,sys
+          sys.path.insert(0,'src')
+          from run_corrected_study import run
+          job=next(j for j in json.load(open('experiments/corrected_matrix.json')) if j['run_id']==os.environ['RUN_ID'])
+          from pathlib import Path
+          Path('logs').mkdir(exist_ok=True)
+          result=run(job,2)
+          if result['status'] not in ('completed','verified_existing'):raise SystemExit(result)
+          PY
+          python src/evaluate_corrected_study.py --runs "$RUN_ID" --threads 2 --adapt
+      - name: Preserve outputs, including failed-run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-${{ matrix.run_id }}
+          retention-days: 7
+          path: |
+            runs_corrected/
+            report/corrected/
+            logs/
+  summarize:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, experiment]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: experiment-*
+          merge-multiple: true
+      - run: pip install numpy==2.3.5 scipy==1.17.0 matplotlib==3.10.8
+      - run: python src/summarize_corrected_study.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrected-study-summary
+          retention-days: 7
+          path: |
+            report/corrected_summary/
+            manuscript/corrected_results.md

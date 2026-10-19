@@ -68,3 +68,18 @@ The 12-epoch comparison must likewise be regenerated under the corrected split. 
 ## What CI validates
 
 GitHub Actions compiles Python source, validates JSON syntax, and checks consistency between tracked run metrics and summary tables. It does not download datasets, train models, regenerate logits, verify data licenses, or certify that the historical results were obtained with an untouched test set.
+
+## Execute the complete corrected study
+
+Use a CPU PyTorch installation and the pinned scientific dependencies listed in `requirements-study.txt`. From the repository root:
+
+```bash
+python src/fetch_study_data.py
+python src/prepare_corrected_data.py
+python src/prepare_corrected_data.py --target
+python src/run_corrected_study.py --execute --workers 2 --threads 4
+python src/evaluate_corrected_study.py --adapt --threads 4
+python src/summarize_corrected_study.py
+```
+
+The training runner generates the 65-cell matrix, preserves console logs and resumes only completed runs whose output hashes verify. Partial outputs require explicit inspection; they are never silently treated as completed. Data preparation refuses to overwrite populated caches. The final summary reports missing cells and exits unsuccessfully while any are missing. The GitHub Actions study workflow performs the same preparation once, then distributes fixed experiment cells and archives checkpoints, logits, logs and evaluation records. Generated partial Markdown is explicitly labeled partial. Final plots and numerical manuscript claims must be reviewed after completion.

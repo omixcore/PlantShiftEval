@@ -1,0 +1,76 @@
+{
+  "created": "2026-10-19",
+  "files": [
+    {
+      "repository": "GVJahnavi/Plant_village_subset",
+      "revision": "243d37baa0780d93a8305d64f382bc1d41dffe92",
+      "remote_path": "data/test-00000-of-00001.parquet",
+      "local_path": "data/pv_test.parquet",
+      "bytes": 45153366,
+      "sha256": "c5df9fe03f134b01112aea2cbb2bcb5db8cd61261ca259cbfc62fda5374444a5",
+      "verified": true,
+      "url": "https://huggingface.co/datasets/GVJahnavi/Plant_village_subset/resolve/243d37baa0780d93a8305d64f382bc1d41dffe92/data/test-00000-of-00001.parquet"
+    },
+    {
+      "repository": "GVJahnavi/Plant_village_subset",
+      "revision": "243d37baa0780d93a8305d64f382bc1d41dffe92",
+      "remote_path": "data/train-00000-of-00001.parquet",
+      "local_path": "data/pv_train.parquet",
+      "bytes": 174220769,
+      "sha256": "de4ae370ce5143b2fc05c6b5241a1db341389e74f59a9a25653b6c06faf6a3b1",
+      "verified": true,
+      "url": "https://huggingface.co/datasets/GVJahnavi/Plant_village_subset/resolve/243d37baa0780d93a8305d64f382bc1d41dffe92/data/train-00000-of-00001.parquet"
+    },
+    {
+      "repository": "agyaatcoder/PlantDoc",
+      "revision": "ace645742b6af1b0df9aaefc2c9b0c988e141814",
+      "remote_path": "data/test-00000-of-00001.parquet",
+      "local_path": "data/pd_test-00000.parquet",
+      "bytes": 72984729,
+      "sha256": "9462c686c9596435a7917ebc0f8a238d9eed921307ab1113d978882d68eda406",
+      "verified": true,
+      "url": "https://huggingface.co/datasets/agyaatcoder/PlantDoc/resolve/ace645742b6af1b0df9aaefc2c9b0c988e141814/data/test-00000-of-00001.parquet"
+    },
+    {
+      "repository": "agyaatcoder/PlantDoc",
+      "revision": "ace645742b6af1b0df9aaefc2c9b0c988e141814",
+      "remote_path": "data/train-00000-of-00002.parquet",
+      "local_path": "data/pd_train-00000.parquet",
+      "bytes": 461233613,
+      "sha256": "7df66cea85687fb66027fda64b478de80650fd42f4b17b7106d75a419f07e2d2",
+      "verified": true,
+      "url": "https://huggingface.co/datasets/agyaatcoder/PlantDoc/resolve/ace645742b6af1b0df9aaefc2c9b0c988e141814/data/train-00000-of-00002.parquet"
+    },
+    {
+      "repository": "agyaatcoder/PlantDoc",
+      "revision": "ace645742b6af1b0df9aaefc2c9b0c988e141814",
+      "remote_path": "data/train-00001-of-00002.parquet",
+      "local_path": "data/pd_train-00001.parquet",
+      "bytes": 457606726,
+      "sha256": "b94d5480c7c615810fef367dcb84915c1ef9031f8e07ae56925e37373f2b78a6",
+      "verified": true,
+      "url": "https://huggingface.co/datasets/agyaatcoder/PlantDoc/resolve/ace645742b6af1b0df9aaefc2c9b0c988e141814/data/train-00001-of-00002.parquet"
+    }
+  ],
+  "licenses": {
+    "PlantVillage": {
+      "original_image_license": "cc-by-sa-3.0",
+      "authority": "https://huggingface.co/datasets/mohanty/PlantVillage/blob/9e97599868962bd0079b8db4b7f1efa9185fa1e7/README.md",
+      "subset_card_license": null,
+      "image_lineage": "all 14238 image bytes match original Git blobs; see pv_lineage.json"
+    },
+    "PlantDoc": {
+      "declared_license": "cc-by-4.0",
+      "authority": "https://huggingface.co/datasets/agyaatcoder/PlantDoc/blob/ace645742b6af1b0df9aaefc2c9b0c988e141814/README.md",
+      "upstream": "https://github.com/pratikkayal/PlantDoc-Object-Detection-Dataset"
+    }
+  },
+  "metadata_files": [
+    {
+      "local_path": "provenance/sources/leaf-map.json",
+      "url": "https://raw.githubusercontent.com/spMohanty/PlantVillage-Dataset/7f7ecc7e1eaca78107e3affe7cb5abd9427e139a/leaf_grouping/leaf-map.json",
+      "sha256": "3b4b253683c6911744959a3870a92509b1faa1ee34e9f8585e21d0fe6337a25b",
+      "bytes": 2429879
+    }
+  ]
+}

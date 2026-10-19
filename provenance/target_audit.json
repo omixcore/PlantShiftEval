@@ -1,0 +1,55 @@
+{
+  "n": 946,
+  "per_class": {
+    "6": 57,
+    "2": 89,
+    "8": 115,
+    "3": 90,
+    "4": 117,
+    "9": 188,
+    "14": 69,
+    "7": 64,
+    "0": 93,
+    "11": 64
+  },
+  "official_train_retained": 853,
+  "official_test": 92,
+  "exclusions": {
+    "source_similarity_candidate": 2,
+    "conflicting_label_component_rows": 8,
+    "target_train_test_similarity_candidate": 0,
+    "unmapped_category": 1619,
+    "ambiguous_multilabel": 3,
+    "target_train_test_identity_overlap": 1
+  },
+  "target_train_rows": 683,
+  "target_validation_rows": 170,
+  "source": "agyaatcoder/PlantDoc",
+  "revision": "ace645742b6af1b0df9aaefc2c9b0c988e141814",
+  "mapping": {
+    "apple scab leaf": 0,
+    "apple rust leaf": 2,
+    "apple leaf": 3,
+    "blueberry leaf": 4,
+    "cherry leaf": 6,
+    "corn gray leaf spot": 7,
+    "corn rust leaf": 8,
+    "corn leaf blight": 9,
+    "grape leaf": 14,
+    "grape leaf black rot": 11
+  },
+  "label_policy": "strict majority of object-category counts; mapped categories only",
+  "caveat": "official split plus exact-hash grouping; near duplicates and acquisition independence remain separate checks",
+  "test_per_class": {
+    "11": 8,
+    "8": 10,
+    "14": 12,
+    "6": 10,
+    "3": 9,
+    "4": 11,
+    "9": 9,
+    "7": 3,
+    "2": 10,
+    "0": 10
+  }
+}

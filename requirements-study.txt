@@ -1,0 +1,11 @@
+# CPU runtime: install torch/torchvision from https://download.pytorch.org/whl/cpu
+# The versions below were installed successfully for the local runtime checks.
+torch==2.14.1
+torchvision==0.29.1
+numpy==2.3.5
+scipy==1.17.0
+scikit-learn==1.8.0
+pyarrow==26.0.0
+Pillow==12.3.0
+matplotlib==3.10.8
+python-docx==1.2.0

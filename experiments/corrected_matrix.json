@@ -1,0 +1,457 @@
+[
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "mtdnet_e6_lr1e-3_s0"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "smallcnn_e6_lr1e-3_s0"
+  },
+  {
+    "model": "mtdnet_pt",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 0,
+    "run_id": "mtdnet_pt_e6_lr3e-4_s0"
+  },
+  {
+    "model": "resnet18",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 0,
+    "run_id": "resnet18_e6_lr3e-4_s0"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "mtdnet_e6_lr1e-3_s1"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "smallcnn_e6_lr1e-3_s1"
+  },
+  {
+    "model": "mtdnet_pt",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 1,
+    "run_id": "mtdnet_pt_e6_lr3e-4_s1"
+  },
+  {
+    "model": "resnet18",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 1,
+    "run_id": "resnet18_e6_lr3e-4_s1"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "mtdnet_e6_lr1e-3_s2"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "smallcnn_e6_lr1e-3_s2"
+  },
+  {
+    "model": "mtdnet_pt",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 2,
+    "run_id": "mtdnet_pt_e6_lr3e-4_s2"
+  },
+  {
+    "model": "resnet18",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 2,
+    "run_id": "resnet18_e6_lr3e-4_s2"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "mtdnet_e6_lr1e-3_s3"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "smallcnn_e6_lr1e-3_s3"
+  },
+  {
+    "model": "mtdnet_pt",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 3,
+    "run_id": "mtdnet_pt_e6_lr3e-4_s3"
+  },
+  {
+    "model": "resnet18",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 3,
+    "run_id": "resnet18_e6_lr3e-4_s3"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "mtdnet_e6_lr1e-3_s4"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "smallcnn_e6_lr1e-3_s4"
+  },
+  {
+    "model": "mtdnet_pt",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 4,
+    "run_id": "mtdnet_pt_e6_lr3e-4_s4"
+  },
+  {
+    "model": "resnet18",
+    "epochs": 6,
+    "lr": "3e-4",
+    "seed": 4,
+    "run_id": "resnet18_e6_lr3e-4_s4"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 0,
+    "run_id": "mtdnet_e6_lr2e-3_s0"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "mtdnet_e12_lr1e-3_s0"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 0,
+    "run_id": "mtdnet_e12_lr2e-3_s0"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 0,
+    "run_id": "smallcnn_e6_lr2e-3_s0"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "smallcnn_e12_lr1e-3_s0"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 0,
+    "run_id": "smallcnn_e12_lr2e-3_s0"
+  },
+  {
+    "model": "mtd_concat",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "mtd_concat_e6_lr1e-3_s0"
+  },
+  {
+    "model": "mtd_single",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "mtd_single_e6_lr1e-3_s0"
+  },
+  {
+    "model": "mtd_appearance",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 0,
+    "run_id": "mtd_appearance_e6_lr1e-3_s0"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 1,
+    "run_id": "mtdnet_e6_lr2e-3_s1"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "mtdnet_e12_lr1e-3_s1"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 1,
+    "run_id": "mtdnet_e12_lr2e-3_s1"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 1,
+    "run_id": "smallcnn_e6_lr2e-3_s1"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "smallcnn_e12_lr1e-3_s1"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 1,
+    "run_id": "smallcnn_e12_lr2e-3_s1"
+  },
+  {
+    "model": "mtd_concat",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "mtd_concat_e6_lr1e-3_s1"
+  },
+  {
+    "model": "mtd_single",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "mtd_single_e6_lr1e-3_s1"
+  },
+  {
+    "model": "mtd_appearance",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 1,
+    "run_id": "mtd_appearance_e6_lr1e-3_s1"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 2,
+    "run_id": "mtdnet_e6_lr2e-3_s2"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "mtdnet_e12_lr1e-3_s2"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 2,
+    "run_id": "mtdnet_e12_lr2e-3_s2"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 2,
+    "run_id": "smallcnn_e6_lr2e-3_s2"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "smallcnn_e12_lr1e-3_s2"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 2,
+    "run_id": "smallcnn_e12_lr2e-3_s2"
+  },
+  {
+    "model": "mtd_concat",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "mtd_concat_e6_lr1e-3_s2"
+  },
+  {
+    "model": "mtd_single",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "mtd_single_e6_lr1e-3_s2"
+  },
+  {
+    "model": "mtd_appearance",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 2,
+    "run_id": "mtd_appearance_e6_lr1e-3_s2"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 3,
+    "run_id": "mtdnet_e6_lr2e-3_s3"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "mtdnet_e12_lr1e-3_s3"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 3,
+    "run_id": "mtdnet_e12_lr2e-3_s3"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 3,
+    "run_id": "smallcnn_e6_lr2e-3_s3"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "smallcnn_e12_lr1e-3_s3"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 3,
+    "run_id": "smallcnn_e12_lr2e-3_s3"
+  },
+  {
+    "model": "mtd_concat",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "mtd_concat_e6_lr1e-3_s3"
+  },
+  {
+    "model": "mtd_single",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "mtd_single_e6_lr1e-3_s3"
+  },
+  {
+    "model": "mtd_appearance",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 3,
+    "run_id": "mtd_appearance_e6_lr1e-3_s3"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 4,
+    "run_id": "mtdnet_e6_lr2e-3_s4"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "mtdnet_e12_lr1e-3_s4"
+  },
+  {
+    "model": "mtdnet",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 4,
+    "run_id": "mtdnet_e12_lr2e-3_s4"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 6,
+    "lr": "2e-3",
+    "seed": 4,
+    "run_id": "smallcnn_e6_lr2e-3_s4"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "smallcnn_e12_lr1e-3_s4"
+  },
+  {
+    "model": "smallcnn",
+    "epochs": 12,
+    "lr": "2e-3",
+    "seed": 4,
+    "run_id": "smallcnn_e12_lr2e-3_s4"
+  },
+  {
+    "model": "mtd_concat",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "mtd_concat_e6_lr1e-3_s4"
+  },
+  {
+    "model": "mtd_single",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "mtd_single_e6_lr1e-3_s4"
+  },
+  {
+    "model": "mtd_appearance",
+    "epochs": 6,
+    "lr": "1e-3",
+    "seed": 4,
+    "run_id": "mtd_appearance_e6_lr1e-3_s4"
+  }
+]

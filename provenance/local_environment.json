@@ -1,0 +1,16 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "torchvision": "0.29.1+cpu",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "scikit-learn": "1.8.0",
+    "pyarrow": "26.0.0",
+    "Pillow": "12.3.0",
+    "matplotlib": "3.10.8",
+    "python-docx": "1.2.0"
+  },
+  "hardware": "CPU; no accelerator used; 8-core cgroup quota"
+}

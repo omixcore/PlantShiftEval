@@ -12,6 +12,12 @@ A post hoc code audit found that the earlier training entry point defaulted to `
 
 The current `src/train.py` has been corrected: it defaults to a 10% validation split drawn from the training partition and rejects a zero validation fraction. **This code correction does not retroactively validate the historical metrics.** All headline configurations must be rerun with the corrected protocol before definitive performance claims or submission.
 
+## Corrected study execution
+
+The six-task follow-up now has pinned input downloads, verified source-image lineage, overlap screening, frozen splits and a **65-run** control matrix. See [execution status](docs/EXECUTION_STATUS.md), [dataset attribution](DATASET_NOTICE.md) and the [study workflow](.github/workflows/corrected-study.yml). Initial local training is underway; no corrected performance claim is asserted here. The workflow trains each fixed configuration, evaluates synthetic corruptions and the independent official target holdout, and distinguishes zero-shot transfer, unlabeled-image AdaBN and labeled-target fine-tuning.
+
+The cleaned protocol has fewer and more unevenly distributed source-training images than the historical study. Some original biological group IDs remain unavailable. The final target test has only 92 mapped images after screening. These limitations must accompany any eventual numerical conclusion. Successful code checks do not mean all 65 experiments have finished.
+
 ## Recorded results (historical; not yet revalidated)
 
 | Model / protocol | PlantVillage macro-F1 (mean ± sample SD) | Training seeds | Corruption accuracy (mean ± SD) | Corruption seeds |

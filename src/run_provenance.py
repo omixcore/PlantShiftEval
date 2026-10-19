@@ -41,6 +41,8 @@ def write_manifest(args, split, argv):
         "test_x.npy", "test_y.npy", "test_s.npy")]
     if args.bg_aug:
         paths.append(Path(args.bg_cache) / "x.npy")
+    if (cache / "split_indices.json").exists():
+        paths.append(cache / "split_indices.json")
     inputs = [{"path": str(p.resolve()), "bytes": p.stat().st_size,
                "sha256": file_digest(p)} for p in paths]
     versions = {}
