@@ -578,64 +578,51 @@ def build_results(ms):
         f"(bootstrap CI [{pct(p_pre['boot_ci_low'])}, {pct(p_pre['boot_ci_high'])}], exact McNemar "
         f"p < 1e-4), nearly twice the entire architecture effect measured below.")
     ms.p(
-        "Training dynamics mirror the same ordering from the first epoch (Figure 2A): the "
-        "pre-trained pair starts near 0.90 macro-F1 after one epoch, while both from-"
-        "scratch models need four epochs to leave the 0.75 region. The training loss of the "
-        "from-scratch models flattens inside the six-epoch budget, which is why we "
-        "initially treated that budget as converged. Extending the budget (below) shows the "
-        "plateau was premature: test macro-F1 of the same architecture keeps rising by "
-        "another ten points between epochs six and twelve.")
+        "Training dynamics mirror the source-domain ordering in the recorded curves, but "
+        "the longer-run comparison changes both epoch count and peak learning rate "
+        "(12 epochs at 2e-3 versus 6 epochs at 1e-3). It therefore demonstrates sensitivity "
+        "to the combined training recipe and cannot isolate a pure epoch-count effect."
+    )
 
     ms.h("Does decoupling help? It depends on initialization", 2)
     mtd_seeds = seeds("mtdnet")
     ms.p(
-        f"Against the parameter-matched plain CNN, MTD-Net's three seeds span "
-        f"{pct(min(mtd_seeds))}\u2013{pct(max(mtd_seeds))} macro-F1 with a sample standard "
-        f"deviation of {f2(st.stdev(mtd_seeds) * 100)} points. The mean seed-level "
-        f"difference is {f2(p_mtd['delta_f1_mean_seeds'] * 100)} points, but the "
-        f"seed-level t-test does not separate the two models (p = "
-        f"{f2(p_mtd['ttest_seed_p'])} at n = 3 per group). The soft-voting ensemble, which "
-        f"integrates over seed noise, is {f2(p_mtd['delta_f1_ens'] * 100)} points better "
-        f"(CI [{pct(p_mtd['boot_ci_low'])}, {pct(p_mtd['boot_ci_high'])}], exact McNemar p "
-        f"{'< 1e-4' if p_mtd['mcnemar_p'] < 1e-4 else f3(p_mtd['mcnemar_p'])}), and this "
-        f"is the one comparison that survives Holm correction within our contrast family. "
-        f"We therefore conclude that the decoupled design does help in the from-scratch "
-        f"regime, but that a single-seed comparison \u2014 the reporting standard in this "
-        f"literature \u2014 could plausibly have concluded anything from +8.6 to +1 point "
-        f"depending on the seed drawn (Figure 2B).")
+        f"Against the parameter-matched plain CNN, MTD-Net's recorded three seeds span "
+        f"{pct(min(mtd_seeds))}–{pct(max(mtd_seeds))} macro-F1, with sample SD "
+        f"{f2(st.stdev(mtd_seeds) * 100)} points. The mean seed-level difference is "
+        f"{f2(p_mtd['delta_f1_mean_seeds'] * 100)} points and the paired seed-level test "
+        f"is inconclusive (p = {f2(p_mtd['ttest_seed_p'])}, n = 3). The image-level "
+        f"ensemble comparison is positive on this recorded test set, but it does not "
+        f"establish a stable gain across independent training runs."
+    )
     ms.p(
-        f"The two mechanisms show no measurable contribution. Removing the cross-scale "
-        f"gate changes the ensemble difference by {f2(p_gate['delta_f1_ens'] * 100)} "
-        f"points (p = {f2(p_gate['mcnemar_p'])}); removing the auxiliary crop head by "
-        f"{f2(p_aux['delta_f1_ens'] * 100)} points (p = {f2(p_aux['mcnemar_p'])}). Both "
-        f"contrasts are far from significance after correction. What remains of the "
-        f"architecture effect is the presence of a second, high-resolution pathway, not "
-        f"the modulation machinery attached to it.")
+        f"The available ablations do not establish a consistent independent benefit from "
+        f"the cross-scale gate or auxiliary crop head. Because the current design does not "
+        f"include an ablation that removes only the high-resolution texture pathway while "
+        f"holding other components fixed, the comparison with a plain CNN cannot attribute "
+        f"any observed difference specifically to that pathway."
+    )
     if opt is not None and opt.get("mtdnet_g_seed0", {}).get("base_f1_12ep"):
         gv = opt["mtdnet_g_seed0"]
         ms.p(
-            f"One caveat applies to the gate ablation: at initialisation the gate is almost "
-            f"constant (standard deviation 0.02 at the logit level), so the ablated and "
-            f"intact models differ little in how much modulation they can express. We "
-            f"therefore repeated the test at the twelve-epoch budget with a wider gate "
-            f"initialisation (0.15), where the gate is free to vary, and compared against "
-            f"the twelve-epoch seed-0 baseline: {f3(gv['opt_f1'])} versus "
-            f"{f3(gv['base_f1_12ep'])} macro-F1, a difference of "
-            f"{gv['delta_vs_12ep_pt']:+.2f} points. The null result on the gate is thus not "
-            f"an artifact of a degenerate initialisation. It remains a single-seed "
-            f"screening and we do not treat the point estimate as evidence either way.")
+            f"A single-seed screening run with a wider gate initialization gives "
+            f"{f3(gv['opt_f1'])} versus {f3(gv['base_f1_12ep'])} macro-F1 at twelve epochs "
+            f"(difference {gv['delta_vs_12ep_pt']:+.2f} points). Because this is one seed "
+            f"and a modified initialization, it does not resolve whether the gate provides "
+            f"a reproducible benefit."
+        )
     ms.p(
-        f"Attaching the identical wiring to pre-trained weights removes the gain "
-        f"altogether: MTD-P versus ResNet-18 differ by "
-        f"{f2(abs(p_pt['delta_f1_ens']) * 100)} macro-F1 points "
+        f"In the recorded pretrained comparison, MTD-P and ResNet-18 differ by only "
+        f"{f2(abs(p_pt['delta_f1_ens']) * 100)} ensemble macro-F1 points "
         f"({'in favor of MTD-P' if p_pt['delta_f1_ens'] > 0 else 'in favor of ResNet-18'}, "
-        f"p = {f2(p_pt['mcnemar_p'])}) while costing "
+        f"McNemar p = {f2(p_pt['mcnemar_p'])}), while MTD-P uses "
         f"{pct((s_pt['params(M)'] - s_r18['params(M)']) / s_r18['params(M)'], 1)} percent "
         f"more parameters and {f2(lat['mtdnet_pt_s0'] - lat['resnet18_s0'])} additional "
-        f"milliseconds per image. Under matched initialization, the architecture is "
-        f"indistinguishable from its baseline.")
+        f"milliseconds per image in the recorded latency test. The data do not establish "
+        f"a measurable improvement over the pretrained baseline; equivalence is not proven."
+    )
 
-    ms.h("Most of the seed instability is a training-budget artifact", 2)
+    ms.h("Sensitivity to the combined training recipe", 2)
     if opt is not None and "mtdnet" in opt and "smallcnn" in opt:
         om, oc = opt["mtdnet"], opt["smallcnn"]
         p12 = None
@@ -646,53 +633,29 @@ def build_results(ms):
         d6 = (om["base_mean"] - oc["base_mean"]) * 100
         d12 = (om["opt_mean"] - oc["opt_mean"]) * 100
         ms.p(
-            f"The six-epoch budget was chosen for CPU feasibility, so we asked how much of "
-            f"the instability above it explains (Table 5). Both from-scratch models were "
-            f"retrained "
-            f"for twelve epochs at the same peak learning rate and with identical "
-            f"augmentation, three seeds each. Macro-F1 rises from "
-            f"{f3(om['base_mean'])} \u00b1 {f3(om['base_sd'])} to "
-            f"{f3(om['opt_mean'])} \u00b1 {f3(om['opt_sd'])} for MTD-Net and "
-            f"from {f3(oc['base_mean'])} \u00b1 {f3(oc['base_sd'])} to "
-            f"{f3(oc['opt_mean'])} \u00b1 {f3(oc['opt_sd'])} for the plain "
-            f"CNN. Two of our negative results change character. First, the seed standard "
-            f"deviation of MTD-Net collapses from {f2(om['base_sd'] * 100)} to "
-            f"{f2(om['opt_sd'] * 100)} points, so the observation that seed noise exceeds "
-            f"the architecture effect describes the truncated schedule, not the design. "
-            f"Second, the from-scratch model closes most of the distance to the pre-trained "
-            f"arm, from {f2(PRE6)} points at six "
-            f"epochs to {f2(PRE12)} points at twelve, "
-            f"at {s_mtd['params(M)'] / s_pt['params(M)'] * 100:.0f} percent of the "
-            f"parameters.")
+            f"The recorded six-epoch recipe uses peak LR 1e-3, whereas the twelve-epoch "
+            f"comparison uses peak LR 2e-3. MTD-Net macro-F1 changes from "
+            f"{f3(om['base_mean'])} ± {f3(om['base_sd'])} to "
+            f"{f3(om['opt_mean'])} ± {f3(om['opt_sd'])}; the matched plain CNN changes "
+            f"from {f3(oc['base_mean'])} ± {f3(oc['base_sd'])} to "
+            f"{f3(oc['opt_mean'])} ± {f3(oc['opt_sd'])}. These results show sensitivity "
+            f"to the combined recipe. Since epoch count and peak learning rate change "
+            f"together, they do not identify which factor explains the improvement and "
+            f"cannot establish that six-epoch seed variation was merely an artifact."
+        )
         if p12 is not None:
             ms.p(
-                f"The margin over the parameter-matched plain CNN moves the other way in "
-                f"magnitude and the same way in resolvability. The seed-mean difference "
-                f"falls from {d6:+.2f} to {d12:+.2f} points, and the ensemble difference "
-                f"from {p_mtd['delta_f1_ens'] * 100:+.2f} to "
-                f"{p12['delta_f1_ens'] * 100:+.2f} (CI "
-                f"[{pct(p12['boot_ci_low'])}, {pct(p12['boot_ci_high'])}], exact McNemar p "
-                f"{'< 0.001' if p12['mcnemar_p'] < 1e-3 else f3(p12['mcnemar_p'])}). The "
-                f"plain CNN is the main beneficiary of the extra epochs, which is the "
-                f"pattern one expects if the decoupled pathway pays off most before the "
-                f"baseline has learned the texture statistics of the task. But those same "
-                f"epochs cut MTD-Net's seed spread by a factor of "
-                f"{om['base_sd'] / max(om['opt_sd'], 1e-6):.0f}, and the seed-level paired "
-                f"t-test, which could not separate the two models at six epochs "
-                f"(p = {f2(p_mtd['ttest_seed_p'])}), now does "
-                f"(p = {f3(p12['ttest_seed_p'])}). The effect did not grow; it became "
-                f"measurable. We report both budgets rather than the flattering one, "
-                f"because a literature that reports one run at one budget can misjudge both "
-                f"the size and the existence of such an effect.")
-        else:
-            ms.p(
-                f"The margin over the parameter-matched plain CNN moves from {d6:+.2f} to "
-                f"{d12:+.2f} points between the two budgets. We report both regimes rather "
-                f"than selecting the flattering one.")
+                f"The MTD-Net minus plain-CNN mean difference changes from {d6:+.2f} "
+                f"points under the six-epoch recipe to {d12:+.2f} points under the "
+                f"twelve-epoch/higher-LR recipe. The latter paired seed-level test returns "
+                f"p = {f3(p12['ttest_seed_p'])} at n = 3; because this is a different "
+                f"training recipe and only three seed pairs are available, the p-value "
+                f"does not isolate a causal epoch effect or establish broad superiority."
+            )
     else:
-        ms.p("Budget-comparison results pending.")
+        ms.p("The twelve-epoch comparison is not present in the tracked report; no conclusion is drawn from it.")
 
-    ms.h("A fourfold data increase narrows, but does not reorder, the field", 2)
+    ms.h("Full-data scaling is not included in this repository snapshot", 2)
     if full:
         base_parts = []
         for m in ("resnet18", "mtdnet_pt", "mtdnet", "smallcnn"):
@@ -711,9 +674,9 @@ def build_results(ms):
             "and the null result on the gate are unchanged, indicating that our "
             "conclusions are not artifacts of the 320-images-per-class cap.")
     else:
-        ms.p("Data-scaling results pending.")
+        ms.p("The full uncapped data-scaling arm and its per-run outputs are not included in this repository snapshot; no conclusions are drawn from that arm.")
 
-    ms.h("Pre-training sets the corruption level, decoupling widens the margin", 2)
+    ms.h("Synthetic corruption: a descriptive robustness signal", 2)
     if rbs is not None:
         pm, pr = rbs["per_model"], rbs["paired"]
         r_pt, r_r18 = pm["mtdnet_pt"]["robust_acc"], pm["resnet18"]["robust_acc"]
@@ -728,22 +691,19 @@ def build_results(ms):
         d_mtd = (c_mtd["mean"] - r_mtd["mean"]) * 100
         d_small = (c_small["mean"] - r_small["mean"]) * 100
         ms.p(
-            f"Under the eight synthetic degradations (Figure 7), the ordering is the one "
-            f"pre-training predicts: MTD-P ({f3(r_pt['mean'])}, sd {f3(r_pt['sd'])}) and "
-            f"ResNet-18 ({f3(r_r18['mean'])}, sd {f3(r_r18['sd'])}) sit far above both "
-            f"from-scratch models. The {f2(pt_gap)}-point gap between the pre-trained pair "
-            f"is an order of magnitude below the seed spread ({f2(pt_sd)} points), and with "
-            f"a single corruption pass per seed no paired test applies; we therefore call "
-            f"the pair indistinguishable rather than statistically tied. Against its "
-            f"parameter-matched baseline, however, the decoupled design does more than "
-            f"inherit its clean accuracy. Averaged over {n_sd} seeds its margin widens "
-            f"from {f2(gap_clean)} points on clean data to {f2(gap_rob)} points under "
-            f"corruption, positive in every seed, and MTD-Net loses {f2(d_mtd)} points on "
-            f"average where the plain CNN loses {f2(d_small)}. The widening is "
-            f"concentrated in additive noise \u2014 the degradation that attacks precisely "
-            f"the high-frequency channel the texture path preserves. Pre-training still "
-            f"sets the absolute level, but the stronger claim that decoupling confers no "
-            f"specific robustness does not survive replication.")
+            f"Across the eight synthetic degradations, the recorded mean accuracy is "
+            f"{f3(r_mtd['mean'])} for MTD-Net and {f3(r_small['mean'])} for the "
+            f"parameter-matched plain CNN, a difference of {f2(gap_rob)} percentage "
+            f"points across {n_sd} paired seeds. The direction is positive in all recorded "
+            f"pairs, but the paired-seed standard deviation of the difference is "
+            f"{f2(rbp['robust_acc']['delta_sd_pt'])} points and the seed count is only three. "
+            f"This is a descriptive robustness signal that warrants replication; it does "
+            f"not establish that the texture branch itself causes the difference. MTD-P "
+            f"and ResNet-18 differ by {f2(pt_gap)} points under corruption, also too little "
+            f"evidence to claim a general pretrained-architecture advantage. Synthetic "
+            f"corruptions preserve much of the source-image structure and cannot substitute "
+            f"for external-domain evaluation."
+        )
     else:
         rob_pt = rob["mtdnet_pt_s0"]["robust_acc"]
         rob_r18 = rob["resnet18_s0"]["robust_acc"]
@@ -758,33 +718,28 @@ def build_results(ms):
             f"points under corruption; the multi-seed version of this comparison is "
             f"reported in the main text and is what the robustness claim rests on.")
 
-    ms.h("Zero-shot transfer to field images collapses, and crop identity is the "
-         "failure", 2)
+    ms.h("Zero-shot transfer to the mapped PlantDoc subset remains poor", 2)
     best = max(CD, key=lambda k: CD[k]["acc15"])
     cd_best = CD[best]
     within_chance = cd_best.get("within_chance", 0.36)
     ms.p(
-        f"On PlantDoc (Figure 5), every model drops from \u2265 "
-        f"{pct(min(summary[m]['macro_f1'] for m in ('resnet18', 'mtdnet_pt')), 0)} percent "
-        f"source macro-F1 to at most {pct(cd_best['acc15'])} percent 15-way accuracy "
-        f"(best model: {NAME[cd['results'][best]['model']] if False else best}). "
-        f"Renormalizing over the ten classes that actually occur recovers only "
-        f"{pct(cd_best['acc10'])} percent. The error structure is informative: within-crop "
-        f"lesion recognition reaches {pct(cd_best['within_crop'])} percent against a "
-        f"{pct(within_chance)} percent chance floor, whereas crop identification implied "
-        f"by the predicted class falls to {pct(cd_best['crop_acc'])} percent macro over "
-        f"crops. In other words, the models retain part of their lesion-recognition "
-        f"ability but routinely misjudge which plant they are looking at; the composite "
-        f"accuracy is approximately the product of the two, which is why the crop level "
-        f"dominates the loss.")
+        f"On the mapped PlantDoc subset (956 images across ten mapped categories), the "
+        f"best recorded model reaches {pct(cd_best['acc15'])} percent 15-way accuracy "
+        f"and {pct(cd_best['acc10'])} percent after renormalization over the ten represented "
+        f"classes. Within-crop lesion recognition is {pct(cd_best['within_crop'])} percent "
+        f"against a {pct(within_chance)} percent chance reference, while crop identification "
+        f"implied by the predicted class is {pct(cd_best['crop_acc'])} percent macro over "
+        f"crops. This pattern is consistent with crop-identity errors contributing to the "
+        f"source-to-target gap, but category mapping and dominant-object filtering mean it "
+        f"does not establish crop identity as the sole or primary cause."
+    )
     ms.p(
-        f"Confidence tells the same story from the other side: mean maximum softmax "
-        f"probability stays at {f2(cd_best['mean_conf'])} on target images where accuracy "
-        f"is {pct(cd_best['acc15'], 0)} percent. The models are not hesitant under domain "
-        f"shift; they are confidently wrong, and any downstream triage that trusts the "
-        f"confidence would inherit the error. Pre-training does not protect against this: "
-        f"the spread across models at the target domain is a few points, in contrast to "
-        f"the {pct(p_pre['delta_f1_ens'])}-point spread on the source domain.")
+        f"Mean maximum softmax probability remains {f2(cd_best['mean_conf'])} on target "
+        f"images where 15-way accuracy is {pct(cd_best['acc15'], 0)} percent. This indicates "
+        f"miscalibration under the mapped shift, not complete field validation; categories "
+        f"without source counterparts are excluded and results should not be generalized "
+        f"to all PlantDoc images or deployment conditions."
+    )
 
     ms.h("How many target labels does repair take?", 2)
     ad = adapt.get("results", {})
@@ -811,8 +766,9 @@ def build_results(ms):
             f"{pct(p25)} percent; five per class is not enough ({pct(p5)} percent). Full "
             f"fine-tuning on the fold training split reaches {pct(ft)} \u00b1 "
             f"{pct(fts)} percent \u2014 far from the source-domain ceiling, but "
-            f"sufficient to change the practical answer from unusable to deployable-"
-            f"candidate. The same ordering holds for ResNet-18, which tracks MTD-P within "
+            f"an improvement within this pooled-CV protocol, not evidence of deployment readiness "
+            f"without an independent held-out target evaluation. The same ordering holds for "
+            f"ResNet-18, which tracks MTD-P within "
             f"two points at every supervision level, while the from-scratch models start "
             f"lower and remain lower throughout; for MTD-Net, full fine-tuning under the "
             f"small target folds is actually worse than the 25-shot probe, indicating "
