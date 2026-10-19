@@ -1,0 +1,55 @@
+{
+  "n_test": 2916,
+  "n_boot": 2000,
+  "models": {
+    "mtdnet": {
+      "n_seeds": 3,
+      "macro_f1_mean": 0.9627608364437569,
+      "macro_f1_std": 0.005594282933821945,
+      "macro_f1_seeds": [
+        0.9692205461639453,
+        0.9595416723193346,
+        0.9595202908479907
+      ],
+      "acc_mean": 0.9639917695473251,
+      "acc_std": 0.006542792876659421,
+      "params": 394042,
+      "ens_macro_f1": 0.9697011215458945,
+      "ens_acc": 0.970164609053498
+    },
+    "smallcnn": {
+      "n_seeds": 3,
+      "macro_f1_mean": 0.9427794267858655,
+      "macro_f1_std": 0.008975595697306396,
+      "macro_f1_seeds": [
+        0.9499930969183051,
+        0.9456172438077541,
+        0.9327279396315367
+      ],
+      "acc_mean": 0.9439871970736168,
+      "acc_std": 0.01008214899923277,
+      "params": 389936,
+      "ens_macro_f1": 0.9594745334559182,
+      "ens_acc": 0.9588477366255144
+    }
+  },
+  "pairs": [
+    {
+      "a": "mtdnet",
+      "b": "smallcnn",
+      "delta_f1_mean_seeds": 0.019981409657891414,
+      "delta_f1_ens": 0.01022658808997634,
+      "boot_ci_low": 0.004208581493744374,
+      "boot_ci_high": 0.016771837117722423,
+      "boot_p_two_sided": 0.003,
+      "mcnemar_b_a_wrong_b_right": 20,
+      "mcnemar_b_a_right_b_wrong": 53,
+      "mcnemar_p": 0.00014163707253552724,
+      "ttest_seed_p": 0.033188255097962235,
+      "mcnemar_p_holm": 0.00014163707253552724,
+      "boot_p_holm": 0.003,
+      "significant_holm": true
+    }
+  ],
+  "notes": "paired t-test uses the 3 seeds as pairs; McNemar uses the 3-seed ensemble's per-image correctness; bootstrap resamples test images with the seed fixed at 0; Holm correction within this family."
+}
