@@ -1,6 +1,12 @@
 # Reproducibility guide
 
-This repository includes Python source, run-level metric JSONs, and aggregate numeric reports. It does not include raw images, tensor caches, or trained weights. The summary was re-aggregated from recorded run metrics and the existing multi-seed corruption summary; training was **not rerun**.
+## Current status
+
+This repository includes Python source, run-level classification metric JSONs, and aggregate numeric reports. It does not include raw images, tensor caches, trained weights, all per-run prediction logits, complete training logs, or raw per-seed per-condition corruption records. Training was **not rerun** during this mirror.
+
+**Important validity caveat:** the historical metric files do not record whether an internal validation split was used. The earlier training entry point defaulted to `--val-frac=0`, and when validation was omitted, the test split was used for per-epoch checkpoint selection. Therefore, the recorded metrics cannot be certified as independent held-out estimates. Treat them as provisional and regenerate the headline comparisons before making definitive claims.
+
+The current `src/train.py` defaults to `--val-frac 0.1`, rejects zero, and refuses to run checkpoint selection without a training-internal validation split. This protects future runs; it does not retroactively fix the historical metrics.
 
 ## Environment
 
@@ -15,7 +21,7 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Dependencies are currently unpinned because the source snapshot contained no environment lock. Pin Python, PyTorch, torchvision, hardware/CUDA, and package versions before submission.
+Dependencies are currently unpinned. Before submission, record exact Python, PyTorch, torchvision, package, and hardware/CUDA versions.
 
 ## Required local data
 
@@ -27,31 +33,36 @@ data/pd_train-00001.parquet
 data/pd_test-00000.parquet
 ```
 
-The PlantVillage loader references Hugging Face dataset `GVJahnavi/Plant_village_subset`. The exact PlantDoc Parquet revision, license, and hashes are not recorded; see [DATA_PROVENANCE.md](DATA_PROVENANCE.md).
+The PlantVillage loader references Hugging Face dataset `GVJahnavi/Plant_village_subset`. The exact PlantDoc Parquet revision, license, and hashes are not recorded; see [DATA_PROVENANCE.md](DATA_PROVENANCE.md). Obtain the files under their applicable terms and record checksums before running experiments.
 
-## Rebuild cache and run a scratch comparison
+## Rebuild cache and rerun a scratch comparison
 
 The default cap in `src/data.py` is aligned to 320 training images per class. After placing the Parquet files in `data/`:
 
 ```bash
 python src/data.py
 for seed in 0 1 2; do
-  python src/train.py --model mtdnet --cache cache --out "runs/mtdnet_s${seed}" --epochs 6 --size 112 --lr 1e-3 --seed "${seed}"
-  python src/train.py --model smallcnn --cache cache --out "runs/smallcnn_s${seed}" --epochs 6 --size 112 --lr 1e-3 --seed "${seed}"
+  python src/train.py --model mtdnet --cache cache --out "runs_corrected/mtdnet_s${seed}" --epochs 6 --size 112 --lr 1e-3 --val-frac 0.1 --seed "${seed}"
+  python src/train.py --model smallcnn --cache cache --out "runs_corrected/smallcnn_s${seed}" --epochs 6 --size 112 --lr 1e-3 --val-frac 0.1 --seed "${seed}"
 done
 ```
 
-For pretrained comparisons use `--model mtdnet_pt` and `--model resnet18` with peak LR `3e-4`. Keep the data cache, seed, command, and output path recorded.
+Use new output directories such as `runs_corrected/`; do not overwrite historical metrics. For pretrained comparisons, use `--model mtdnet_pt` and `--model resnet18` with peak LR `3e-4`, and pass `--val-frac 0.1` for every run. Select checkpoints only on the training-internal validation split and evaluate the test set once after training.
 
-## Main scripts
+The 12-epoch comparison must likewise be regenerated under the corrected split. Its current recorded contrast also changes peak LR from 1e-3 to 2e-3, so it is a combined training-recipe comparison, not an isolated epoch-budget experiment.
 
-- `src/significance.py`: paired seed tests, ensemble tests, bootstrap intervals, Holm correction.
-- `src/robustness.py` / `src/robustness_stats.py`: synthetic corruption and aggregation.
+## Analysis scripts and missing inputs
+
+- `src/significance.py`: seed-level and ensemble tests; requires per-run `logits.pt` files that are not included in this mirror.
+- `src/robustness.py`: creates corruption measurements from local data and trained models.
+- `src/robustness_stats.py`: aggregates `runs/robustness_ms.json`; that raw multi-seed, per-condition file is not included. Only the precomputed `report/robustness_summary.json` is tracked, so the complete aggregate cannot currently be rebuilt from raw run records.
 - `src/crossdomain.py`: zero-shot PlantDoc transfer.
 - `src/calibration.py`: calibration comparisons.
 - `src/adaptation.py` / `src/adapt_ft_sweep.py`: exploratory target adaptation.
-- `src/analyze.py`: summaries and diagnostic figures; uses the multi-seed robustness aggregate.
+- `src/analyze.py`: summaries and diagnostic figures.
 - `src/make_report.py`: HTML report from aggregate JSON.
-- `src/make_manuscript.py`: manuscript generation; requires local cache metadata and run outputs.
+- `src/make_manuscript.py`: manuscript package generator; requires local `cache/meta.json`, `cache_pd/meta.json`, figures, and run artifacts not included in the mirror.
 
-CI validates Python syntax, JSON syntax, and summary consistency. It does not download datasets, retrain models, or verify external data licensing.
+## What CI validates
+
+GitHub Actions compiles Python source, validates JSON syntax, and checks consistency between tracked run metrics and summary tables. It does not download datasets, train models, regenerate logits, verify data licenses, or certify that the historical results were obtained with an untouched test set.
