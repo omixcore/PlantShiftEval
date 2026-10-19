@@ -6,8 +6,10 @@ Outputs (into `submission/`):
   Table_1.docx ... Table_4.doxsx  editable table files (journal requirement)
   word_count.json             section word counts against the 7,000-word cap
 
-All quantitative statements are injected from the result JSONs; nothing is
-transcribed by hand, so the text cannot drift from the numbers.
+Most summary statistics are computed from tracked result JSONs. Interpretive prose and
+some protocol descriptions are authored manually and must be checked against source
+artifacts. This builder requires local cache metadata and run artifacts that are not
+included in the public repository snapshot.
 """
 
 from __future__ import annotations
@@ -228,38 +230,36 @@ AFFIL = ("\u00b9Department of Plant Pathology, Institute of Agricultural Science
 CORR = "Correspondence: corresponding.author@institution.edu"
 
 ABSTRACT = (
-"High performance on a controlled leaf-image dataset does not establish that a model "
-"uses disease-specific texture cues or generalises to field imagery. We present a "
-"seed-replicated methodological evaluation of texture-appearance decoupling, training-"
-"recipe sensitivity, synthetic corruption robustness and cross-domain transfer. MTD-Net "
-"is treated as a testable design hypothesis: a high-resolution lesion-texture path is "
-"combined with a downsampled appearance path, cross-scale gating and an auxiliary crop-"
-"species head. At six epochs, the across-seed spread ({mtd_sd} percentage points) exceeds "
-"the mean macro-F1 difference from a parameter-matched plain CNN ({mtd_gain} points); "
-"image-level ensemble tests are positive ({ens_gain} points, McNemar p {mtd_p}), but "
-"the seed-level comparison remains uncertain. The no-gate ablation is numerically similar "
-"and does not establish a consistent gate benefit. A longer, higher-learning-rate recipe "
-"raises scratch-model macro-F1 to {opt_f1} with an across-seed SD of {opt_sd} points; "
-"because both epochs and learning rate change, this contrast demonstrates recipe "
-"sensitivity rather than an isolated epoch effect. ImageNet-pretrained MTD-P and ResNet-18 "
-"differ by only {pt_gap} points in mean macro-F1. Zero-shot accuracy on a mapped PlantDoc "
-"subset reaches at most {pd_best}, revealing a substantial source-to-field gap. Synthetic "
-"corruptions provide a complementary stress test but cannot substitute for external-domain "
-"validation; target-adaptation results are exploratory because the mapped target set is "
-"small and the current protocol pools target splits for cross-validation. The findings "
-"support a methodological conclusion: texture decoupling is a plausible hypothesis, but "
-"its benefit is conditional and must be evaluated alongside training strategy, seed "
-"variation and domain shift rather than assumed from the architecture alone."
+"Texture-oriented architectures may improve plant-disease recognition on controlled "
+"images, but apparent gains must be separated from seed variability, training recipe, "
+"and domain shift. We assess MTD-Net as a testable hypothesis about texture/appearance "
+"decoupling rather than assuming architectural superiority. In the recorded six-epoch "
+"runs, MTD-Net exceeds a parameter-matched plain CNN by {mtd_gain} macro-F1 points on "
+"average, but its across-seed standard deviation is {mtd_sd} points and the paired "
+"seed-level comparison is inconclusive (p = {seed_p}; n = 3). The ablations do not "
+"establish independent benefits from the gate or auxiliary head, and pretrained MTD-P "
+"has essentially the same in-domain macro-F1 as ResNet-18 (ensemble difference "
+"{pt_gap} points). Zero-shot 15-way accuracy on the mapped PlantDoc subset reaches at "
+"most {pd_best}; the longer-training comparison also changes peak learning rate and "
+"therefore measures recipe sensitivity, not an isolated epoch effect. A code audit found "
+"that the tracked historical metrics do not record whether an internal validation split "
+"was used, while the mirrored training entry point previously allowed test-set checkpoint "
+"selection when validation was omitted. These scores are provisional until all headline "
+"experiments are rerun with training-internal validation and a single final test "
+"evaluation. The current evidence supports a cautious methodological conclusion: "
+"texture decoupling is a hypothesis to test, and synthetic corruption robustness cannot "
+"substitute for cross-domain validation."
 )
 
 KEYWORDS = ("convolutional neural network; plant disease detection; transfer learning; "
             "distribution shift; model selection; batch normalization; PlantVillage")
 
 GRAPHICAL_ABSTRACT_TEXT = (
-    "A seed-replicated, two-dataset evaluation shows that a purpose-built decoupled "
-    "architecture beats a matched baseline only before pre-training is introduced, and "
-    "that field-image transfer is limited by crop recognition and repaired mainly with "
-    "target labels."
+    "A seed-replicated evaluation tests texture/appearance decoupling against matched "
+    "and pretrained baselines. The recorded results show recipe-sensitive scratch-model "
+    "performance, no clear gain over a pretrained ResNet-18, and a substantial "
+    "source-to-field gap. Historical metrics require a corrected validation-split rerun "
+    "before definitive performance claims."
 )
 
 
@@ -294,6 +294,7 @@ def build_front(ms):
     p = ms.p(ABSTRACT.format(
         mtd_sd=f2(stdev(seeds("mtdnet")) * 100) if len(seeds("mtdnet")) > 1 else "0.0",
         mtd_gain=f2(pair("mtdnet", "smallcnn")["delta_f1_mean_seeds"] * 100),
+        seed_p=f3(pair("mtdnet", "smallcnn")["ttest_seed_p"]),
         ens_gain=f2(pair("mtdnet", "smallcnn")["delta_f1_ens"] * 100),
         mtd_p=("< 0.001" if pair("mtdnet", "smallcnn")["mcnemar_p"] < 1e-3
                else "= " + f3(pair("mtdnet", "smallcnn")["mcnemar_p"])),
@@ -380,9 +381,10 @@ def build_intro(ms):
         "rarely report together: synthetic corruption robustness, zero-shot transfer to "
         "the field-image dataset PlantDoc, and a graded set of target-domain adaptations "
         "(batch-normalization re-estimation, few-shot linear probes, and full fine-tuning) "
-        "evaluated with five-fold cross-validation. Finally, because a fourfold data "
-        "increase might itself change the ranking, we repeated the key comparisons on the "
-        "full uncapped PlantVillage subset with a held-out validation split.")
+        "evaluated with five-fold cross-validation over pooled mapped target shards. Because "
+        "this is not an independent held-out target test, adaptation findings are exploratory. "
+        "The full uncapped PlantVillage arm is not included in the tracked outputs for this "
+        "repository snapshot and is not used to support the conclusions.")
 
 
 # --------------------------------------------------------------------------- #
@@ -418,9 +420,11 @@ def build_methods(ms):
         f"accounts for at least half of the labeled objects were kept, giving {pd_n} "
         f"target images covering all five source crops. Categories without a source "
         f"counterpart (tomato, pepper, potato, squash, raspberry, strawberry) were "
-        f"excluded, so the evaluation measures appearance shift and imaging shift but not "
-        f"novel-crop shift. Both datasets are publicly available under permissive "
-        f"licenses; no new data were collected and no ethical approval was required.")
+        f"excluded, so the evaluation measures appearance and imaging shift within this "
+        f"mapped subset but not novel-crop shift. The exact PlantDoc source revision, "
+        f"license, and file checksums for the Parquet data used here are not recorded in "
+        f"this repository snapshot and must be verified before redistribution or publication. "
+        f"No new data were collected.")
 
     ms.h("Network architecture", 2)
     ms.p(
@@ -450,34 +454,42 @@ def build_methods(ms):
 
     ms.h("Training protocol", 2)
     ms.p(
-        "All models were trained with identical settings: AdamW (weight decay 0.02), a "
-        "one-cycle schedule (25 percent warm-up), batch size 64, six epochs, label "
-        "smoothing 0.05, gradient clipping at norm 5. Learning rates were 1e-3 for "
-        "from-scratch models and 3e-4 for pre-trained models, chosen in exploratory runs "
-        "before the study and never tuned per model. Data augmentation: random resized "
-        "crop (scale 0.55\u20131.0), horizontal and vertical flips, rotation up to "
-        "20 degrees, and color jitter (0.25, 0.25, 0.25, 0.05). Input resolution 112 \u00d7 "
-        "112; evaluation uses resize to 128 and a center crop of 112. Every configuration "
-        "was run with three seeds (0, 1, 2). In the capped-data regime the final epoch is "
-        "reported; in 16 of 17 runs it coincided with the best epoch (largest discrepancy "
-        "0.07 macro-F1 points), so checkpoint selection has no material effect. In the "
-        "data-scaling arm, 10 percent of the training split was held out for epoch "
-        "selection and the test set was evaluated exactly once after training.")
+        "Within each initialization group, models used the same recipe: AdamW (weight "
+        "decay 0.02), a one-cycle schedule (25 percent warm-up), batch size 64, six "
+        "epochs, label smoothing 0.05, gradient clipping at norm 5. Learning rates were "
+        "1e-3 for from-scratch models and 3e-4 for pre-trained models. Augmentation used "
+        "random resized crops (scale 0.55–1.0), horizontal and vertical flips, rotation "
+        "up to 20 degrees, and color jitter (0.25, 0.25, 0.25, 0.05). Input resolution "
+        "was 112 × 112; evaluation resized to 128 and center-cropped to 112. Every core "
+        "configuration except MobileNetV3-Small has three recorded seeds (0, 1, 2); "
+        "MobileNetV3-Small is a single-seed reference and is not used for seed-level "
+        "inference. The public mirror contains metric JSONs but not raw data, caches, "
+        "trained weights, prediction logits, or complete training logs."
+    )
 
     ms.h("Statistical analysis", 2)
     ms.p(
-        "For each model we report the mean and sample standard deviation of test macro-F1 "
-        "across the three seeds, and a soft-voting ensemble (mean softmax over seeds) as "
-        "the primary comparison object, following the recommendation that ensembles "
-        "provide the most stable single-number summary of a configuration.[[lakshminarayanan2017]] Paired "
-        "differences between two ensembles are tested with the exact McNemar test on the "
-        "per-image correct/incorrect vectors;[[mcnemar1947]] 95 percent confidence intervals are obtained "
-        "by paired bootstrap (2,000 resamples of test images);[[efron1993]] the family of ten "
-        "pairwise contrasts is controlled with Holm's step-down procedure.[[holm1979]] Seed-level "
-        "differences are additionally summarized with a two-sample Welch t-test across "
-        "seeds, which we report even though its power at n = 3 is limited, following the "
-        "comparative-classifier testing literature,[[dietterich1998]][[demsar2006]] because the "
-        "contrast between seed variance and effect size is itself one of our findings.")
+        "For each model we report mean and sample standard deviation of test macro-F1 "
+        "across the recorded seeds, together with soft-voting ensemble comparisons. "
+        "Paired image-level comparisons use the exact McNemar test and bootstrap confidence "
+        "intervals over test images; Holm correction is applied across the reported family "
+        "of contrasts. Seed-level differences are summarized with a paired t-test across "
+        "matched seed IDs. With only three seed pairs, this test has very limited power "
+        "and is treated as descriptive rather than definitive evidence."
+    )
+
+    ms.h("Run provenance and test-set isolation", 2)
+    ms.p(
+        "The historical run metrics do not record whether an internal validation split "
+        "was used. A code audit found that the mirrored training entry point previously "
+        "defaulted to val-frac = 0; when validation was omitted, the test split was passed "
+        "to the per-epoch checkpoint-selection loop. We therefore cannot certify that the "
+        "tracked scores are independent held-out estimates. They are provisional and must "
+        "not support definitive architecture claims until all headline configurations are "
+        "rerun with validation drawn only from the training split and the test set evaluated "
+        "once after checkpoint selection. The current entry point now requires a nonzero "
+        "training-internal validation split."
+    )
 
     ms.h("Corruption benchmark", 2)
     ms.p(
