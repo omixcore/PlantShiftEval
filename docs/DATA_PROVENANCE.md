@@ -1,4 +1,6 @@
-# Data provenance and licensing checklist
+# Data provenance and licensing record
+
+The recovered inputs and corrected splits below were used for the completed 65-run study. The opening historical sections document what was missing from the earlier snapshot; they do not describe the current pinned study.
 
 ## PlantVillage
 
@@ -14,7 +16,7 @@ The current protocol maps PlantDoc categories to the 15 PlantVillage classes and
 
 ## Test-set isolation
 
-The historical run metrics do not preserve validation-split metadata. The previous training entry point allowed the test split to be used for per-epoch checkpoint selection when `--val-frac=0`. The current code now requires a nonzero training-internal validation split, but the old scores have not been regenerated. Treat historical performance and significance estimates as provisional until that rerun is complete.
+The historical run metrics do not preserve validation-split metadata. The previous training entry point allowed the test split to be used for per-epoch checkpoint selection when `--val-frac=0`. The current code now requires a nonzero training-internal validation split, and the completed corrected study is recorded separately. Historical performance and significance estimates remain provisional because the new study also changes the retained training population.
 
 ## Data handling
 

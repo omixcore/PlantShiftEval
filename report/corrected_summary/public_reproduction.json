@@ -1,0 +1,8 @@
+{
+  "runs_checked": 65,
+  "metric_disagreements": [],
+  "ece_absolute_tolerance": 2e-06,
+  "accuracy_f1_absolute_tolerance": 1e-10,
+  "status": "passed",
+  "scope": "Statistical metric regeneration from public arrays; corruption aggregation uses archived per-condition records. Model retraining/inference is a separate reproduction route."
+}

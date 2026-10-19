@@ -1,0 +1,10 @@
+{
+  "document": "manuscript/PlantShiftEval_corrected_manuscript.docx",
+  "pages": 13,
+  "all_pages_visually_inspected": true,
+  "figures": 5,
+  "tables": 5,
+  "title_border_removed": true,
+  "last_layout_change": "Widened epoch and seed table columns; page 5 reinspected, other 12 page images byte-identical to inspected render",
+  "sha256": "d6789e5b074f7e29b19003b575aae1260f2240aa44bb569d7c63a4074fd12e78"
+}

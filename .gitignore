@@ -228,6 +228,7 @@ cache_pd_split/
 *.parquet
 *.npy
 *.npz
+!evidence/corrected/*/predictions.npz
 runs/*/*.pt
 runs/*/*.pth
 runs12/*/*.pt
@@ -246,3 +247,4 @@ provenance/source_rows.json
 provenance/target_rows.json
 cache_pd_before_overlap_filter/
 runs_corrected/
+downloads/

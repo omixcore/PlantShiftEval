@@ -1,0 +1,24 @@
+[
+  {
+    "model": "mtdnet",
+    "seed": 0,
+    "local_threads": 4,
+    "remote_threads": 2,
+    "input_hashes_identical": true,
+    "local_macro_f1": 0.6069310848733086,
+    "remote_macro_f1": 0.6069310848733086,
+    "difference": 0.0,
+    "note": "Cross-environment diagnostic; not an additional primary-study seed and not pooled with the five GitHub runs."
+  },
+  {
+    "model": "smallcnn",
+    "seed": 0,
+    "local_threads": 4,
+    "remote_threads": 2,
+    "input_hashes_identical": true,
+    "local_macro_f1": 0.6030018540829154,
+    "remote_macro_f1": 0.6033202775597439,
+    "difference": -0.0003184234768285332,
+    "note": "Cross-environment diagnostic; not an additional primary-study seed and not pooled with the five GitHub runs."
+  }
+]

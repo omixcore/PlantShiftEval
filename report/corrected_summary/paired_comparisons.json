@@ -1,0 +1,153 @@
+{
+  "family": [
+    {
+      "name": "primary_mtd_vs_cnn",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": 0.012262292351754,
+      "sample_sd_difference": 0.038288467722726226,
+      "ci95_student_t": [
+        -0.03527911956594201,
+        0.05980370426945002
+      ],
+      "p_unadjusted": 0.5134980314468187,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power",
+      "p_holm": 1
+    },
+    {
+      "name": "gate",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": -0.007788651105070143,
+      "sample_sd_difference": 0.013842185715864236,
+      "ci95_student_t": [
+        -0.024975994764909165,
+        0.009398692554768877
+      ],
+      "p_unadjusted": 0.2767619357564414,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power",
+      "p_holm": 1
+    },
+    {
+      "name": "auxiliary_task",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": -0.01599831604365003,
+      "sample_sd_difference": 0.016960598091674058,
+      "ci95_student_t": [
+        -0.03705768008208517,
+        0.005061047994785111
+      ],
+      "p_unadjusted": 0.10258276122825509,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power",
+      "p_holm": 0.5129138061412755
+    },
+    {
+      "name": "texture_branch_with_capacity_change",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": 0.009397277438513596,
+      "sample_sd_difference": 0.02054823749671738,
+      "ci95_student_t": [
+        -0.01611672928770101,
+        0.034911284164728204
+      ],
+      "p_unadjusted": 0.3643009162604847,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power",
+      "p_holm": 1
+    },
+    {
+      "name": "pretrained_increment",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": 0.0002894202711793303,
+      "sample_sd_difference": 0.03573545354568825,
+      "ci95_student_t": [
+        -0.044082005855984825,
+        0.04466084639834348
+      ],
+      "p_unadjusted": 0.9864185468129213,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power",
+      "p_holm": 1
+    }
+  ],
+  "factorial_interactions": [
+    {
+      "model": "mtdnet",
+      "contrast": "(12-6 epochs at LR2e-3) minus (12-6 epochs at LR1e-3)",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": -0.02547394024406291,
+      "sample_sd_difference": 0.026597966124245417,
+      "ci95_student_t": [
+        -0.058499677205981745,
+        0.007551796717855927
+      ],
+      "p_unadjusted": 0.0989129935466277,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power"
+    },
+    {
+      "model": "smallcnn",
+      "contrast": "(12-6 epochs at LR2e-3) minus (12-6 epochs at LR1e-3)",
+      "n": 5,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mean_difference": -0.012424196061112669,
+      "sample_sd_difference": 0.021564093750481426,
+      "ci95_student_t": [
+        -0.03919955492497624,
+        0.014351162802750901
+      ],
+      "p_unadjusted": 0.26710716471576024,
+      "uncertainty_unit": "paired training seeds, conditional on fixed data split",
+      "assumption": "Student-t interval/test assumes approximately normal seed differences; n=5 offers limited power"
+    }
+  ]
+}

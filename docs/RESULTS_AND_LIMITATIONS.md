@@ -1,72 +1,24 @@
-# Recorded results and limitations
+# Corrected results and limitations
 
-**Status: provisional.** The tables below reproduce the tracked historical metrics; they are not corrected rerun results. The historical `metrics.json` files do not record whether a training-internal validation split was used. The earlier training entry point defaulted to `--val-frac=0` and used the test split for per-epoch checkpoint selection when validation was omitted. We therefore cannot certify that these are unbiased held-out estimates. Current code fixes the future training path, but the experiments must be rerun before definitive claims.
+Evidence: complete 65-run study; all configurations have five training seeds.
 
-## Recorded PlantVillage metrics
-
-| Model | Mean macro-F1 | Across-seed sample SD | Seeds |
+| Configuration | Source macro-F1 mean ± SD | Corruption accuracy | Target zero-shot accuracy |
 |---|---:|---:|---:|
-| MTD-Net (scratch) | 0.8632 | 0.0467 | 3 |
-| Plain CNN (parameter-matched scratch) | 0.8323 | 0.0079 | 3 |
-| MTD-Net without gate | 0.8717 | 0.0242 | 3 |
-| MTD-Net without auxiliary species head | 0.8601 | 0.0559 | 3 |
-| MTD-P (pretrained ResNet-18 trunk) | 0.9862 | 0.0012 | 3 |
-| ResNet-18 | 0.9861 | 0.0021 | 3 |
+| MTD-Net | 0.6026 ± 0.0245 | 0.4496 | 0.1478 |
+| Plain CNN | 0.5903 ± 0.0250 | 0.3784 | 0.1283 |
+| MTD-P | 0.8745 ± 0.0292 | 0.7781 | 0.3370 |
+| ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |
 
-The recorded MTD-Net minus plain-CNN mean difference is **+3.09 macro-F1 points**. The paired seed-level test is inconclusive (p = 0.396; n = 3), while the image-level ensemble bootstrap interval is positive (Δ macro-F1 = +4.21 points; 95% CI +3.07 to +5.39; McNemar p = 1.21 × 10⁻¹¹). The image-level analysis is conditional on the recorded test set and ensemble; because test-set checkpoint-selection leakage cannot be ruled out, these inferential statistics are provisional too.
+The primary six-epoch scratch contrast is +1.23 macro-F1 percentage points for MTD-Net versus the parameter-matched CNN, with a paired-seed 95% Student-t interval of −3.53 to +5.98 points (five seeds; Holm-adjusted p = 1). This does not establish a stable advantage or practical equivalence. MTD-P versus pretrained ResNet-18 differs by +0.03 points, with a seed interval of −4.41 to +4.47 points. Gate and auxiliary-task benefits are not established by the declared contrasts.
 
-The no-gate variant has a slightly higher recorded mean macro-F1, but its seed-level contrast is not significant (p = 0.589) and the ensemble difference is near zero with a confidence interval crossing zero. The auxiliary-head comparison is inconclusive (p = 0.644). MTD-P and ResNet-18 have recorded macro-F1 means of 0.9862 and 0.9861, respectively; the current evidence does not establish a reliable difference.
+Training configuration has a substantial descriptive effect: MTD-Net means range from 0.6026 at six epochs / LR 1e-3 to 0.7930 at twelve epochs / LR 2e-3; corresponding CNN means range from 0.5903 to 0.7404. The full factorial reports each factor and its interaction rather than attributing the joint change to epochs alone. The four scratch recipe contrasts and their raw per-seed values are retained without selecting a single favorable cell as the primary test.
 
-## Training-recipe sensitivity
+Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0.3109 target zero-shot accuracy. These are different metrics and datasets, not directly subtractable performance estimates. Synthetic corruption, source-fitted calibration, image-only AdaBN and supervised target fine-tuning are separately reported. The study does not establish semantic texture disentanglement, universal superiority or field reliability.
 
-The recorded contrast is 6 epochs at peak LR 1e-3 versus 12 epochs at peak LR 2e-3.
+## Interpretation limits
 
-| Model | 6-epoch mean macro-F1 (SD) | 12-epoch / higher-LR mean macro-F1 (SD) |
-|---|---:|---:|
-| MTD-Net | 0.8632 (0.0467) | 0.9628 (0.0056) |
-| Plain CNN | 0.8323 (0.0079) | 0.9428 (0.0090) |
+The cleaned source split contains 2,922 optimizer-training images, 333 validation images and 2,916 official test images. Filtering removes 5,820 training rows in known leaf/identity components overlapping test and 12 further similarity candidates before per-class capping. Class support is uneven; one retained source-cache class has only 16 images. Biological leaf IDs remain missing for 1,604 retained source-training-cache images and 857 source-test images. Image-identity fallback and similarity screening cannot certify full biological or acquisition independence.
 
-Both scratch models improve and become less variable under the second recipe. Because epoch count and learning rate both change, the comparison does not isolate a pure training-budget effect. These historical scores also require rerunning with the corrected validation protocol.
+The mapped target pool is 946 images after filtering, with 683 target-training, 170 validation and 92 official test images; one duplicate train row is unused. Results cover the selected mapped subset, not the whole PlantDoc population. Five seeds quantify training variability conditional on these splits. The supplementary ensemble Wilson image intervals do not capture acquisition dependence or dataset-selection uncertainty. Removing a branch changes parameter count and does not isolate a texture mechanism. Historical and corrected scores use different training populations and cannot isolate the impact of the old checkpoint-selection problem.
 
-## Synthetic corruption
-
-These are recorded mean accuracies across eight synthetic corruptions, not PlantDoc accuracies.
-
-| Model | Clean accuracy (mean ± SD) | Corruption accuracy (mean ± SD) | Corruption seeds |
-|---|---:|---:|---:|
-| MTD-Net | 0.8812 ± 0.0354 | 0.5885 ± 0.0587 | 3 |
-| Plain CNN | 0.8499 ± 0.0050 | 0.5085 ± 0.0296 | 3 |
-| MTD-P | 0.9877 ± 0.0014 | 0.8967 ± 0.0093 | 3 |
-| ResNet-18 | 0.9871 ± 0.0017 | 0.8864 ± 0.0064 | 3 |
-
-The recorded MTD-Net–plain-CNN mean corruption-accuracy difference is +8.00 points, with paired-seed SD 6.85 points and only three seeds. This is a descriptive robustness signal, not proof that the texture branch alone causes the effect. The raw multi-seed per-condition input used to build the aggregate is missing from the repository, so the complete robustness aggregation is not currently reproducible from run-level inputs.
-
-## Zero-shot PlantDoc transfer
-
-The mapping retains 956 images across 10 categories. Unmapped categories are excluded, and 15-way accuracy penalizes classes absent from PlantDoc.
-
-| Model | PlantDoc 15-way accuracy |
-|---|---:|
-| MTD-P | 0.2458 |
-| ResNet-18 | 0.2385 |
-| MTD-Net (scratch) | 0.1036 |
-| Plain CNN | 0.0973 |
-
-The best recorded model remains at about 24.6% 15-way accuracy, indicating a substantial source-to-target gap under this mapping protocol, not complete deployment validation. These scores should also be regenerated after the test-selection issue is resolved.
-
-## Calibration and adaptation
-
-On mapped PlantDoc, recorded mean raw ECE is 0.492 for scratch MTD-Net, 0.386 for MTD-P, and 0.326 for ResNet-18. Source-fitted temperature scaling worsens these to 0.602, 0.534, and 0.499. Target-label-fitted oracle scaling is diagnostic only.
-
-The adaptation analysis pools mapped PlantDoc train and test shards and uses stratified five-fold CV. It is exploratory, not an independent held-out target-test evaluation.
-
-## Remaining limitations and required next steps
-
-- Rerun all headline models with validation data split only from the training partition, and evaluate the untouched test set once.
-- Increase seed count beyond three before claiming small architectural effects.
-- Cross epoch count and learning rate to separate their effects.
-- Gate and auxiliary-head effects are not isolated convincingly.
-- Synthetic corruption does not replace independent field-domain validation.
-- PlantDoc mapping and dominant-object filtering narrow the target problem.
-- Exact dataset revisions, licenses, checksums, package lock, trained weights, logits, full training logs, and raw per-seed corruption inputs are not included.
-- The full uncapped data-scaling arm is not tracked.
+Historical scores are archived separately in [HISTORICAL_RESULTS_AND_LIMITATIONS.md](HISTORICAL_RESULTS_AND_LIMITATIONS.md). See [all configurations](../manuscript/corrected_results.md) and [paired contrasts](../report/corrected_summary/paired_comparisons.json).

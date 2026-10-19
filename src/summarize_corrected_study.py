@@ -83,7 +83,7 @@ def main():
         '', 'AdaBN accesses only target-training images without labels. Supervised fine-tuning uses target-training labels and target-validation checkpoint selection. Both are reported separately from zero-shot transfer. Source-fitted calibration uses only the source validation labels. The small official target holdout limits precision and breadth of field-generalization claims.',
         '', 'Historical metrics cannot be compared directly to this cleaned source protocol because both split validity and retained training composition changed. No claim of universal superiority, semantic disentanglement, deployment readiness or practical equivalence is generated automatically.']
     (ROOT/'manuscript').mkdir(exist_ok=True);(ROOT/'manuscript/corrected_results.md').write_text('\n'.join(text)+'\n')
-    if rows:figures(rows,grouped,out)
+    if rows and not missing:figures(rows,grouped,out)
     print(json.dumps(status),flush=True)
     if missing:raise SystemExit(1)
 
@@ -102,8 +102,18 @@ def figures(rows,grouped,out):
             if not vv:continue
             ax.scatter(i+np.linspace(-.08,.08,len(vv)),vv,color='#3284b7',s=25,zorder=3)
             ax.errorbar(i,np.mean(vv),yerr=np.std(vv,ddof=1) if len(vv)>1 else 0,fmt='_',color='#163a50',capsize=4)
-        ax.set_xticks(range(len(configs)),[m.replace('mtdnet_pt','MTD-P').replace('mtdnet','MTD-Net') for m,_,_ in configs],rotation=20,ha='right')
+        labels={'mtdnet':'MTD-Net','smallcnn':'Plain CNN','mtdnet_pt':'MTD-P','resnet18':'ResNet-18','mtd_concat':'No gate','mtd_single':'No auxiliary task','mtd_appearance':'Appearance only'}
+        ax.set_xticks(range(len(configs)),[labels[m] for m,_,_ in configs],rotation=20,ha='right')
     core=[('mtdnet',6,'1e-3'),('smallcnn',6,'1e-3'),('mtdnet_pt',6,'3e-4'),('resnet18',6,'3e-4')]
+    figure_rows={
+        'Figure1_source_comparisons':[r for r in rows if (r['model'],r['epochs'],r['lr']) in core],
+        'Figure2_training_factorial':[r for r in rows if r['model'] in ('mtdnet','smallcnn')],
+        'Figure3_component_ablations':[r for r in rows if r['model'] in ('mtd_concat','mtd_single','mtd_appearance') or (r['model'],r['epochs'],r['lr'])==('mtdnet',6,'1e-3')],
+        'Figure4_domain_limits':[r for r in rows if (r['model'],r['epochs'],r['lr']) in core],
+        'Figure5_target_access':[r for r in rows if r['model'] in ('mtdnet_pt','resnet18')]}
+    for name,records in figure_rows.items():
+        with (out/(name+'_data.csv')).open('w',newline='') as handle:
+            writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(records)
     f,ax=plt.subplots(figsize=(6,3.4));plot_groups(ax,core,'source_macro_f1');ax.set_ylabel('Source test macro-F1');save(f,'Figure1_source_comparisons')
     f,axes=plt.subplots(1,2,figsize=(7,3.4))
     for ax,model in zip(axes,('mtdnet','smallcnn')):
@@ -111,9 +121,9 @@ def figures(rows,grouped,out):
             means=[]
             for ep in (6,12):
                 vv=[r['source_macro_f1'] for r in grouped[(model,ep,lr)]];means.append(np.mean(vv) if vv else np.nan)
-                if vv:ax.scatter(np.full(len(vv),ep),vv,color=color,s=15,alpha=.65)
+                if vv:ax.scatter(ep+np.linspace(-.12,.12,len(vv)),vv,color=color,s=15,alpha=.65)
             ax.plot([6,12],means,'o-',label='LR '+lr,color=color)
-        ax.set(title=model,xlabel='Epochs',ylabel='Source test macro-F1',xticks=[6,12]);ax.legend(frameon=False)
+        ax.set(title={'mtdnet':'MTD-Net','smallcnn':'Plain CNN'}[model],xlabel='Epochs',ylabel='Source test macro-F1',xticks=[6,12]);ax.legend(frameon=False)
     save(f,'Figure2_training_factorial')
     f,ax=plt.subplots(figsize=(6,3.4));plot_groups(ax,[('mtdnet',6,'1e-3'),('mtd_concat',6,'1e-3'),('mtd_single',6,'1e-3'),('mtd_appearance',6,'1e-3')],'source_macro_f1');ax.set_ylabel('Source test macro-F1');save(f,'Figure3_component_ablations')
     f,axes=plt.subplots(1,2,figsize=(8,3.4))
@@ -124,7 +134,7 @@ def figures(rows,grouped,out):
         for i,measure in enumerate(('target_accuracy','adabn_accuracy','supervised_ft_accuracy')):
             vv=[r[measure] for r in grouped[(model,6,'3e-4')] if r[measure] is not None]
             if vv:ax.scatter(i+np.linspace(-.06,.06,len(vv)),vv,color='#3284b7');ax.plot(i,np.mean(vv),'_',color='#163a50',ms=15)
-        ax.set(title=model,xticks=[0,1,2],xticklabels=['Zero-shot','AdaBN','Supervised FT'],ylabel='Official target-test accuracy')
+        ax.set(title={'mtdnet_pt':'MTD-P','resnet18':'ResNet-18'}[model],xticks=[0,1,2],xticklabels=['Zero-shot','AdaBN','Supervised FT'],ylabel='Official target-test accuracy')
     save(f,'Figure5_target_access')
 
 if __name__=='__main__':main()

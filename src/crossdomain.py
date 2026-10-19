@@ -3,8 +3,8 @@
 PlantVillage is lab-style: one leaf, uniform background, studio light.
 PlantDoc is field-style: cluttered background, several leaves per frame,
 varying exposure, phone cameras.  A model trained *only* on PlantVillage and
-tested *directly* on PlantDoc measures how much of its accuracy came from the
-easy acquisition conditions rather than from the lesion itself.
+tested *directly* on PlantDoc measures transfer under a change in dataset and
+acquisition conditions. It does not identify which visual cues caused errors.
 
 Protocol
 --------
@@ -21,9 +21,9 @@ Protocol
    crop_acc   accuracy of the *crop* implied by the predicted class -> measures
               whether the model still knows what plant it is looking at
 
-If a model's acc15 collapses but crop_acc stays high, the failure is in lesion
-recognition, not in crop recognition; if crop_acc collapses too, the model was
-riding on background/appearance cues.
+Crop-restricted and full-taxonomy scores describe different prediction tasks.
+Their differences are diagnostic and do not establish a background or lesion
+feature mechanism.
 """
 
 from __future__ import annotations

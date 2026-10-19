@@ -1,49 +1,25 @@
 # Research positioning
 
-## Recommended title
-
 **Testing Texture-Representation Hypotheses in Plant Disease Recognition: Training-Strategy Effects and Cross-Domain Generalization Limits**
 
-MTD-Net is the candidate architecture used to test the texture/appearance-decoupling hypothesis. The proposed methodological contribution is the evaluation of that hypothesis under repeated seeds, component ablations, training-recipe sensitivity, synthetic corruptions, and cross-domain transfer—not an assumed state-of-the-art result.
+MTD-Net is an experimental vehicle for an original methodological investigation. Its contribution is the controlled, reproducible examination of texture-oriented configurations and their failure boundaries. Architectural novelty or superiority is not assumed.
 
-## Critical status before publication
+## What the completed evidence supports
 
-The currently tracked scores are historical and provisional. The run-level metric JSONs do not record the validation-split setting, and the earlier training entry point defaulted to `--val-frac=0`, which could use the test split for per-epoch checkpoint selection. The current code now requires a training-internal validation split, but the historical runs have not been regenerated. Do not present the existing p-values or metrics as definitive unbiased held-out results until that rerun is complete.
+The primary six-epoch scratch contrast is +1.23 macro-F1 percentage points for MTD-Net versus the parameter-matched CNN, with a paired-seed 95% Student-t interval of −3.53 to +5.98 points (five seeds; Holm-adjusted p = 1). This does not establish a stable advantage or practical equivalence. MTD-P versus pretrained ResNet-18 differs by +0.03 points, with a seed interval of −4.41 to +4.47 points. Gate and auxiliary-task benefits are not established by the declared contrasts.
 
-## What the recorded evidence suggests (provisionally)
+Training configuration has a substantial descriptive effect: MTD-Net means range from 0.6026 at six epochs / LR 1e-3 to 0.7930 at twelve epochs / LR 2e-3; corresponding CNN means range from 0.5903 to 0.7404. The full factorial reports each factor and its interaction rather than attributing the joint change to epochs alone. The four scratch recipe contrasts and their raw per-seed values are retained without selecting a single favorable cell as the primary test.
 
-- Texture/appearance decoupling is plausible, but the recorded scratch-model gain is small relative to seed variation and is not established as a stable effect.
-- The gate and auxiliary crop-species head have not shown a consistent independent benefit.
-- The 12-epoch comparison also raises peak learning rate, so it demonstrates recipe sensitivity rather than a pure epoch-budget effect.
-- Pretrained MTD-P is effectively tied with ResNet-18 on recorded in-domain macro-F1.
-- Synthetic-corruption robustness and PlantDoc transfer are distinct tests; transfer remains poor even for the strongest recorded pretrained model.
-- The pooled PlantDoc adaptation results are exploratory and do not establish deployment readiness.
+Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0.3109 target zero-shot accuracy. These are different metrics and datasets, not directly subtractable performance estimates. Synthetic corruption, source-fitted calibration, image-only AdaBN and supervised target fine-tuning are separately reported. The study does not establish semantic texture disentanglement, universal superiority or field reliability.
 
-## Recommended narrative after corrected reruns
+## Narrative and boundaries
 
-1. Motivate the gap between controlled leaf images and field imagery.
-2. State the texture-representation hypothesis and the competing possibility that pre-training and optimization dominate.
-3. Describe matched scratch baselines, pretrained baselines, seeds, and ablations before the results.
-4. Report means with seed variability; do not claim a gate or auxiliary-head benefit that is not established.
-5. Treat the longer/higher-LR comparison as a combined recipe contrast until a factorial control is run.
-6. Contrast synthetic corruption with zero-shot PlantDoc transfer.
-7. Close with the evidence boundary and the controls needed next.
+Lead with the representation hypothesis, declare the alternative explanation of optimization and initialization, and report the full corrected design before numerical claims. Use the primary paired contrast, all factorial cells and component controls. Treat non-significance as limited evidence, not equivalence. The branch labels do not prove semantic factorization; branch removal changes capacity. Separate source classification, synthetic stress tests and target transfer. Target adaptation uses additional image or label information and cannot be relabeled zero-shot generalization.
 
-## Claims to avoid
+The cleaned source split contains 2,922 optimizer-training images, 333 validation images and 2,916 official test images. Filtering removes 5,820 training rows in known leaf/identity components overlapping test and 12 further similarity candidates before per-class capping. Class support is uneven; one retained source-cache class has only 16 images. Biological leaf IDs remain missing for 1,604 retained source-training-cache images and 857 source-test images. Image-identity fallback and similarity screening cannot certify full biological or acquisition independence.
 
-- Universal superiority or state-of-the-art claims.
-- Attributing corruption gains to the texture branch alone.
-- Claiming that epochs alone caused the 12-epoch improvement.
-- Treating synthetic corruption as field validation.
-- Calling pooled PlantDoc five-fold adaptation an independent held-out test.
-- Claiming that the gate or auxiliary head improves performance in general.
-- Treating the current historical scores as final, unbiased test estimates.
+The mapped target pool is 946 images after filtering, with 683 target-training, 170 validation and 92 official test images; one duplicate train row is unused. Results cover the selected mapped subset, not the whole PlantDoc population. Five seeds quantify training variability conditional on these splits. The supplementary ensemble Wilson image intervals do not capture acquisition dependence or dataset-selection uncertainty. Removing a branch changes parameter count and does not isolate a texture mechanism. Historical and corrected scores use different training populations and cannot isolate the impact of the old checkpoint-selection problem.
 
-## Needed before submission
+## Publication preparation still owned by the authors
 
-1. Rerun the headline comparisons with a training-internal validation split and a single final test evaluation.
-2. Increase seed count beyond three for small architectural effects.
-3. Cross epoch count (6/12) with learning rate (1e-3/2e-3) using the same seeds and data.
-4. Pin dataset revisions, licenses, checksums, class mapping, and split definitions.
-5. Archive the per-run logits, raw corruption outputs, commands, environment, and package lock.
-6. Use an independent PlantDoc holdout for adaptation, or keep pooled CV explicitly exploratory.
+Complete verified author/affiliation details, contributions, funding and competing-interest declarations; review the final numerical narrative and venue requirements; preserve durable access to pinned data and checkpoint archives. Broader deployment claims would require further independently acquired data and biological grouping metadata. These are limitations and author responsibilities, not unfinished cells in the completed 65-run experiment.

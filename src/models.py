@@ -266,10 +266,9 @@ class MTDNetGate(MTDNet):
     """Same wiring, but the cross-scale gate is initialised with a usable
     dynamic range instead of a flat 0.25 multiplier.
 
-    Motivation: the gate ablation removed a module that, at its default init,
-    was numerically almost an identity scaling, so "no effect" was the only
-    possible outcome.  Re-running the ablation with a gate that can actually
-    select channels is the fair test of whether cross-scale gating helps.
+    This optional initialization changes the initial gate dynamic range.
+    Its usefulness requires a controlled experiment; initialization alone
+    neither guarantees a gating benefit nor explains an ablation result.
     """
 
     def __init__(self, n_disease: int, n_species: int, g_init: float = 0.15, **kw):

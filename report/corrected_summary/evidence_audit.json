@@ -1,0 +1,12 @@
+{
+  "planned": 65,
+  "audited_training_and_evaluation_pairs": 65,
+  "source_input_fingerprint_sets": 1,
+  "target_split_fingerprint_sets": 1,
+  "training_source_fingerprint_sets": 1,
+  "training_commits": [
+    "bd7cd1d94ff2591fa58dac5eb69f0e66225b8f72"
+  ],
+  "failures": [],
+  "status": "passed"
+}

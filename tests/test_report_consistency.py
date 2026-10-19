@@ -59,10 +59,11 @@ class ProtocolAuditTests(unittest.TestCase):
         self.assertNotIn("same peak learning rate", source)
         self.assertNotIn("fully reproducible: code, per-run configurations, seeds, logs, trained weights", source)
 
-    def test_reproducibility_gaps_are_explicit(self):
+    def test_corrected_and_historical_reproduction_are_distinct(self):
         docs = (ROOT / "docs" / "REPRODUCIBILITY.md").read_text(encoding="utf-8")
-        self.assertIn("runs/robustness_ms.json", docs)
-        self.assertIn("prediction logits", docs)
+        self.assertIn("reproduce_public_results.py", docs)
+        self.assertIn("65 primary runs", docs)
+        self.assertIn("provisional historical records", docs)
         self.assertTrue((ROOT / "runs" / "latency.json").is_file())
         self.assertTrue((ROOT / "runs" / "robustness.json").is_file())
 

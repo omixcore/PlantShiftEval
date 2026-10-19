@@ -1,73 +1,20 @@
 # Reproducibility guide
 
-## Current status
+## Completed study and public statistical reproduction
 
-This repository includes Python source, run-level classification metric JSONs, and aggregate numeric reports. It does not include raw images, tensor caches, trained weights, all per-run prediction logits, complete training logs, or raw per-seed per-condition corruption records. Training was **not rerun** during this mirror.
+All 65 primary runs completed with five seeds per configuration in [workflow 39265931897](https://github.com/omixcore/PlantShiftEval/actions/runs/39265931897), training revision `bd7cd1d94ff2591fa58dac5eb69f0e66225b8f72`. Every run has recorded Python/package versions, source and input hashes, checkpoint/output hashes and frozen split indices. See `report/corrected_summary/evidence_audit.json` and `provenance/corrected_workflow.json`.
 
-**Important validity caveat:** the historical metric files do not record whether an internal validation split was used. The earlier training entry point defaulted to `--val-frac=0`, and when validation was omitted, the test split was used for per-epoch checkpoint selection. Therefore, the recorded metrics cannot be certified as independent held-out estimates. Treat them as provisional and regenerate the headline comparisons before making definitive claims.
-
-The current `src/train.py` defaults to `--val-frac 0.1`, rejects zero, and refuses to run checkpoint selection without a training-internal validation split. This protects future runs; it does not retroactively fix the historical metrics.
-
-For the corrected control matrix and reporting decisions, see [CORRECTED_EXPERIMENT_PLAN.md](CORRECTED_EXPERIMENT_PLAN.md). Each new run saves `run_manifest.json` before training and marks it completed only after hashing the checkpoint, metrics and logits. It records full arguments, original-cache training/validation indices, input and source hashes, Git revision/dirty status, Python/package versions and target-background access. It is a local audit record, not upstream dataset verification. Console logs and an environment lock must still be archived separately. Output directories must be new or empty to prevent overwriting previous runs. Background augmentation uses target images and must be reported as transductive, even without target labels.
-
-## Environment
-
-Python 3.10 or newer is required.
+Install NumPy to regenerate source/target classification and calibration metrics directly from the 65 public prediction arrays:
 
 ```bash
-python -m venv .venv
-# Linux/macOS
-source .venv/bin/activate
-# Windows PowerShell: .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python src/reproduce_public_results.py
 ```
 
-Dependencies are currently unpinned. Before submission, record exact Python, PyTorch, torchvision, package, and hardware/CUDA versions.
+The checked publication archive reproduces without disagreements. Accuracy and macro-F1 tolerance is 1e-10; ECE tolerance is 2e-6 for floating-point softmax differences. Corruption averages use the archived eight per-condition accuracy records, not new inference. This route does not require torch or weights. Small platform/thread differences during fresh training are possible; a separate CPU-repeat diagnostic is in `provenance/local_cpu_repeat.json`.
 
-## Required local data
+## Full training and inference
 
-```text
-data/pv_train.parquet
-data/pv_test.parquet
-data/pd_train-00000.parquet
-data/pd_train-00001.parquet
-data/pd_test-00000.parquet
-```
-
-The PlantVillage loader references Hugging Face dataset `GVJahnavi/Plant_village_subset`. The exact PlantDoc Parquet revision, license, and hashes are not recorded; see [DATA_PROVENANCE.md](DATA_PROVENANCE.md). Obtain the files under their applicable terms and record checksums before running experiments.
-
-## Rebuild cache and rerun a scratch comparison
-
-The default cap in `src/data.py` is aligned to 320 training images per class. After placing the Parquet files in `data/`:
-
-```bash
-python src/data.py
-for seed in 0 1 2; do
-  python src/train.py --model mtdnet --cache cache --out "runs_corrected/mtdnet_s${seed}" --epochs 6 --size 112 --lr 1e-3 --val-frac 0.1 --seed "${seed}"
-  python src/train.py --model smallcnn --cache cache --out "runs_corrected/smallcnn_s${seed}" --epochs 6 --size 112 --lr 1e-3 --val-frac 0.1 --seed "${seed}"
-done
-```
-
-Use new output directories such as `runs_corrected/`; do not overwrite historical metrics. For pretrained comparisons, use `--model mtdnet_pt` and `--model resnet18` with peak LR `3e-4`, and pass `--val-frac 0.1` for every run. Select checkpoints only on the training-internal validation split and evaluate the test set once after training.
-
-The 12-epoch comparison must likewise be regenerated under the corrected split. Its current recorded contrast also changes peak LR from 1e-3 to 2e-3, so it is a combined training-recipe comparison, not an isolated epoch-budget experiment.
-
-## Analysis scripts and missing inputs
-
-- `src/significance.py`: seed-level and ensemble tests; requires per-run `logits.pt` files that are not included in this mirror.
-- `src/robustness.py`: creates corruption measurements from local data and trained models.
-- `src/robustness_stats.py`: aggregates `runs/robustness_ms.json`; that raw multi-seed, per-condition file is not included. Only the precomputed `report/robustness_summary.json` is tracked, so the complete aggregate cannot currently be rebuilt from raw run records.
-- `src/crossdomain.py`: zero-shot PlantDoc transfer.
-- `src/calibration.py`: calibration comparisons.
-- `src/adaptation.py` / `src/adapt_ft_sweep.py`: exploratory target adaptation.
-- `src/analyze.py`: summaries and diagnostic figures.
-- `src/make_report.py`: HTML report from aggregate JSON.
-- `src/make_manuscript.py`: manuscript package generator; requires local `cache/meta.json`, `cache_pd/meta.json`, figures, and run artifacts not included in the mirror.
-
-## What CI validates
-
-GitHub Actions compiles Python source, validates JSON syntax, and checks consistency between tracked run metrics and summary tables. It does not download datasets, train models, regenerate logits, verify data licenses, or certify that the historical results were obtained with an untouched test set.
+Use Python 3.10+ and `requirements-study.txt`. Install its torch/torchvision CPU versions from the official CPU wheel index. The exact realized environment is also preserved per run. The workflow uses two CPU threads per job; use `--threads 2` for the closest match. Data URLs, revisions, hashes and licenses are in `provenance/datasets.json` and `DATASET_NOTICE.md`; raw image data are not committed.
 
 ## Execute the complete corrected study
 
@@ -77,9 +24,30 @@ Use a CPU PyTorch installation and the pinned scientific dependencies listed in 
 python src/fetch_study_data.py
 python src/prepare_corrected_data.py
 python src/prepare_corrected_data.py --target
-python src/run_corrected_study.py --execute --workers 2 --threads 4
-python src/evaluate_corrected_study.py --adapt --threads 4
+python src/run_corrected_study.py --execute --workers 2 --threads 2
+python src/evaluate_corrected_study.py --adapt --threads 2
+python src/audit_corrected_outputs.py
 python src/summarize_corrected_study.py
+python src/target_uncertainty.py
+python src/export_public_predictions.py --source-root .
+python src/reproduce_public_results.py
+python src/assemble_corrected_manuscript.py
 ```
 
-The training runner generates the 65-cell matrix, preserves console logs and resumes only completed runs whose output hashes verify. Partial outputs require explicit inspection; they are never silently treated as completed. Data preparation refuses to overwrite populated caches. The final summary reports missing cells and exits unsuccessfully while any are missing. The GitHub Actions study workflow performs the same preparation once, then distributes fixed experiment cells and archives checkpoints, logits, logs and evaluation records. Generated partial Markdown is explicitly labeled partial. Final plots and numerical manuscript claims must be reviewed after completion.
+The training runner generates the 65-cell matrix, preserves console logs and resumes only completed runs whose output hashes verify. Partial outputs require explicit inspection; they are never silently treated as completed. Data preparation refuses to overwrite populated caches. The final summary reports missing cells and exits unsuccessfully while any are missing. The GitHub Actions study workflow performs the same preparation once, then distributes fixed experiment cells and archives checkpoints, logits, logs and evaluation records. Generated partial Markdown is explicitly labeled partial. All 65 observed runs are complete; final figures have been inspected. The same completeness guards apply to new replications.
+
+## Checkpoints and final document
+
+The workflow experiment artifacts contain original checkpoints, logits, console logs and evaluation outputs; pretrained artifacts also contain target fine-tuned weights. Separate verified archives group the 55 scratch runs, five MTD-P runs and five ResNet-18 runs. `provenance/checkpoint_archives.json` records archive hashes and sizes. Keep a durable archive copy because GitHub Actions retention is finite. AdaBN statistics can be reconstructed from source weights and the frozen target-training images. Public prediction arrays remain committed in Git for weight-free statistical reproduction.
+
+To export the manuscript after complete results exist:
+
+```bash
+python src/export_corrected_docx.py --out PlantShiftEval_corrected_manuscript.docx
+```
+
+The DOCX figures use the generated PNGs; editable SVG and PDF figures plus plotting CSVs are in `report/corrected_summary`. Document rendering requires LibreOffice and the document verification tools, separately from numerical reproduction.
+
+## Historical scripts
+
+The old `runs/`, `runs12/`, older summary files and pooled target adaptation scripts are preserved as provisional historical records. They are not inputs to corrected reporting. The old entry point could select on test when validation was absent. The corrected study uses frozen internal source validation and independent official target-test membership; its different training population prevents a direct estimate of the impact of that old bug alone.

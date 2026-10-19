@@ -18,6 +18,10 @@ jobs:
         run: python -m compileall -q src
       - name: Check tracked result consistency
         run: python -m unittest discover -s tests -v
+      - name: Reproduce all public prediction metrics
+        run: |
+          python -m pip install numpy==2.3.5
+          python src/reproduce_public_results.py
       - name: Validate JSON artifacts
         run: |
           python - <<'PY'

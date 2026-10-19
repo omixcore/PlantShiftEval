@@ -1,0 +1,26 @@
+[
+  {
+    "filename": "PlantShiftEval_scratch_checkpoints.zip",
+    "group": "scratch",
+    "runs": 55,
+    "bytes": 92233956,
+    "sha256": "3840744ee9fe6bb34b64385066f403d36a1dac7855444ca2a844ec89b110974d",
+    "workflow_run_id": 39265931897
+  },
+  {
+    "filename": "PlantShiftEval_MTD-P_checkpoints.zip",
+    "group": "mtdnet_pt",
+    "runs": 5,
+    "bytes": 511652007,
+    "sha256": "347f7b9192c473aa6f5a822a91962bed0873da7e2ce0e8b88b4c150dd1666f54",
+    "workflow_run_id": 39265931897
+  },
+  {
+    "filename": "PlantShiftEval_ResNet18_checkpoints.zip",
+    "group": "resnet18",
+    "runs": 5,
+    "bytes": 520223854,
+    "sha256": "663b722a92104ae0645e7c4250effed3b7337a90ec2112d75cdb0363f621d521",
+    "workflow_run_id": 39265931897
+  }
+]
