@@ -23,7 +23,7 @@ Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0
 
 ## Paper and evidence
 
-- [Complete corrected manuscript (50 references)](manuscript/PlantShiftEval_corrected_manuscript.md), [reference authenticity and relevance audit](manuscript/reference_audit.md), and [research positioning](docs/RESEARCH_POSITIONING.md).
+- [Complete corrected manuscript (51 references)](manuscript/PlantShiftEval_corrected_manuscript.md), [reference metadata and claim-support audit](manuscript/reference_audit.md), and [research positioning](docs/RESEARCH_POSITIONING.md).
 - [Five figures in editable SVG, PDF and PNG, with plotting CSVs](report/corrected_summary).
 - [All 65 raw prediction arrays and run records](evidence/corrected), with SHA-256 index; [metric reproduction check](report/corrected_summary/public_reproduction.json) passed without disagreements.
 - [Full evidence audit](report/corrected_summary/evidence_audit.json), [workflow record](provenance/corrected_workflow.json) and [six-task completion record](docs/EXECUTION_STATUS.md).
