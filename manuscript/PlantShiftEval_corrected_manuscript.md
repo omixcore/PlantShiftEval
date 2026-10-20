@@ -4,17 +4,33 @@
 
 ## Abstract
 
-Texture-oriented architectures for plant disease recognition require evaluation that separates configuration effects from optimization and domain shift. We examined MTD-Net using a corrected, auditable protocol with known-leaf and image-overlap screening, training-internal validation, and 65 fixed training configurations over five seeds. On the cleaned 15-class source test, six-epoch MTD-Net and a parameter-matched CNN achieved mean macro-F1 values of 0.6026 and 0.5903, respectively. The paired difference was +1.23 percentage points (seed-level 95% interval -3.53 to +5.98). Pretrained MTD-P and ResNet-18 achieved 0.8745 and 0.8742. Epoch-by-learning-rate controls and component ablations characterize protocol dependence without establishing semantic disentanglement. Mean zero-shot accuracies on 92 official target-test images were 0.337 and 0.311 for the pretrained pair. Corruption, calibration, image-only adaptation and supervised adaptation are reported separately. Limited leaf metadata, uneven source support and a small target holdout constrain interpretation. The evidence supports configuration-specific conclusions rather than universal architectural superiority.
+Texture-oriented plant disease classifiers are often evaluated on controlled images, but within-domain accuracy alone cannot identify the contribution of texture-oriented components or predict field transfer. We evaluated MTD-Net in a corrected, traceable protocol comprising 65 fixed configurations, five seeds per configuration, training-internal checkpoint selection and a held-out PlantDoc test set. On the cleaned 15-class source test, six-epoch MTD-Net and a parameter-matched CNN achieved mean macro-F1 values of 0.6026 and 0.5903; the paired difference was +1.23 percentage points (seed-level 95% interval, −3.53 to +5.98). Across the sampled recipes, MTD-Net macro-F1 ranged from 0.6026 to 0.7930, showing that training duration and peak learning rate materially changed source performance. Pretrained MTD-P and ResNet-18 achieved 0.8745 and 0.8742 source macro-F1, but their mean zero-shot accuracies on 92 mapped target-test images were 0.3370 and 0.3109. Image-only adaptation raised these values to 0.3609 and 0.3391; supervised target fine-tuning raised them to 0.6109 and 0.6370. The evidence points to a small, uncertain scratch-architecture contrast, substantial training-recipe and initialization effects, and a persistent controlled-to-field gap. PlantShiftEval contributes a reproducible comparison framework for testing texture-oriented design choices under explicit data, optimization and target-access conditions.
 
 ## Introduction
 
-Image-based plant disease recognition raises a representation question as well as a classification problem: which visual signals support a decision, and which remain informative when acquisition conditions change? PlantVillage enabled systematic learning from labeled leaf photographs [1], whereas PlantDoc introduced a more heterogeneous collection of non-laboratory imagery [2]. Performance on one collection does not by itself establish performance on another. A model can exploit a useful association in its training domain without learning a feature that transfers to a different imaging context.
+Image-based plant disease recognition has advanced rapidly through convolutional neural networks trained on labeled leaf photographs. PlantVillage helped establish large-scale supervised benchmarks [1,2], and subsequent studies reported strong performance across crops and disease categories [3,4]. Field-oriented datasets and comparative analyses have since shown that performance depends on image diversity, capture conditions, symptom presentation and background complexity [5–12]. A model evaluated only on controlled images may learn cues that are predictive within that collection but unreliable when the imaging context changes.
 
-Texture is a plausible source of disease information because local patterns can encode spots, lesions and surface changes. Nevertheless, naming a network branch “texture” does not establish what it represents. Evidence from controlled texture–shape conflicts in general object recognition shows that training data can alter cue preferences [3]; that observation motivates tests in plant imagery but does not demonstrate the behavior of the present model. A high-resolution feature branch can also carry shape, color and background information. Consequently, improvements by a multibranch model must be separated from claims of semantic disentanglement or an identified biological-image mechanism.
+This issue is especially relevant to texture-oriented architectures. Disease symptoms often include local patterns such as lesions, speckling, discoloration and tissue damage, but an image classifier can also exploit leaf shape, color, surrounding vegetation, soil or acquisition artifacts. General computer-vision research demonstrates that CNN predictions can favor texture over shape and that dataset-specific visual regularities can impair transfer across environments [13–15]. These findings motivate texture-focused experiments; they do not imply that a high-resolution branch isolates lesion texture by design. The role of such a branch must be tested through matched comparisons and component ablations.
 
-Training strategy is another plausible explanation for performance differences. A short optimization schedule may disadvantage an otherwise adequate baseline, and changing both learning rate and training duration prevents attribution to either factor alone. Similarly, comparing a pretrained model with a different scratch architecture confounds initialization with architecture and capacity. The informative question is whether the candidate design adds a repeatable benefit under a matched protocol, including when a conventional pretrained ResNet-18 is available [4].
+Plant-disease research has increasingly addressed the laboratory-to-field gap through domain adaptation and cross-domain learning. Unsupervised adaptation has been evaluated across PlantDoc and other disease datasets [16], cross-domain few-shot protocols have tested transfer with limited target labels [17], and hybrid convolution–Transformer models have combined feature extraction with distribution alignment [18]. The datasets available for this question have also expanded. PlantWild provides a large in-the-wild multimodal recognition benchmark [19], while PlantSeg adds lesion-level segmentation annotations to field imagery [20]. These resources make it possible to distinguish performance on curated laboratory images from performance under more heterogeneous visual conditions.
 
-This study therefore treats MTD-Net as a candidate configuration rather than an assumed superior network. PlantShiftEval denotes the evaluation project. We ask whether the configuration improves source-domain performance relative to a parameter-matched CNN, whether the ranking depends on an epoch-by-learning-rate contrast, and whether component differences persist under a frozen validation protocol. We then distinguish synthetic-corruption performance from held-out target-domain accuracy and confidence calibration [5,6]. Finally, we distinguish zero-shot transfer from adaptation with target images and adaptation with target labels. AdaBN provides a simple image-only diagnostic based on target-domain normalization statistics [7]. The purpose is to characterize the scope and uncertainty of the evidence, including inconclusive and negative findings.
+Recent work broadens the comparison beyond a new CNN architecture. Public domain-generalization benchmarks compare convolutional, Transformer and self-supervised foundation-model baselines [21]; few-shot and unseen-disease studies examine transfer with scarce labels or novel classes [22,23]. Plant-specific self-supervised methods now include unified multi-objective pretraining and attentive contrastive learning [24,25]. Agricultural evaluations of DINOv2, low-rank adaptation and distillation [26], contrastive pretraining for plant disease recognition [27], frozen foundation-model features [28], cross-domain reliability and calibration [29], and multi-backbone fusion [30] further emphasize representation choice and evaluation design. Together, this literature shifts the practical question from how high a model scores on a familiar benchmark to which gains persist when training strategy, initialization, label access and target domain are explicitly separated.
+
+Here, MTD-Net is treated as a candidate texture-oriented configuration, not as a presumed improvement. We ask three questions: (i) does MTD-Net improve source-domain macro-F1 over a parameter-matched CNN under a fixed split and paired seeds; (ii) how much do epoch count and peak learning rate change the ranking; and (iii) do component contrasts or a pretrained MTD-Net configuration add measurable value relative to a conventional pretrained ResNet-18? We then compare synthetic corruption, zero-shot PlantDoc transfer, image-only adaptation and supervised target fine-tuning as distinct evaluation conditions. The goal is to quantify configuration effects and their transfer boundaries using the completed, auditable 65-configuration study.
+
+## Related work
+
+### Representation learning and texture-oriented design
+
+ResNet established residual learning as a practical backbone for visual recognition [31], while Vision Transformers introduced a token-based alternative to convolutional feature hierarchies [32]. Self-supervised vision methods—including DINO and DINOv2 [33,34], SimCLR [35], BYOL [36] and MoCo [37]—show that useful representations can be learned through different objectives and pretraining regimes. The recent plant-disease studies cited above apply these ideas to scarce labels, unseen disease categories and field imagery [23–28]. For the present question, these results make initialization and representation quality central comparison factors: a texture-oriented branch should be evaluated against controls that share the training protocol and, where relevant, the pretrained backbone.
+
+### Domain generalization and adaptation
+
+DomainBed formalized comparisons across domain-generalization algorithms and evaluation choices [38], while WILDS assembled benchmarks for naturally occurring distribution shifts [39]. A broad survey organizes domain generalization around data augmentation, representation learning, domain alignment and related strategies [40]. Domain-adversarial training and Deep CORAL provide representative feature-alignment methods [41,42], whereas adaptive batch normalization (AdaBN) uses target-image statistics to adjust normalization without target labels [43]. These methods rely on different information and make different claims: zero-shot transfer, image-only adaptation and supervised target fine-tuning should therefore be reported separately.
+
+### Robustness, calibration and training strategy
+
+Synthetic corruption benchmarks offer controlled stress tests [44], and covariate-shift adaptation shows that access to unlabeled test-like images can alter robustness results [45]. Calibration methods quantify whether confidence tracks empirical correctness [46]; evaluations under dataset shift and deep ensembles further show why accuracy alone is insufficient to describe uncertainty [47,48]. Optimization choices also affect the comparison: AdamW decouples weight decay from the gradient update [49], while large-learning-rate schedules can change convergence behavior and the apparent value of an architecture [50]. The present study uses these distinctions to report corruption performance, target accuracy, source-fitted calibration and target-access conditions as separate outcomes.
 
 ## Materials and methods
 
@@ -46,13 +62,13 @@ The scratch comparison uses the repository's plain CNN, with its parameter count
 
 ### Optimization and checkpoint selection
 
-Images are cached at 160 × 160 source resolution and transformed to 112 × 112 model inputs. Training uses random resized cropping, horizontal and vertical flips, rotation and color jitter, followed by ImageNet normalization. Evaluation uses resizing and center cropping without stochastic augmentation. AdamW [8] uses weight decay 0.02, a OneCycle learning-rate schedule [9], batch size 64, disease cross-entropy with label smoothing 0.05, and gradient clipping at norm five. The auxiliary loss weight is 0.3 when that output is enabled. Source background swapping and crop-balanced sampling are disabled in the corrected core study.
+Images are cached at 160 × 160 source resolution and transformed to 112 × 112 model inputs. Training uses random resized cropping, horizontal and vertical flips, rotation and color jitter, followed by ImageNet normalization. Evaluation uses resizing and center cropping without stochastic augmentation. AdamW [49] uses weight decay 0.02, a OneCycle learning-rate schedule [50], batch size 64, disease cross-entropy with label smoothing 0.05, and gradient clipping at norm five. The auxiliary loss weight is 0.3 when that output is enabled. Source background swapping and crop-balanced sampling are disabled in the corrected core study.
 
 The scratch factorial crosses 6/12 epochs with peak learning rates 1e-3/2e-3. Component ablations use six epochs and peak learning rate 1e-3. Both pretrained configurations use six epochs and peak learning rate 3e-4. Model seeds are 0–4; Python, NumPy and PyTorch RNGs are initialized, and the data-order generator is independently seeded. The maximum validation macro-F1 selects the checkpoint, with the first checkpoint retained for tied maxima. The source test is evaluated once after training. A runtime test instruments evaluation calls to verify this separation on a small test fixture; it does not substitute for the real-data experiments.
 
 ### Corruption, transfer and target-label access
 
-Synthetic evaluation applies eight fixed conditions to the source test: two noise severities, two blur severities, increased brightness, reduced contrast and two occlusion severities. Conditions and the common corruption RNG seed are fixed in `src/robustness.py`. Their mean accuracy is a synthetic stress-test outcome; this is not an ImageNet-C reproduction or a substitute for field-domain evaluation [5].
+Synthetic evaluation applies eight fixed conditions to the source test: two noise severities, two blur severities, increased brightness, reduced contrast and two occlusion severities. Conditions and the common corruption RNG seed are fixed in `src/robustness.py`. Their mean accuracy is a synthetic stress-test outcome; this is not an ImageNet-C reproduction or a substitute for field-domain evaluation [44].
 
 PlantDoc object-category names are mapped explicitly to ten supported source classes. Images without a mapped dominant category are excluded; tied categories do not define an unambiguous image label. Additional screening excludes two source-similarity candidates and eight rows in identity components with conflicting labels. One target-training duplicate overlapping official target test is unused. The resulting cached pool contains 946 rows, with 683 adaptation-training images, 170 target-validation images and 92 official target-test images. Target-training images within the stated similarity threshold of official target test are excluded; the recovered data contained none after the other filters. Official test membership is preserved after these documented exclusions rather than replaced by pooled cross-validation.
 
@@ -60,7 +76,7 @@ Zero-shot evaluation reads no target images during source training. Image-only a
 
 ### Outcomes, uncertainty and traceability
 
-The primary source outcome is macro-F1. Accuracy, expected calibration error with 15 confidence bins, per-class behavior, synthetic-corruption accuracy and target accuracy are secondary outcomes. Source-fitted temperature scaling minimizes negative log-likelihood on source-validation predictions only [6]; the fitted temperature is then applied to target-test logits without target-label fitting. This evaluates transfer of a source-fitted calibrator, not an oracle target calibrator.
+The primary source outcome is macro-F1. Accuracy, expected calibration error with 15 confidence bins, per-class behavior, synthetic-corruption accuracy and target accuracy are secondary outcomes. Source-fitted temperature scaling minimizes negative log-likelihood on source-validation predictions only [46]; the fitted temperature is then applied to target-test logits without target-label fitting. This evaluates transfer of a source-fitted calibrator, not an oracle target calibrator.
 
 We report all seed points, means and sample standard deviations. Paired seed differences receive Student-t intervals and paired tests, conditional on the frozen dataset; their approximate-normality assumption and five-seed sample size limit precision. Holm adjustment is applied across five architectural/configuration contrasts. A difference-of-differences summarizes the epoch-by-learning-rate interaction for each scratch model. Nonsignificance is not interpreted as equivalence, and seed variability is not treated as target-population sampling uncertainty. The small, selected target holdout limits generalization beyond these images. As an additional descriptive diagnostic, probability-averaged five-seed target ensembles receive Wilson image-level intervals under an independent-image binomial assumption. These intervals are distinct from seed intervals and do not capture unknown acquisition dependencies or population selection.
 
@@ -157,45 +173,132 @@ Source-fitted temperature scaling increases mean target ECE for all four core co
 
 ## Discussion
 
-The central methodological result is the set of conditional contrasts rather than a declaration that one architecture is generally best. The source comparison evaluates a whole candidate configuration, including its optimization and auxiliary supervision. Component ablations narrow the interpretation, but removing a branch changes capacity, and neither the branch name nor a predictive gain establishes a uniquely texture-based mechanism. Direct feature interventions and additional matched controls would be required for that stronger claim.
+The matched scratch comparison gives MTD-Net a +1.23-point mean macro-F1 difference over the plain CNN, with a seed-level 95% interval spanning −3.53 to +5.98 points. This is a small and uncertain difference under the tested six-epoch recipe. The gate and auxiliary-task contrasts likewise do not show a consistent benefit. The data therefore do not support a general claim that the proposed architecture outperforms a parameter-matched CNN; they do support a direct estimate of its performance under a reproducible comparison.
 
-The factorial controls address an important ambiguity in the historical study: increasing training duration while also increasing peak learning rate does not isolate an epoch effect. The corrected design reports both factors and their interaction under common split assignments and seed identifiers. These schedules still sample a limited hyperparameter space and are not a comprehensive tuning contest. Any favorable contrast is specific to these declared budgets and should not be generalized to all well-tuned baselines.
+Training strategy produced larger descriptive changes than the primary architecture contrast. MTD-Net macro-F1 increased from 0.6026 to 0.7503 when training was extended from six to twelve epochs at peak LR 1e-3, and from 0.6708 to 0.7930 at peak LR 2e-3. The plain CNN also improved under the longer schedules. This pattern places optimization budget alongside architecture as a major determinant of the reported score. The factorial design makes the tested epoch and learning-rate effects visible instead of assigning their joint change to a single factor.
 
-The pretrained comparison estimates whether the candidate additions help when both configurations have access to pretrained ResNet-18 features. It does not isolate pretraining itself because the scratch and pretrained architectures differ. Parameter counts and data access accompany scores so that an apparent benefit is not conflated with an identical-capacity or identical-information comparison.
+Pretraining changed the performance level more strongly than adding the candidate branch. MTD-P and pretrained ResNet-18 reached nearly identical source macro-F1 values (0.8745 and 0.8742), and the paired contrast was centered near zero. Their zero-shot PlantDoc accuracies were higher than those of the scratch models, yet remained 0.3370 and 0.3109. Recent PlantWild, domain-generalization, self-supervised and foundation-model studies likewise show that representation choice is central to field transfer, while results vary with dataset, taxonomy and evaluation protocol [19–30]. The relevant conclusion here is specific: under the tested protocol, the MTD-P additions did not yield a clear source-domain gain over pretrained ResNet-18, and neither pretrained configuration transferred reliably to the selected target holdout.
 
-Source performance, synthetic stress tests and target transfer answer different questions. Corruptions modify source images while largely preserving the source labeling and acquisition context. The target experiment changes image composition, collection conditions and taxonomy support simultaneously; it does not identify a single causal reason for errors. Temperature scaling fitted on source validation addresses source confidence and need not remain calibrated under target shift. Numerical changes in target ECE must therefore be read alongside target accuracy and the explicit fitting split.
+Synthetic corruption and field transfer measure different kinds of shift. The pretrained models retained mean accuracy of 0.7781 and 0.7437 across the eight source-corruption conditions, but zero-shot PlantDoc accuracy was 0.3370 and 0.3109. Corrupting source images does not reproduce the combined changes in background, scene composition, label mapping and symptom presentation present in a field dataset. Field-transfer results should therefore remain a primary outcome rather than being inferred from corruption robustness [16–21,29].
 
-AdaBN and supervised fine-tuning introduce different information. The former accesses target-training pixels without labels; the latter uses labels and a separate target-validation set. Their gains or losses are conditional on that access and must not be presented as zero-shot generalization. Using official target-test membership after documented filtering provides a clearer held-out estimate than the historical pooled cross-validation, but only 92 mapped test images remain. Seed replication does not remove this small-test-set limitation.
+Target-data access materially changed the result. AdaBN used unlabeled target-training images and raised MTD-P accuracy from 0.3370 to 0.3609; supervised fine-tuning used target labels and target-validation checkpoint selection, reaching 0.6109. ResNet-18 showed a similar pattern, reaching 0.3391 with AdaBN and 0.6370 with supervised fine-tuning. These figures describe different operating conditions, not a single zero-shot ranking. Source-fitted temperature scaling also failed to improve target ECE in the reported configurations, consistent with the known difficulty of transferring calibration under dataset shift [44–48].
 
-Data curation also changes the population being measured. Known source leaf overlap was substantial, and removing it reduces some class supports severely. Missing biological group IDs remain unresolved for part of both source partitions. Difference-hash screening can remove similar independent images and can miss duplicates with larger transformations. The corrected study is thus more explicit about available evidence, without certifying complete biological independence or a representative field population. Historical and corrected scores cannot quantify the impact of checkpoint-selection leakage alone because the training composition also changed.
-
-The reusable contribution is the traceable evaluation record: fixed inputs, class mapping, explicit target access, validation-selected checkpoints, seed-level contrasts and reconstructable figures. This record supports independent scrutiny of the conditional effects and negative findings. Further acquisition-level and deployment validation would be needed to assess practical use.
+The study’s practical contribution is an auditable evaluation record: fixed source and target partitions, explicit label mapping and target access, five-seed results, paired contrasts, saved predictions, and reproducible summary figures. The data audit also identifies the conditions that define the current estimates: the source cache is class-imbalanced and has incomplete leaf identifiers, while the mapped PlantDoc test contains 92 images. These facts define the population represented by the results. A useful next comparison is a multi-target benchmark with matched pretrained initializations, acquisition-level grouping and the same zero-shot/adaptation split across architectures.
 
 ## Conclusion
 
-This study evaluates texture-oriented configuration choices under explicit optimization and domain-access controls. The reported estimates, intervals and failure boundaries define where the current evidence applies. Additional datasets, better biological grouping metadata and independently collected target images are needed before making broader claims about disease-specific texture mechanisms or practical field reliability.
+This study tests MTD-Net as a texture-oriented design under controlled comparisons of architecture, training recipe and target-data access. Its six-epoch scratch result was only 1.23 macro-F1 points above the parameter-matched CNN, with substantial uncertainty across seeds. Training duration and learning rate produced larger changes, while MTD-P did not improve source macro-F1 over pretrained ResNet-18. Both pretrained models transferred poorly to the selected PlantDoc holdout despite strong source performance; adaptation improved accuracy when target images or labels were available. The central finding is methodological and empirical: architecture claims are best judged alongside optimization controls, pretrained baselines and an independent field-domain evaluation.
 
 ## Figure legends
 
-**Figure 1. Corrected source-domain configuration comparisons.** Individual points show five training seeds; the central mark and error bars show the mean and sample standard deviation. Scratch models use six epochs and peak LR 1e-3; pretrained models use six epochs and peak LR 3e-4. Comparisons are interpreted within the declared initialization stratum.
+**Figure 1. Corrected source-domain configuration comparisons.** Individual points show five training seeds; the central mark and error bars show the mean and sample standard deviation. Scratch models use six epochs and peak LR 1e-3; pretrained models use six epochs and peak LR 3e-4.
 
-**Figure 2. Training-recipe factorial.** Source-test macro-F1 for MTD-Net and the plain CNN at 6/12 epochs and peak LR 1e-3/2e-3. Points show individual seeds and lines join cell means. The design separates the sampled factors; it does not establish an exhaustive optimum.
+**Figure 2. Training-recipe factorial.** Source-test macro-F1 for MTD-Net and the plain CNN at 6/12 epochs and peak LR 1e-3/2e-3. Points show individual seeds and lines join cell means, allowing the tested epoch and learning-rate contrasts to be read separately.
 
-**Figure 3. Component contrasts.** Source-test macro-F1 for the candidate model, gate removal, disabled auxiliary task and appearance-only ablation. Points show seeds and error bars show sample SD. Appearance-only removal changes parameter count and cannot by itself identify a texture-specific mechanism.
+**Figure 3. Component contrasts.** Source-test macro-F1 for MTD-Net, gate removal, disabled auxiliary task and the appearance-only ablation. Points show seeds and error bars show sample SD. Because the appearance-only ablation also reduces parameter count, it represents a combined architecture-and-capacity contrast.
 
-**Figure 4. Corruption and domain-transfer limits.** Mean accuracy over eight fixed synthetic source corruptions and accuracy on the mapped official target holdout. These are distinct evaluations. Source and target images differ in more than one acquisition factor.
+**Figure 4. Corruption and domain-transfer performance.** Mean accuracy over eight fixed synthetic source corruptions is plotted alongside accuracy on the mapped official PlantDoc holdout. The two outcomes describe different evaluation conditions.
 
-**Figure 5. Target information conditions.** Accuracy on the same held-out target test after zero-shot transfer, target-training-image AdaBN or supervised target-training fine-tuning. Individual points represent five source training seeds. Fine-tuning checkpoints are chosen using only target validation; target-test labels are used for final evaluation only.
+**Figure 5. Target-information conditions.** Accuracy on the same held-out target test after zero-shot transfer, target-training-image AdaBN or supervised target-training fine-tuning. Individual points represent five source training seeds. Fine-tuning checkpoints are selected using target validation; target-test labels are used only for final evaluation.
 
 ## References
 
 1. Mohanty SP, Hughes DP, Salathé M. Using Deep Learning for Image-Based Plant Disease Detection. *Frontiers in Plant Science*. 2016;7:1419. https://doi.org/10.3389/fpls.2016.01419
-2. Singh D, Jain N, Jain P, Kayal P, Kumawat S, Batra N. PlantDoc: A Dataset for Visual Plant Disease Detection. *Proceedings of CoDS COMAD 2020*. 2020:249–253. https://doi.org/10.1145/3371158.3371196
-3. Geirhos R, Rubisch P, Michaelis C, Bethge M, Wichmann FA, Brendel W. ImageNet-trained CNNs are biased towards texture; increasing shape bias improves accuracy and robustness. *ICLR*. 2019. https://arxiv.org/abs/1811.12231
-4. He K, Zhang X, Ren S, Sun J. Deep Residual Learning for Image Recognition. *CVPR*. 2016:770–778. https://arxiv.org/abs/1512.03385
-5. Hendrycks D, Dietterich T. Benchmarking Neural Network Robustness to Common Corruptions and Perturbations. *ICLR*. 2019. https://arxiv.org/abs/1903.12261
-6. Guo C, Pleiss G, Sun Y, Weinberger KQ. On Calibration of Modern Neural Networks. *PMLR*. 2017;70:1321–1330. https://proceedings.mlr.press/v70/guo17a.html
-7. Li Y, Wang N, Shi J, Liu J, Hou X. Revisiting Batch Normalization for Practical Domain Adaptation. arXiv:1603.04779. 2016. https://arxiv.org/abs/1603.04779
 
-8. Loshchilov I, Hutter F. Decoupled Weight Decay Regularization. *ICLR*. 2019. https://arxiv.org/abs/1711.05101
-9. Smith LN, Topin N. Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates. arXiv:1708.07120v3. 2018. https://arxiv.org/abs/1708.07120
+2. Hughes DP, Salathé M. An open access repository of images on plant health to enable the development of mobile disease diagnostics. *arXiv*. 2015; arXiv:1511.08060. https://arxiv.org/abs/1511.08060
+
+3. Ferentinos KP. Deep learning models for plant disease detection and diagnosis. *Computers and Electronics in Agriculture*. 2018;145:311–318. https://doi.org/10.1016/j.compag.2018.01.009
+
+4. Too EC, Yujian L, Njuki S, Yingchun L. A comparative study of fine-tuning deep learning models for plant disease identification. *Computers and Electronics in Agriculture*. 2019;161:272–279. https://doi.org/10.1016/j.compag.2018.03.032
+
+5. Singh D, Jain N, Jain P, Kayal P, Kumawat S, Batra N. PlantDoc: A Dataset for Visual Plant Disease Detection. In: *Proceedings of the 7th ACM IKDD CoDS and 25th COMAD*. 2020:249–253. https://doi.org/10.1145/3371158.3371196
+
+6. Picon A, Alvarez-Gila A, Seitz M, Ortiz-Barredo A, Echazarra J, Johannes A. Deep convolutional neural networks for mobile capture device-based crop disease classification in the wild. *Computers and Electronics in Agriculture*. 2019;161:280–290. https://doi.org/10.1016/j.compag.2018.04.002
+
+7. Barbedo JGA. Impact of dataset size and variety on the effectiveness of deep learning and transfer learning for plant disease classification. *Computers and Electronics in Agriculture*. 2018;153:46–53. https://doi.org/10.1016/j.compag.2018.08.013
+
+8. Ramcharan A, Baranowski K, McCloskey P, Ahmed B, Legg J, Hughes DP. Deep learning for image-based cassava disease detection. *Frontiers in Plant Science*. 2017;8:1852. https://doi.org/10.3389/fpls.2017.01852
+
+9. Fuentes A, Yoon S, Kim SC, Park DS. A robust deep-learning-based detector for real-time tomato plant diseases and pests recognition. *Sensors*. 2017;17(9):2022. https://doi.org/10.3390/s17092022
+
+10. Lu Y, Yi S, Zeng N, Liu Y, Zhang Y. Identification of rice diseases using deep convolutional neural networks. *Neurocomputing*. 2017;267:378–384. https://doi.org/10.1016/j.neucom.2017.06.023
+
+11. Barbedo JGA. A review on the main challenges in automatic plant disease identification based on visible range images. *Biosystems Engineering*. 2016;144:52–60. https://doi.org/10.1016/j.biosystemseng.2016.01.017
+
+12. Boulent J, Foucher S, Théau J, St-Charles PL. Convolutional neural networks for the automatic identification of plant diseases. *Frontiers in Plant Science*. 2019;10:941. https://doi.org/10.3389/fpls.2019.00941
+
+13. Geirhos R, Rubisch P, Michaelis C, Bethge M, Wichmann FA, Brendel W. ImageNet-trained CNNs are biased towards texture; increasing shape bias improves accuracy and robustness. *International Conference on Learning Representations*. 2019. https://arxiv.org/abs/1811.12231
+
+14. Torralba A, Efros AA. Unbiased look at dataset bias. In: *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition*. 2011:1521–1528. https://doi.org/10.1109/CVPR.2011.5995347
+
+15. Beery S, Van Horn G, Perona P. Recognition in Terra Incognita. In: *European Conference on Computer Vision*. 2018:456–473. https://doi.org/10.1007/978-3-030-01270-0_28
+
+16. Wu X, Fan X, Luo P, Das Choudhury S, Tjahjadi T, Hu C. From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild. *Plant Phenomics*. 2023;5:0038. https://doi.org/10.34133/plantphenomics.0038
+
+17. Yang SY, Feng Q, Zhang J, Yang W, Zhou W, Yan W. From laboratory to field: cross-domain few-shot learning for crop disease identification in the field. *Frontiers in Plant Science*. 2024;15:1434222. https://doi.org/10.3389/fpls.2024.1434222
+
+18. Tunio MH, Li JP, Zeng X, Ahmed A, Shah SA, Shaikh HU, Mallah GA, Yahya IA. Advancing plant disease classification: A robust and generalized approach with transformer-fused convolution and Wasserstein domain adaptation. *Computers and Electronics in Agriculture*. 2024;227:109574. https://doi.org/10.1016/j.compag.2024.109574
+
+19. Wei T, Chen Z, Huang Z, Yu X. Benchmarking In-the-Wild Multimodal Plant Disease Recognition and A Versatile Baseline. In: *Proceedings of the ACM International Conference on Multimedia (MM '24)*. 2024. Official project and dataset page: https://tqwei05.github.io/PlantWild/
+
+20. Wei T, Chen Z, Yu X, Chapman S, Melloy P, Huang Z. PlantSeg: A Large-Scale In-the-wild Dataset for Plant Disease Segmentation. *arXiv*. 2024; arXiv:2409.04038. https://arxiv.org/abs/2409.04038
+
+21. Zhan K, Peng Y, Liao M. Domain generalization plant leaf disease recognition: Toward from laboratory to field. *Engineering Applications of Artificial Intelligence*. 2025;156:111168. https://doi.org/10.1016/j.engappai.2025.111168
+
+22. Rezaei M, Diepeveen D, Laga H, Jones MG, Sohel F. Plant disease recognition in a low data scenario using few-shot learning. *Computers and Electronics in Agriculture*. 2024;219:108812. https://doi.org/10.1016/j.compag.2024.108812
+
+23. Chai AYH, et al. Beyond supervision: Harnessing self-supervised learning in unseen plant disease recognition. *Neurocomputing*. 2024;610:128608. https://doi.org/10.1016/j.neucom.2024.128608
+
+24. Huan X, Chen B, Zhou H. A unified self-supervised framework for plant disease detection on laboratory and in-field images. *Electronics*. 2025;14(17):3410. https://doi.org/10.3390/electronics14173410
+
+25. Yilma G, Dagne M, Ahmed MK, Bellam RB. Attentive self-supervised contrastive learning (ASCL) for plant disease classification. *Results in Engineering*. 2025;25:103922. https://doi.org/10.1016/j.rineng.2025.103922
+
+26. Espejo-Garcia B, Güldenring R, Nalpantidis L, Fountas S. Foundation vision models in agriculture: DINOv2, LoRA and knowledge distillation for disease and weed identification. *Computers and Electronics in Agriculture*. 2025;239:110900. https://doi.org/10.1016/j.compag.2025.110900
+
+27. Shah SSA, Saeed F, Raza MU, Rehman A, Shaheryar M, Kim II-M, Yun S, Kang JM. PlantCLR: contrastive self-supervised pretraining for generalizable plant disease detection. *Scientific Reports*. 2026;16:10550. https://doi.org/10.1038/s41598-026-45684-x
+
+28. Nguyen TA, Nguyen DS, Dang QM, Phan BNL, Nguyen LH. From laboratory to field: Frozen foundation-model features toward robust plant disease recognition. *Smart Agricultural Technology*. 2026; article 102531. https://doi.org/10.1016/j.atech.2026.102531
+
+29. Xiang K, Shi D, Zhu X. Quantifying the reliability gap in cross-domain plant disease classification: benchmarking the limited efficacy of standard mitigation techniques under controlled-to-field shift. *Frontiers in Plant Science*. 2026;17:1826962. https://doi.org/10.3389/fpls.2026.1826962
+
+30. El Karch H, Natij Y, Benaly M, El Gouri R, Mezouari A. Backbone diversity beats text supervision: a systematic study of frozen multi-foundation model fusion for in-the-wild plant disease recognition. *Frontiers in Plant Science*. 2026;17:1860665. https://doi.org/10.3389/fpls.2026.1860665
+
+31. He K, Zhang X, Ren S, Sun J. Deep Residual Learning for Image Recognition. In: *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition*. 2016:770–778. https://doi.org/10.1109/CVPR.2016.90
+
+32. Dosovitskiy A, Beyer L, Kolesnikov A, et al. An Image is Worth 16×16 Words: Transformers for Image Recognition at Scale. *International Conference on Learning Representations*. 2021. https://arxiv.org/abs/2010.11929
+
+33. Caron M, Touvron H, Misra I, et al. Emerging Properties in Self-Supervised Vision Transformers. In: *Proceedings of the IEEE/CVF International Conference on Computer Vision*. 2021:9650–9660. https://doi.org/10.1109/ICCV48922.2021.00946
+
+34. Oquab M, Darcet T, Moutakanni T, et al. DINOv2: Learning Robust Visual Features without Supervision. *Transactions on Machine Learning Research*. 2024. https://arxiv.org/abs/2304.07193
+
+35. Chen T, Kornblith S, Norouzi M, Hinton G. A Simple Framework for Contrastive Learning of Visual Representations. In: *Proceedings of the 37th International Conference on Machine Learning*. 2020;119:1597–1607. https://proceedings.mlr.press/v119/chen20j.html
+
+36. Grill JB, Strub F, Altché F, et al. Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning. *Advances in Neural Information Processing Systems*. 2020;33:21271–21284. https://arxiv.org/abs/2006.07733
+
+37. He K, Fan H, Wu Y, Xie S, Girshick R. Momentum Contrast for Unsupervised Visual Representation Learning. In: *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*. 2020:9729–9738. https://doi.org/10.1109/CVPR42600.2020.00975
+
+38. Gulrajani I, Lopez-Paz D. In Search of Lost Domain Generalization. *International Conference on Learning Representations*. 2021. https://arxiv.org/abs/2007.01434
+
+39. Koh PW, Sagawa S, Marklund H, et al. WILDS: A Benchmark of in-the-Wild Distribution Shifts. In: *Proceedings of the 38th International Conference on Machine Learning*. 2021;139:5637–5664. https://proceedings.mlr.press/v139/koh21a.html
+
+40. Zhou K, Liu Z, Qiao Y, Xiang T, Loy CC. Domain Generalization: A Survey. *IEEE Transactions on Pattern Analysis and Machine Intelligence*. 2023;45(4):4396–4415. https://doi.org/10.1109/TPAMI.2022.3195549
+
+41. Ganin Y, Ustinova E, Ajakan H, et al. Domain-Adversarial Training of Neural Networks. *Journal of Machine Learning Research*. 2016;17(59):1–35. https://jmlr.org/papers/v17/15-239.html
+
+42. Sun B, Saenko K. Deep CORAL: Correlation Alignment for Deep Domain Adaptation. In: *European Conference on Computer Vision Workshops*. 2016:443–450. https://doi.org/10.1007/978-3-319-49409-8_35
+
+43. Li Y, Wang N, Shi J, Liu J, Hou X. Revisiting Batch Normalization for Practical Domain Adaptation. *arXiv*. 2016; arXiv:1603.04779. https://arxiv.org/abs/1603.04779
+
+44. Hendrycks D, Dietterich T. Benchmarking Neural Network Robustness to Common Corruptions and Perturbations. *International Conference on Learning Representations*. 2019. https://arxiv.org/abs/1903.12261
+
+45. Schneider S, Rusak E, Eck L, Bringmann O, Brendel W, Bethge M. Improving robustness against common corruptions by covariate shift adaptation. *Advances in Neural Information Processing Systems*. 2020;33:11539–11551. https://proceedings.neurips.cc/paper_files/paper/2020/hash/85690f81aadc1749175c187784afc9ee-Abstract.html
+
+46. Guo C, Pleiss G, Sun Y, Weinberger KQ. On Calibration of Modern Neural Networks. In: *Proceedings of the 34th International Conference on Machine Learning*. 2017;70:1321–1330. https://proceedings.mlr.press/v70/guo17a.html
+
+47. Ovadia Y, Fertig E, Ren J, et al. Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in Neural Information Processing Systems*. 2019;32. https://arxiv.org/abs/1906.02530
+
+48. Lakshminarayanan B, Pritzel A, Blundell C. Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles. *Advances in Neural Information Processing Systems*. 2017;30. https://arxiv.org/abs/1612.01474
+
+49. Loshchilov I, Hutter F. Decoupled Weight Decay Regularization. *International Conference on Learning Representations*. 2019. https://arxiv.org/abs/1711.05101
+
+50. Smith LN, Topin N. Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates. *arXiv*. 2018; arXiv:1708.07120. https://arxiv.org/abs/1708.07120
