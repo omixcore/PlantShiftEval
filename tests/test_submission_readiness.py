@@ -1,10 +1,14 @@
-import sys, unittest
+import importlib.util, sys, unittest
 from pathlib import Path
-import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
-from target_bootstrap import class_metrics, bootstrap_indices, mcnemar_exact, holm
 from audit_manuscript import parse_reference_lines, parse_citations, title_from_ref, doi_from_ref
 
+TARGET_AVAILABLE=bool(importlib.util.find_spec("numpy"))
+if TARGET_AVAILABLE:
+    import numpy as np
+    from target_bootstrap import class_metrics, bootstrap_indices, mcnemar_exact, holm
+
+@unittest.skipUnless(TARGET_AVAILABLE,"NumPy is optional for summary CI")
 class TargetBootstrapTests(unittest.TestCase):
     def test_supported_macro_f1_and_accuracy(self):
         y=np.array([0,0,1,1]); pred=np.array([0,1,1,1])
