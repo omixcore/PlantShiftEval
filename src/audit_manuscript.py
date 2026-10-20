@@ -50,7 +50,7 @@ def title_from_ref(ref):
     if not boundaries: return None,None
     boundary=boundaries[-1]
     title=ref[boundary.end():end.start()].strip()
-    authors=ref[:boundary.start()].strip()
+    authors=re.sub(r"^\s*\d+\.\s*","",ref[:boundary.start()]).strip()
     return title,authors
 
 def first_author_surname(author_text):
