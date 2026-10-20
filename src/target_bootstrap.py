@@ -26,7 +26,7 @@ def class_metrics(y,pred):
     rows=[]
     for k in range(N_CLASSES):
         rows.append({"class_index":k,"support":int(sup[k]),"predicted_count":int(pc[k]),"correct":int(tp[k]),
-                     "precision":float(pr[k]) if pc[k] else None,"recall":float(re[k]) if sup[k] else None,
+                     "precision":float(pr[k]),"recall":float(re[k]) if sup[k] else None,
                      "f1":float(f1[k]) if sup[k] else None})
     return {"n":int(len(y)),"correct":int(np.sum(y==pred)),"accuracy":float(np.mean(y==pred)),
             "macro_f1_15":float(f1.mean()),"macro_f1_supported":float(f1[present].mean()),
