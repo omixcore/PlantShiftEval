@@ -96,5 +96,7 @@ jobs:
             echo "No generated outputs changed."
           else
             git commit -m "Add DINOv2 baseline and submission-readiness evidence"
-            git push
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
           fi
