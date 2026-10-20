@@ -32,7 +32,7 @@ def weights_sha256(model):
     for name,tensor in sorted(model.state_dict().items()):
         t=tensor.detach().cpu().contiguous()
         h.update(name.encode("utf-8"));h.update(str(t.dtype).encode("ascii"));h.update(str(tuple(t.shape)).encode("ascii"))
-        h.update(t.view(torch.uint8).numpy().tobytes())
+        h.update(t.numpy().tobytes())
     return h.hexdigest()
 
 def extract(model,images,device,batch_size,threads):
@@ -41,7 +41,7 @@ def extract(model,images,device,batch_size,threads):
     mean=MEAN.to(device);std=STD.to(device)
     with torch.inference_mode():
         for start in range(0,len(images),batch_size):
-            arr=np.asarray(images[start:start+batch_size])
+            arr=np.array(images[start:start+batch_size],copy=True)
             x=torch.from_numpy(arr).permute(0,3,1,2).contiguous().to(device=device,dtype=torch.float32).div_(255.)
             x=F.interpolate(x,size=(IMAGE_SIZE,IMAGE_SIZE),mode="bicubic",align_corners=False)
             x=(x-mean)/std
