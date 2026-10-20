@@ -71,7 +71,7 @@ def bootstrap_model(y,p,stratified,ordinary):
 def mcnemar_exact(a,b):
     a=np.asarray(a,dtype=bool); b=np.asarray(b,dtype=bool)
     win=int(np.sum(a&~b)); loss=int(np.sum(~a&b)); n=win+loss
-    p=1.0 if n==0 else min(1.0,2*sum(math.comb(n,k) for k in range(min(win,loss)+1)/(2**n)))
+    p=1.0 if n==0 else min(1.0,2*sum(math.comb(n,k) for k in range(min(win,loss)+1))/(2**n))
     return {"dinov2_only_correct":win,"baseline_only_correct":loss,"discordant_images":n,"mcnemar_exact_p":float(p)}
 
 def holm(ps):
