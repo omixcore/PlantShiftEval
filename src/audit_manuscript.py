@@ -4,6 +4,7 @@ import argparse, difflib, json, re, time, unicodedata, urllib.error, urllib.pars
 from pathlib import Path
 
 YEAR_RE=re.compile(r"\b(?:19|20)\d{2}\b")
+PUBLISHER_TITLE_OVERRIDES={"10.1145/3371158.3371196":{"title":"PlantDoc: A Dataset for Visual Plant Disease Detection","source":"https://doi.org/10.1145/3371158.3371196","reason":"Crossref exposes the short label PlantDoc; the official ACM record confirms the full article title, authors, year and pages 249–253."}}
 DOI_RE=re.compile(r"10\.\d{4,9}/[^\s]+",re.I)
 CITE_RE=re.compile(r"\[([0-9][0-9,\s–-]*)\]")
 
@@ -95,7 +96,13 @@ def metadata_check(number,ref,verify_crossref=True):
         return row
     ctitle=(data.get("title") or [""])[0]
     row["crossref_title"]=ctitle
-    row["title_similarity"]=difflib.SequenceMatcher(None,normalize(title or ""),normalize(ctitle)).ratio()
+    override=PUBLISHER_TITLE_OVERRIDES.get(doi.lower())
+    expected_title=override["title"] if override else ctitle
+    row["title_similarity"]=difflib.SequenceMatcher(None,normalize(title or ""),normalize(expected_title)).ratio()
+    if override:
+        row["publisher_verified_title"]=override["title"]
+        row["publisher_record"]=override["source"]
+        row["crossref_metadata_note"]=override["reason"]
     authors_data=data.get("author") or []
     if authors_data:
         fam=normalize(authors_data[0].get("family",""))
@@ -114,7 +121,7 @@ def metadata_check(number,ref,verify_crossref=True):
     if row["first_author_match"] is False: flags.append("first_author_mismatch")
     if row["year_match"] is False: flags.append("year_mismatch")
     row["flags"]=flags
-    row["status"]="needs_manual_review" if flags else "crossref_match"
+    row["status"]="needs_manual_review" if flags else ("publisher_title_override_crossref_abbreviated" if override else "crossref_match")
     return row
 
 def audit(root:Path,verify_crossref=True):
