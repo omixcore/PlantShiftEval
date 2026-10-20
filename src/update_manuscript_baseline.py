@@ -30,6 +30,7 @@ def main():
     if not dino_record: raise SystemExit("Target bootstrap did not include DINOv2.")
     ens=dino_record["five_seed_probability_ensemble"]
     aci=ens["accuracy_image_bootstrap_ci95"]; fci=ens["macro_f1_supported_stratified_bootstrap_ci95"]
+    supports=list(s["class_support"].values()); support_note=f"Observed target class support ranged from {min(supports)} to {max(supports)} images; the smallest represented class has only {min(supports)} images."
     comps={r["baseline"]:r for r in s["paired_dinov2_comparisons"]}
     def pctci(pair,key):
         lo,hi=pair[key]
@@ -49,14 +50,14 @@ def main():
         text=text[:abs_start]+abstract+text[intro_start:]
     result_block=("### Frozen DINOv2-S/14 baseline\n\n"
       f"The official DINOv2-S/14 backbone was kept frozen. A multinomial logistic-regression linear probe was selected from the declared C grid using only the source validation partition (selected C = {b['classifier']['selected_C']:g}) and then refit on all permitted source-cache rows. No target labels or target-test scores were used for model selection. The baseline reached source-test accuracy {src['accuracy']:.4f} and 15-class macro-F1 {src['macro_f1_15']:.4f}.\n\n"
-      f"On the same mapped target holdout, DINOv2 achieved accuracy {dino['accuracy']:.4f} (ordinary image-bootstrap 95% CI {aci[0]:.4f}–{aci[1]:.4f}) and supported-class macro-F1 {dino['macro_f1_supported']:.4f} (class-stratified 95% CI {fci[0]:.4f}–{fci[1]:.4f}). The supported-class metric averages the ten classes present in the target holdout; 15-class macro-F1 is also retained in the machine-readable output. The confidence intervals condition on the selected images and do not account for unknown acquisition dependence.\n\n"
+      f"On the same mapped target holdout, DINOv2 achieved accuracy {dino['accuracy']:.4f} (ordinary image-bootstrap 95% CI {aci[0]:.4f}–{aci[1]:.4f}) and supported-class macro-F1 {dino['macro_f1_supported']:.4f} (class-stratified 95% CI {fci[0]:.4f}–{fci[1]:.4f}). The supported-class metric averages the ten classes present in the target holdout; 15-class macro-F1 is also retained in the machine-readable output. The confidence intervals condition on the selected images and do not account for unknown acquisition dependence. {support_note}\n\n"
       "Paired comparisons use the five-seed probability ensemble for each existing model and the identical target-image order. They are summarized in report/corrected_summary/target_bootstrap.json; the raw class-wise metrics and intervals are in report/corrected_summary/target_per_class_metrics.csv.\n")
     text=replace_or_insert_section(text,"### Frozen DINOv2-S/14 baseline",result_block,"### Conditional target image uncertainty")
     if "The frozen DINOv2-S/14 baseline adds a direct representation-level comparison" not in text:
         para=("The frozen DINOv2-S/14 baseline adds a direct representation-level comparison under the same mapped target holdout. Its classifier hyperparameter was chosen using source validation only, and target labels were reserved for final scoring. "
               f"Against the five-seed MTD-P probability ensemble, the paired accuracy difference (DINOv2 minus MTD-P) was {p_mtd['accuracy_difference']:+.4f} with a class-stratified bootstrap interval {pctci(p_mtd,'accuracy_difference_stratified_ci95')} and Holm-adjusted exact McNemar p = {p_mtd['mcnemar_holm_adjusted_p']:.4g}. "
               f"Against the ResNet-18 ensemble, the difference was {p_res['accuracy_difference']:+.4f} with interval {pctci(p_res,'accuracy_difference_stratified_ci95')} and Holm-adjusted p = {p_res['mcnemar_holm_adjusted_p']:.4g}. "
-              "These paired comparisons apply to the selected 92 images and do not establish equivalence or generalization to the full PlantDoc population. Frozen foundation features are a direct comparator, not a novel contribution of this study.")
+              "These paired comparisons apply to the selected 92 images and do not establish equivalence or generalization to the full PlantDoc population. {support_note} Frozen foundation features are a direct comparator, not a novel contribution of this study.")
         anchor="The closest 2026 literature"
         pos=text.find(anchor)
         if pos<0: raise ValueError("Cannot locate domain-generalization discussion anchor")
