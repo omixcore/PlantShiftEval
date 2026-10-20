@@ -57,7 +57,7 @@ def main():
         para=("The frozen DINOv2-S/14 baseline adds a direct representation-level comparison under the same mapped target holdout. Its classifier hyperparameter was chosen using source validation only, and target labels were reserved for final scoring. "
               f"Against the five-seed MTD-P probability ensemble, the paired accuracy difference (DINOv2 minus MTD-P) was {p_mtd['accuracy_difference']:+.4f} with a class-stratified bootstrap interval {pctci(p_mtd,'accuracy_difference_stratified_ci95')} and Holm-adjusted exact McNemar p = {p_mtd['mcnemar_holm_adjusted_p']:.4g}. "
               f"Against the ResNet-18 ensemble, the difference was {p_res['accuracy_difference']:+.4f} with interval {pctci(p_res,'accuracy_difference_stratified_ci95')} and Holm-adjusted p = {p_res['mcnemar_holm_adjusted_p']:.4g}. "
-              "These paired comparisons apply to the selected 92 images and do not establish equivalence or generalization to the full PlantDoc population. {support_note} Frozen foundation features are a direct comparator, not a novel contribution of this study.")
+              f"These paired comparisons apply to the selected 92 images and do not establish equivalence or generalization to the full PlantDoc population. {support_note} Frozen foundation features are a direct comparator, not a novel contribution of this study.")
         anchor="The closest 2026 literature"
         pos=text.find(anchor)
         if pos<0: raise ValueError("Cannot locate domain-generalization discussion anchor")
