@@ -214,7 +214,7 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 3. Ferentinos KP. Deep learning models for plant disease detection and diagnosis. *Computers and Electronics in Agriculture*. 2018;145:311–318. https://doi.org/10.1016/j.compag.2018.01.009
 
-4. Too EC, Yujian L, Njuki S, Yingchun L. A comparative study of fine-tuning deep learning models for plant disease identification. *Computers and Electronics in Agriculture*. 2019;161:272–279. https://doi.org/10.1016/j.compag.2018.03.032
+4. Too EC, Li Y, Njuki S, Liu Y. A comparative study of fine-tuning deep learning models for plant disease identification. *Computers and Electronics in Agriculture*. 2019;161:272–279. https://doi.org/10.1016/j.compag.2018.03.032
 
 5. Singh D, Jain N, Jain P, Kayal P, Kumawat S, Batra N. PlantDoc: A Dataset for Visual Plant Disease Detection. In: *Proceedings of the 7th ACM IKDD CoDS and 25th COMAD*. 2020:249–253. https://doi.org/10.1145/3371158.3371196
 
@@ -226,7 +226,7 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 9. Fuentes A, Yoon S, Kim SC, Park DS. A robust deep-learning-based detector for real-time tomato plant diseases and pests recognition. *Sensors*. 2017;17(9):2022. https://doi.org/10.3390/s17092022
 
-10. Lu Y, Yi S, Zeng N, Liu Y, Zhang Y. Identification of rice diseases using deep convolutional neural networks. *Neurocomputing*. 2017;267:378–384. https://doi.org/10.1016/j.neucom.2017.06.023
+10. Wang H, Pan X, Zhu Y, Li S, Zhu R. Maize leaf disease recognition based on TC-MRSN model in sustainable agriculture. *Computers and Electronics in Agriculture*. 2024;221:108915. https://doi.org/10.1016/j.compag.2024.108915
 
 11. Barbedo JGA. A review on the main challenges in automatic plant disease identification based on visible range images. *Biosystems Engineering*. 2016;144:52–60. https://doi.org/10.1016/j.biosystemseng.2016.01.017
 
@@ -240,19 +240,19 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 16. Wu X, Fan X, Luo P, Das Choudhury S, Tjahjadi T, Hu C. From Laboratory to Field: Unsupervised Domain Adaptation for Plant Disease Recognition in the Wild. *Plant Phenomics*. 2023;5:0038. https://doi.org/10.34133/plantphenomics.0038
 
-17. Yang SY, Feng Q, Zhang J, Yang W, Zhou W, Yan W. From laboratory to field: cross-domain few-shot learning for crop disease identification in the field. *Frontiers in Plant Science*. 2024;15:1434222. https://doi.org/10.3389/fpls.2024.1434222
+17. Yang S, Feng Q, Zhang J, Yang W, Zhou W, Yan W. From laboratory to field: cross-domain few-shot learning for crop disease identification in the field. *Frontiers in Plant Science*. 2024;15:1434222. https://doi.org/10.3389/fpls.2024.1434222
 
 18. Tunio MH, Li JP, Zeng X, Ahmed A, Shah SA, Shaikh HU, Mallah GA, Yahya IA. Advancing plant disease classification: A robust and generalized approach with transformer-fused convolution and Wasserstein domain adaptation. *Computers and Electronics in Agriculture*. 2024;227:109574. https://doi.org/10.1016/j.compag.2024.109574
 
-19. Wei T, Chen Z, Huang Z, Yu X. Benchmarking In-the-Wild Multimodal Plant Disease Recognition and A Versatile Baseline. In: *Proceedings of the ACM International Conference on Multimedia (MM '24)*. 2024. Official project and dataset page: https://tqwei05.github.io/PlantWild/
+19. Wei T, Chen Z, Huang Z, Yu X. Benchmarking In-the-Wild Multimodal Disease Recognition and A Versatile Baseline. In: *Proceedings of the 32nd ACM International Conference on Multimedia (MM '24)*. 2024:1593–1601. https://doi.org/10.1145/3664647.3680599
 
-20. Wei T, Chen Z, Yu X, Chapman S, Melloy P, Huang Z. PlantSeg: A Large-Scale In-the-wild Dataset for Plant Disease Segmentation. *arXiv*. 2024; arXiv:2409.04038. https://arxiv.org/abs/2409.04038
+20. Wei T, Chen Z, Yu X, Chapman S, Melloy P, Huang Z. A Large-Scale In-the-wild Dataset for Plant Disease Segmentation. *Scientific Data*. 2026;13:205. https://doi.org/10.1038/s41597-025-06513-4
 
-21. Zhan K, Peng Y, Liao M. Domain generalization plant leaf disease recognition: Toward from laboratory to field. *Engineering Applications of Artificial Intelligence*. 2025;156:111168. https://doi.org/10.1016/j.engappai.2025.111168
+21. Zhan K, Peng Y, Liao M, Wang Y. Domain generalization plant leaf disease recognition: Toward from laboratory to field. *Engineering Applications of Artificial Intelligence*. 2025;156:111168. https://doi.org/10.1016/j.engappai.2025.111168
 
 22. Rezaei M, Diepeveen D, Laga H, Jones MG, Sohel F. Plant disease recognition in a low data scenario using few-shot learning. *Computers and Electronics in Agriculture*. 2024;219:108812. https://doi.org/10.1016/j.compag.2024.108812
 
-23. Chai AYH, et al. Beyond supervision: Harnessing self-supervised learning in unseen plant disease recognition. *Neurocomputing*. 2024;610:128608. https://doi.org/10.1016/j.neucom.2024.128608
+23. Chai AYH, Lee SH, Tay FS, Bonnet P, Joly A. Beyond supervision: Harnessing self-supervised learning in unseen plant disease recognition. *Neurocomputing*. 2024;610:128608. https://doi.org/10.1016/j.neucom.2024.128608
 
 24. Huan X, Chen B, Zhou H. A unified self-supervised framework for plant disease detection on laboratory and in-field images. *Electronics*. 2025;14(17):3410. https://doi.org/10.3390/electronics14173410
 
@@ -260,7 +260,7 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 26. Espejo-Garcia B, Güldenring R, Nalpantidis L, Fountas S. Foundation vision models in agriculture: DINOv2, LoRA and knowledge distillation for disease and weed identification. *Computers and Electronics in Agriculture*. 2025;239:110900. https://doi.org/10.1016/j.compag.2025.110900
 
-27. Shah SSA, Saeed F, Raza MU, Rehman A, Shaheryar M, Kim II-M, Yun S, Kang JM. PlantCLR: contrastive self-supervised pretraining for generalizable plant disease detection. *Scientific Reports*. 2026;16:10550. https://doi.org/10.1038/s41598-026-45684-x
+27. Shah SSA, Saeed F, Raza MU, Rehman A, Shaheryar M, Kim I-M, Yun S, Kang JM. PlantCLR: contrastive self-supervised pretraining for generalizable plant disease detection. *Scientific Reports*. 2026;16:10550. https://doi.org/10.1038/s41598-026-45684-x
 
 28. Nguyen TA, Nguyen DS, Dang QM, Phan BNL, Nguyen LH. From laboratory to field: Frozen foundation-model features toward robust plant disease recognition. *Smart Agricultural Technology*. 2026; article 102531. https://doi.org/10.1016/j.atech.2026.102531
 
@@ -272,13 +272,13 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 32. Dosovitskiy A, Beyer L, Kolesnikov A, et al. An Image is Worth 16×16 Words: Transformers for Image Recognition at Scale. *International Conference on Learning Representations*. 2021. https://arxiv.org/abs/2010.11929
 
-33. Caron M, Touvron H, Misra I, et al. Emerging Properties in Self-Supervised Vision Transformers. In: *Proceedings of the IEEE/CVF International Conference on Computer Vision*. 2021:9650–9660. https://doi.org/10.1109/ICCV48922.2021.00946
+33. Caron M, Touvron H, Misra I, et al. Emerging Properties in Self-Supervised Vision Transformers. In: *Proceedings of the IEEE/CVF International Conference on Computer Vision*. 2021:9650–9660. https://doi.org/10.1109/ICCV48922.2021.00951
 
 34. Oquab M, Darcet T, Moutakanni T, et al. DINOv2: Learning Robust Visual Features without Supervision. *Transactions on Machine Learning Research*. 2024. https://arxiv.org/abs/2304.07193
 
 35. Chen T, Kornblith S, Norouzi M, Hinton G. A Simple Framework for Contrastive Learning of Visual Representations. In: *Proceedings of the 37th International Conference on Machine Learning*. 2020;119:1597–1607. https://proceedings.mlr.press/v119/chen20j.html
 
-36. Grill JB, Strub F, Altché F, et al. Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning. *Advances in Neural Information Processing Systems*. 2020;33:21271–21284. https://arxiv.org/abs/2006.07733
+36. Grill JB, Strub F, Altché F, et al. Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning. *Advances in Neural Information Processing Systems*. 2020;33:21271–21284. https://proceedings.neurips.cc/paper_files/paper/2020/hash/f3ada80d5c4ee70142b17b8192b2958e-Abstract.html
 
 37. He K, Fan H, Wu Y, Xie S, Girshick R. Momentum Contrast for Unsupervised Visual Representation Learning. In: *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*. 2020:9729–9738. https://doi.org/10.1109/CVPR42600.2020.00975
 
@@ -300,10 +300,12 @@ This study tests MTD-Net as a texture-oriented design under controlled compariso
 
 46. Guo C, Pleiss G, Sun Y, Weinberger KQ. On Calibration of Modern Neural Networks. In: *Proceedings of the 34th International Conference on Machine Learning*. 2017;70:1321–1330. https://proceedings.mlr.press/v70/guo17a.html
 
-47. Ovadia Y, Fertig E, Ren J, et al. Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in Neural Information Processing Systems*. 2019;32. https://arxiv.org/abs/1906.02530
+47. Ovadia Y, Fertig E, Ren J, et al. Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in Neural Information Processing Systems*. 2019;32:13991–14002. https://proceedings.neurips.cc/paper_files/paper/2019/hash/8558cb408c1d76621371888657d2eb1d-Abstract.html
 
-48. Lakshminarayanan B, Pritzel A, Blundell C. Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles. *Advances in Neural Information Processing Systems*. 2017;30. https://arxiv.org/abs/1612.01474
+48. Lakshminarayanan B, Pritzel A, Blundell C. Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles. *Advances in Neural Information Processing Systems*. 2017;30:6402–6413. https://proceedings.neurips.cc/paper_files/paper/2017/hash/9ef2ed4b7fd2c810847ffa5fa85bce38-Abstract.html
 
 49. Loshchilov I, Hutter F. Decoupled Weight Decay Regularization. *International Conference on Learning Representations*. 2019. https://arxiv.org/abs/1711.05101
 
-50. Smith LN, Topin N. Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates. *arXiv*. 2018; arXiv:1708.07120. https://arxiv.org/abs/1708.07120
+50. Smith LN, Topin N. Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates. *arXiv*. 2017; arXiv:1708.07120. https://arxiv.org/abs/1708.07120
+
+51. Gómez-Flores W, Garza-Saldaña JJ, Varela-Fuentes SE. Detection of Huanglongbing disease based on intensity-invariant texture analysis of images in the visible spectrum. *Computers and Electronics in Agriculture*. 2019;162:825–835. https://doi.org/10.1016/j.compag.2019.05.032
