@@ -28,7 +28,7 @@ class TargetBootstrapTests(unittest.TestCase):
 
 class ManuscriptAuditTests(unittest.TestCase):
     def test_reference_numbering_and_citation_ranges(self):
-        text="\\n".join(["## Intro","Claim [1, 2] and [3–4].","## References","1. A. Title.","","2. B. Title.","","3. C. Title.","","4. D. Title."])
+        text="\n".join(["## Intro","Claim [1, 2] and [3–4].","## References","1. A. Title.","","2. B. Title.","","3. C. Title.","","4. D. Title."])
         refs=parse_reference_lines(text)
         self.assertEqual(sorted(refs),[1,2,3,4])
         cited,invalid=parse_citations(text,4)
