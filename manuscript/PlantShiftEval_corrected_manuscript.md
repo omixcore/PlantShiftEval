@@ -165,9 +165,9 @@ All methods use the same held-out target test and five source seeds. The adaptat
 
 ### Frozen DINOv2-S/14 baseline
 
-The official DINOv2-S/14 backbone was kept frozen. A multinomial logistic-regression linear probe was selected from the declared C grid using only the source validation partition (selected C = 100) and then refit on all permitted source-cache rows. No target labels or target-test scores were used for model selection. The baseline reached source-test accuracy 0.9558 and 15-class macro-F1 0.9374.
+The official DINOv2-S/14 backbone was kept frozen. A multinomial logistic-regression linear probe was selected from the declared C grid using only the source validation partition (selected C = 100) and then refit on all permitted source-cache rows. No target labels or target-test scores were used for model selection. The baseline reached source-test accuracy 0.9551 and 15-class macro-F1 0.9364.
 
-On the same mapped target holdout, DINOv2 achieved accuracy 0.3696 (ordinary image-bootstrap 95% CI 0.2717–0.4674) and supported-class macro-F1 0.3628 (class-stratified 95% CI 0.2838–0.4345). The supported-class metric averages the ten classes present in the target holdout; 15-class macro-F1 is also retained in the machine-readable output. The confidence intervals condition on the selected images and do not account for unknown acquisition dependence. Observed target class support ranged from 3 to 12 images; the smallest represented class has only 3 images.
+On the same mapped target holdout, DINOv2 achieved accuracy 0.3696 (ordinary image-bootstrap 95% CI 0.2717–0.4674) and supported-class macro-F1 0.3651 (class-stratified 95% CI 0.2838–0.4365). The supported-class metric averages the ten classes present in the target holdout; 15-class macro-F1 is also retained in the machine-readable output. The confidence intervals condition on the selected images and do not account for unknown acquisition dependence. Observed target class support ranged from 3 to 12 images; the smallest represented class has only 3 images.
 
 Paired comparisons use the five-seed probability ensemble for each existing model and the identical target-image order. They are summarized in report/corrected_summary/target_bootstrap.json; the raw class-wise metrics and intervals are in report/corrected_summary/target_per_class_metrics.csv.
 

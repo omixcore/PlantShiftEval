@@ -57,9 +57,7 @@
     51
   ],
   "uncited_reference_numbers": [],
-  "structural_errors": [
-    "Reference audit table rows 16140 do not match manuscript references 51"
-  ],
+  "structural_errors": [],
   "crossref_requested": true,
   "doi_references_checked": 34,
   "crossref_matched": 33,
@@ -82,8 +80,7 @@
     49,
     50
   ],
-  "source_record_verified_no_doi_reference_numbers": [],
-  "url_only_unverified_reference_numbers": [
+  "source_record_verified_no_doi_reference_numbers": [
     2,
     13,
     32,
@@ -102,25 +99,8 @@
     49,
     50
   ],
-  "manual_review_reference_numbers": [
-    2,
-    13,
-    32,
-    34,
-    35,
-    36,
-    38,
-    39,
-    41,
-    43,
-    44,
-    45,
-    46,
-    47,
-    48,
-    49,
-    50
-  ],
+  "url_only_unverified_reference_numbers": [],
+  "manual_review_reference_numbers": [],
   "metadata_flags": [],
   "reference_records": [
     {
@@ -147,7 +127,10 @@
       "doi": null,
       "cited_year": 2015,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; arXiv data-release paper",
+      "source_audit_url": "https://arxiv.org/abs/1511.08060"
     },
     {
       "number": 3,
@@ -329,7 +312,10 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://arxiv.org/abs/1811.12231"
     },
     {
       "number": 14,
@@ -644,7 +630,10 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; arXiv access record",
+      "source_audit_url": "https://arxiv.org/abs/2010.11929"
     },
     {
       "number": 33,
@@ -670,7 +659,10 @@
       "doi": null,
       "cited_year": 2024,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; TMLR publication, arXiv full text",
+      "source_audit_url": "https://arxiv.org/abs/2304.07193"
     },
     {
       "number": 35,
@@ -679,7 +671,10 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://proceedings.mlr.press/v119/chen20j.html"
     },
     {
       "number": 36,
@@ -688,7 +683,10 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Official proceedings link added",
+      "source_audit_url": "https://proceedings.neurips.cc/paper_files/paper/2020/hash/f3ada80d5c4ee70142b17b8192b2958e-Abstract.html"
     },
     {
       "number": 37,
@@ -714,7 +712,10 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; arXiv access record",
+      "source_audit_url": "https://arxiv.org/abs/2007.01434"
     },
     {
       "number": 39,
@@ -723,7 +724,10 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://proceedings.mlr.press/v139/koh21a.html"
     },
     {
       "number": 40,
@@ -749,7 +753,10 @@
       "doi": null,
       "cited_year": 2016,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://jmlr.org/papers/v17/15-239.html"
     },
     {
       "number": 42,
@@ -775,7 +782,10 @@
       "doi": null,
       "cited_year": 2016,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; arXiv method paper",
+      "source_audit_url": "https://arxiv.org/abs/1603.04779"
     },
     {
       "number": 44,
@@ -784,7 +794,10 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; ICLR 2019",
+      "source_audit_url": "https://arxiv.org/abs/1903.12261"
     },
     {
       "number": 45,
@@ -793,7 +806,10 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://proceedings.neurips.cc/paper_files/paper/2020/hash/85690f81aadc1749175c187784afc9ee-Abstract.html"
     },
     {
       "number": 46,
@@ -802,7 +818,10 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified",
+      "source_audit_url": "https://proceedings.mlr.press/v70/guo17a.html"
     },
     {
       "number": 47,
@@ -811,7 +830,10 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Added page range and official link",
+      "source_audit_url": "https://proceedings.neurips.cc/paper_files/paper/2019/hash/8558cb408c1d76621371888657d2eb1d-Abstract.html"
     },
     {
       "number": 48,
@@ -820,7 +842,10 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Added page range and official link",
+      "source_audit_url": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/9ef2ed4b7fd2c810847ffa5fa85bce38-Abstract.html"
     },
     {
       "number": 49,
@@ -829,7 +854,10 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Verified; arXiv access record",
+      "source_audit_url": "https://arxiv.org/abs/1711.05101"
     },
     {
       "number": 50,
@@ -838,7 +866,10 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "url_present_no_doi"
+      "status": "source_record_verified_no_doi",
+      "source_audit_verified": true,
+      "source_audit_metadata_note": "Corrected preprint year",
+      "source_audit_url": "https://arxiv.org/abs/1708.07120"
     },
     {
       "number": 51,
@@ -858,5 +889,5 @@
       "flags": []
     }
   ],
-  "status": "failed"
+  "status": "passed"
 }

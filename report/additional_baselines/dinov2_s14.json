@@ -91,11 +91,11 @@
   },
   "source_test": {
     "n": 2916,
-    "correct": 2787,
-    "accuracy": 0.9557613168724279,
-    "macro_f1_15": 0.9373562217149173,
-    "macro_f1_supported": 0.9373562217149173,
-    "balanced_accuracy_supported": 0.9563665746638932,
+    "correct": 2785,
+    "accuracy": 0.9550754458161865,
+    "macro_f1_15": 0.9363642058474712,
+    "macro_f1_supported": 0.9363642058474712,
+    "balanced_accuracy_supported": 0.9554948318550945,
     "n_supported_classes": 15,
     "per_class": [
       {
@@ -110,20 +110,20 @@
       {
         "class_index": 1,
         "support": 125,
-        "predicted_count": 129,
-        "correct": 125,
-        "precision": 0.9689922480620154,
-        "recall": 1.0,
-        "f1": 0.9842519685039369
+        "predicted_count": 128,
+        "correct": 124,
+        "precision": 0.96875,
+        "recall": 0.992,
+        "f1": 0.9802371541501976
       },
       {
         "class_index": 2,
         "support": 56,
-        "predicted_count": 114,
+        "predicted_count": 115,
         "correct": 56,
-        "precision": 0.49122807017543857,
+        "precision": 0.48695652173913045,
         "recall": 1.0,
-        "f1": 0.6588235294117647
+        "f1": 0.6549707602339181
       },
       {
         "class_index": 3,
@@ -164,11 +164,11 @@
       {
         "class_index": 7,
         "support": 103,
-        "predicted_count": 105,
+        "predicted_count": 106,
         "correct": 94,
-        "precision": 0.8952380952380953,
+        "precision": 0.8867924528301887,
         "recall": 0.912621359223301,
-        "f1": 0.903846153846154
+        "f1": 0.8995215311004785
       },
       {
         "class_index": 8,
@@ -182,11 +182,11 @@
       {
         "class_index": 9,
         "support": 197,
-        "predicted_count": 195,
-        "correct": 186,
-        "precision": 0.9538461538461539,
-        "recall": 0.9441624365482234,
-        "f1": 0.9489795918367347
+        "predicted_count": 194,
+        "correct": 185,
+        "precision": 0.9536082474226805,
+        "recall": 0.9390862944162437,
+        "f1": 0.9462915601023019
       },
       {
         "class_index": 10,
@@ -239,19 +239,19 @@
     "n": 92,
     "correct": 34,
     "accuracy": 0.3695652173913043,
-    "macro_f1_15": 0.24187220187220185,
-    "macro_f1_supported": 0.3628083028083028,
+    "macro_f1_15": 0.24341494762547392,
+    "macro_f1_supported": 0.3651224214382109,
     "balanced_accuracy_supported": 0.3727272727272727,
     "n_supported_classes": 10,
     "per_class": [
       {
         "class_index": 0,
         "support": 10,
-        "predicted_count": 11,
-        "correct": 6,
-        "precision": 0.5454545454545454,
-        "recall": 0.6,
-        "f1": 0.5714285714285713
+        "predicted_count": 10,
+        "correct": 5,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
       },
       {
         "class_index": 1,
@@ -274,11 +274,11 @@
       {
         "class_index": 3,
         "support": 9,
-        "predicted_count": 9,
+        "predicted_count": 10,
         "correct": 5,
-        "precision": 0.5555555555555556,
+        "precision": 0.5,
         "recall": 0.5555555555555556,
-        "f1": 0.5555555555555556
+        "f1": 0.5263157894736842
       },
       {
         "class_index": 4,
@@ -319,20 +319,20 @@
       {
         "class_index": 8,
         "support": 10,
-        "predicted_count": 4,
-        "correct": 2,
-        "precision": 0.5,
-        "recall": 0.2,
-        "f1": 0.28571428571428575
+        "predicted_count": 5,
+        "correct": 3,
+        "precision": 0.6,
+        "recall": 0.3,
+        "f1": 0.4
       },
       {
         "class_index": 9,
         "support": 9,
-        "predicted_count": 6,
+        "predicted_count": 5,
         "correct": 1,
-        "precision": 0.16666666666666666,
+        "precision": 0.2,
         "recall": 0.1111111111111111,
-        "f1": 0.13333333333333333
+        "f1": 0.14285714285714285
       },
       {
         "class_index": 10,
@@ -498,7 +498,7 @@
     "cache_pd_corrected/y.npy": "7f1618b12a88fda49f95c6b4236853e6ab70d31f7d0795432ba5a88860dfb821",
     "cache_pd_corrected/split_indices.json": "95813ed871e6ec1112aff10a30f4a5fe70740546e6755f4c25d6e3b4f20add3e"
   },
-  "study_git_commit": "df78260d2e049301217d5bb8efb1b6ec6f1dae30",
+  "study_git_commit": "d0a2e474f5bb28373317ddffa79997f0edab28da",
   "environment": {
     "python": "3.12.15",
     "torch": "2.14.1+cpu",
