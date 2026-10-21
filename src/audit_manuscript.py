@@ -80,6 +80,32 @@ def get_crossref(doi,timeout=20):
             time.sleep(1.0*(attempt+1))
     return None,"request_failed"
 
+def source_audit_record(audit_text, number, reference):
+    """Accept DOI-less records only when the separate audit documents a matching official source URL and completed metadata check."""
+    reference_urls=[u.rstrip(".,;)]}") for u in re.findall(r"https?://[^\\s]+",reference)]
+    for line in audit_text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells=[part.strip() for part in line.strip().strip("|").split("|")]
+        if len(cells)<5:
+            continue
+        try:
+            row_number=int(cells[0])
+        except (ValueError,TypeError):
+            continue
+        if row_number!=number:
+            continue
+        metadata_note=cells[2]
+        source_cell=cells[4]
+        source_urls=re.findall(r"\\]\\((https?://[^)]+)\\)",source_cell)
+        same_url=next((u.rstrip(".,;)]}") for u in source_urls if u.rstrip(".,;)]}") in reference_urls),None)
+        note=metadata_note.lower()
+        documented_check=any(term in note for term in ("verified","official proceedings link","official link","corrected preprint year"))
+        if same_url and documented_check:
+            return {"source_audit_verified":True,"source_audit_metadata_note":metadata_note,"source_audit_url":same_url.rstrip(".,;)]}")}
+        return None
+    return None
+
 def metadata_check(number,ref,verify_crossref=True):
     doi=doi_from_ref(ref); title,authors=title_from_ref(ref); year=ref_year(ref)
     row={"number":number,"reference":ref,"title_parsed":title,"doi":doi,"cited_year":year,
@@ -141,24 +167,35 @@ def audit(root:Path,verify_crossref=True):
         if verify_crossref: time.sleep(0.12)
     if invalid: structural.append("Invalid/out-of-range citation expressions: "+", ".join(invalid))
     if uncited: structural.append("Uncited references: "+", ".join(map(str,uncited)))
+    audit_text=""
     if not audit_file.exists(): structural.append("Missing reference_audit.md")
     else:
         audit_text=audit_file.read_text(encoding="utf-8")
-        audit_count=len(re.findall(r"^\|\s*\d+\s*\|",audit_text,re.M))
+        audit_count=len(re.findall(r"^\\|\\s*\\d+\\s*\\|",audit_text,re.M))
         if audit_count!=len(refs): structural.append(f"Reference audit table rows {audit_count} do not match manuscript references {len(refs)}")
+    for row in out_rows:
+        if row["status"]=="url_present_no_doi":
+            source_record=source_audit_record(audit_text,row["number"],row["reference"])
+            if source_record:
+                row.update(source_record)
+                row["status"]="source_record_verified_no_doi"
     dois=[r["doi"].lower() for r in out_rows if r.get("doi")]
     duplicate_dois=sorted({d for d in dois if dois.count(d)>1})
     if duplicate_dois: structural.append("Duplicate DOI strings: "+", ".join(duplicate_dois))
     flagged=[r for r in out_rows if r["status"]=="needs_manual_review"]
     doi_checked=sum(bool(r.get("doi")) and ("crossref_title" in r or "publisher_verified_title" in r) for r in out_rows)
-    url_only=[r for r in out_rows if r["status"]=="url_present_no_doi"]
+    url_only=[r for r in out_rows if r.get("url_present") and not r.get("doi")]
+    url_only_verified=[r for r in url_only if r["status"]=="source_record_verified_no_doi"]
+    url_only_unverified=[r for r in url_only if r["status"]!="source_record_verified_no_doi"]
     unresolved=[r for r in out_rows if r["status"].startswith("crossref_") and r["status"]!="crossref_match"]
-    manual_review=flagged+url_only+unresolved+[r for r in out_rows if r["status"]=="missing_doi_and_url"]
+    manual_review=flagged+url_only_unverified+unresolved+[r for r in out_rows if r["status"]=="missing_doi_and_url"]
     result={"schema_version":1,"manuscript":str(manuscript.relative_to(root)),"reference_count":len(refs),
         "citation_count":len(cited),"cited_reference_numbers":cited,"uncited_reference_numbers":uncited,
         "structural_errors":structural,"crossref_requested":verify_crossref,
         "doi_references_checked":doi_checked,"crossref_matched":sum(r["status"]=="crossref_match" for r in out_rows),
         "url_only_reference_numbers":[r["number"] for r in url_only],
+        "source_record_verified_no_doi_reference_numbers":[r["number"] for r in url_only_verified],
+        "url_only_unverified_reference_numbers":[r["number"] for r in url_only_unverified],
         "manual_review_reference_numbers":sorted({r["number"] for r in manual_review}),
         "metadata_flags":flagged,"reference_records":out_rows,
         "status":"failed" if structural else ("needs_manual_review" if manual_review else "passed")}
@@ -167,7 +204,9 @@ def audit(root:Path,verify_crossref=True):
     lines=["# Bibliography metadata audit","",f"- Status: {result['status']}",f"- References: {len(refs)}",
         f"- In-text cited reference numbers: {len(cited)}",f"- DOI records with Crossref metadata retrieved: {result['doi_references_checked']}",
         f"- Exact Crossref title/author/year matches: {result['crossref_matched']}",
-        f"- URL-only references without DOI metadata resolution: {len(url_only)}",
+        f"- References with source URLs but no DOI: {len(url_only)}",
+        f"- DOI-less references with documented source-record verification: {len(url_only_verified)}",
+        f"- DOI-less references still needing source verification: {len(url_only_unverified)}",
         f"- References requiring manual review: {len(result['manual_review_reference_numbers'])}",
         f"- Metadata flags: {len(flagged)}",""]
     lines += ["| No. | Cited title | DOI | Crossref title | Similarity | Author/year checks | Status |",
@@ -183,7 +222,7 @@ def audit(root:Path,verify_crossref=True):
     if structural: lines += ["","## Structural errors",""]+["- "+x for x in structural]
     if manual_review:
         lines += ["","## Manual review required",""]+[f"- Reference {r['number']}: status={r['status']}; cited title: {r.get('title_parsed')}; DOI: {r.get('doi') or 'none'}; URL present: {r.get('url_present')}; Crossref title: {r.get('crossref_title') or 'not retrieved'}; flags: {', '.join(r.get('flags',[])) or 'none'}" for r in sorted({r['number']:r for r in manual_review}.values(),key=lambda x:x['number'])]
-    lines += ["","Crossref similarity is a triage signal, not a substitute for reading the publisher record. Preprints and proceedings without DOI are checked for numbering, URL presence and in-text use but need source-specific manual verification.",""]
+    lines += ["","Crossref similarity is a triage signal, not a substitute for reading the publisher record. DOI-less preprints and proceedings are not counted as Crossref matches; they are marked source_record_verified_no_doi only when the separate reference audit documents a completed metadata check and the same official source URL. Otherwise they remain in the manual-review list.",""]
     (out/"bibliography_crossref_audit.md").write_text("\n".join(lines),encoding="utf-8")
     return result
 
