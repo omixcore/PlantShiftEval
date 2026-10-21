@@ -181,8 +181,7 @@ def audit(root:Path,verify_crossref=True):
         if "year_match" in r: checks.append("year="+str(r["year_match"]))
         lines.append(f"| {r['number']} | {title} | {r.get('doi') or '—'} | {ct or '—'} | {sim} | {', '.join(checks) or 'not available'} | {r['status']} |")
     if structural: lines += ["","## Structural errors",""]+["- "+x for x in structural]
-    if flagged:
-        if manual_review:
+    if manual_review:
         lines += ["","## Manual review required",""]+[f"- Reference {r['number']}: status={r['status']}; cited title: {r.get('title_parsed')}; DOI: {r.get('doi') or 'none'}; URL present: {r.get('url_present')}; Crossref title: {r.get('crossref_title') or 'not retrieved'}; flags: {', '.join(r.get('flags',[])) or 'none'}" for r in sorted({r['number']:r for r in manual_review}.values(),key=lambda x:x['number'])]
     lines += ["","Crossref similarity is a triage signal, not a substitute for reading the publisher record. Preprints and proceedings without DOI are checked for numbering, URL presence and in-text use but need source-specific manual verification.",""]
     (out/"bibliography_crossref_audit.md").write_text("\n".join(lines),encoding="utf-8")
