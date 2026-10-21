@@ -13,9 +13,8 @@ MTD-Net is the candidate architecture in an original methodological study of tex
 | MTD-P | 0.8745 ± 0.0292 | 0.7781 | 0.3370 |
 | ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |
 | DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |
-| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |
 
-All rows average five seeds. Scratch models use six epochs / peak LR 1e-3; pretrained models use six epochs / peak LR 3e-4. Corruption averages eight conditions. The target holdout has 92 mapped official test images. Full SDs, all factorial cells and adaptation conditions are in the [results](manuscript/corrected_results.md) and [machine-readable summaries](report/corrected_summary).
+MTD-Net, Plain CNN, MTD-P and ResNet-18 rows average five seeds; the DINOv2-S/14 frozen-feature linear probe is a single deterministic fit. Scratch models use six epochs / peak LR 1e-3; supervised pretrained MTD-P and ResNet-18 use six epochs / peak LR 3e-4. Corruption averages eight conditions. The target holdout has 92 mapped official test images. Full SDs, all factorial cells and adaptation conditions are in the [results](manuscript/corrected_results.md) and [machine-readable summaries](report/corrected_summary).
 
 The primary six-epoch scratch contrast is +1.23 macro-F1 percentage points for MTD-Net versus the parameter-matched CNN, with a paired-seed 95% Student-t interval of −3.53 to +5.98 points (five seeds; Holm-adjusted p = 1). This does not establish a stable advantage or practical equivalence. MTD-P versus pretrained ResNet-18 differs by +0.03 points, with a seed interval of −4.41 to +4.47 points. Gate and auxiliary-task benefits are not established by the declared contrasts.
 
@@ -25,6 +24,7 @@ Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0
 
 ## Paper and evidence
 
+- [Editable Word manuscript](manuscript/PlantShiftEval_corrected_manuscript.docx) and [Crossref/source-record bibliography audit](report/additional_baselines/bibliography_crossref_audit.md) ([machine-readable JSON](report/additional_baselines/bibliography_crossref_audit.json)).
 - [Complete corrected manuscript (51 references)](manuscript/PlantShiftEval_corrected_manuscript.md), [reference metadata and claim-support audit](manuscript/reference_audit.md), and [research positioning](docs/RESEARCH_POSITIONING.md).
 - [Five figures in editable SVG, PDF and PNG, with plotting CSVs](report/corrected_summary).
 - [All 65 raw prediction arrays and run records](evidence/corrected), with SHA-256 index; [metric reproduction check](report/corrected_summary/public_reproduction.json) passed without disagreements.
