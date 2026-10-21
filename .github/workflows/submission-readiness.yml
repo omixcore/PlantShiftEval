@@ -94,6 +94,9 @@ jobs:
           for path in report/additional_baselines report/corrected_summary/target_bootstrap.json report/corrected_summary/target_bootstrap.md report/corrected_summary/target_per_class_metrics.csv report/corrected_summary/public_reproduction.json manuscript/PlantShiftEval_corrected_manuscript.md manuscript/PlantShiftEval_corrected_manuscript.docx README.md docs/RESEARCH_POSITIONING.md; do
             if [ -e "$path" ]; then git add "$path"; fi
           done
+          # Data-preparation/audit steps may also update tracked provenance files.
+          # Stage those tracked changes before rebasing; never add ignored caches or raw data.
+          git add -u
           if git diff --cached --quiet; then
             echo "No generated outputs changed."
           else
