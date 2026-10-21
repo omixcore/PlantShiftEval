@@ -82,7 +82,7 @@ def get_crossref(doi,timeout=20):
 
 def source_audit_record(audit_text, number, reference):
     """Accept DOI-less records only when the separate audit documents a matching official source URL and completed metadata check."""
-    reference_urls=[u.rstrip(".,;)]}") for u in re.findall(r"https?://[^\\s]+",reference)]
+    reference_urls=[u.rstrip(".,;)]}") for u in re.findall(r"https?://[^\s]+",reference)]
     for line in audit_text.splitlines():
         if not line.startswith("|"):
             continue
@@ -97,7 +97,7 @@ def source_audit_record(audit_text, number, reference):
             continue
         metadata_note=cells[2]
         source_cell=cells[4]
-        source_urls=re.findall(r"\\]\\((https?://[^)]+)\\)",source_cell)
+        source_urls=re.findall(r"\]\((https?://[^)]+)\)",source_cell)
         same_url=next((u.rstrip(".,;)]}") for u in source_urls if u.rstrip(".,;)]}") in reference_urls),None)
         note=metadata_note.lower()
         documented_check=any(term in note for term in ("verified","official proceedings link","official link","corrected preprint year"))
