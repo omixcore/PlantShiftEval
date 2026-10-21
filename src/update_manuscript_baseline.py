@@ -20,7 +20,7 @@ def replace_or_insert_section(text, heading, block, before_heading):
 
 def repair_target_uncertainty_section(text):
     heading="### Conditional target image uncertainty"
-    discussion="\n## Discussion"
+    discussion="## Discussion"
     start=text.find(heading)
     end=text.find(discussion,start+len(heading)) if start>=0 else -1
     if start<0 or end<0:
@@ -31,7 +31,7 @@ def repair_target_uncertainty_section(text):
       "These image-level intervals do not account for possible dependence among images from the same plant, leaf, or acquisition session. "
       "The target holdout contains 92 images across ten represented classes, with class support ranging from 3 to 12 images. "
       "Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.")
-    return text[:start]+block+"\n\n"+text[end+1:]
+    return text[:start]+block+"\n\n"+text[end:]
 
 def main():
     baseline_path=ROOT/"report/additional_baselines/dinov2_s14.json"
