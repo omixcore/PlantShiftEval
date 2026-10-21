@@ -1,0 +1,514 @@
+{
+  "status": "completed",
+  "model": "DINOv2-S/14 (dinov2_vits14) frozen backbone + source-trained logistic-regression linear probe",
+  "official_code_repository": "https://github.com/facebookresearch/dinov2",
+  "official_code_commit": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+  "requested_code_ref": "7764ea0f912e53c92e82eb78a2a1631e92725fc8",
+  "weights_state_sha256": "5ba70ff8cbcc944b73eb1d49f71e1ea54b009ad866b34d0cb8b84ed143aa56eb",
+  "feature": "forward_features()['x_norm_clstoken'], L2-normalized",
+  "input": {
+    "cached_source_size": [
+      160,
+      160
+    ],
+    "cached_target_size": [
+      144,
+      144
+    ],
+    "resize": [
+      224,
+      224
+    ],
+    "interpolation": "bicubic",
+    "normalization_mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "normalization_std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "batch_size": 16,
+    "device": "cpu"
+  },
+  "classifier": {
+    "method": "sklearn LogisticRegression",
+    "solver": "lbfgs",
+    "class_weight": "balanced",
+    "max_iter": 3000,
+    "tolerance": 1e-05,
+    "candidate_C_values": [
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "selection_metric": "source-validation macro-F1 over 15 source classes",
+    "selected_C": 100.0,
+    "candidate_validation_results": [
+      {
+        "C": 0.001,
+        "source_validation_macro_f1_15": 0.8507602029632341,
+        "source_validation_macro_f1_supported": 0.8507602029632341,
+        "source_validation_accuracy": 0.8468468468468469
+      },
+      {
+        "C": 0.01,
+        "source_validation_macro_f1_15": 0.8850592960880077,
+        "source_validation_macro_f1_supported": 0.8850592960880077,
+        "source_validation_accuracy": 0.8798798798798799
+      },
+      {
+        "C": 0.1,
+        "source_validation_macro_f1_15": 0.9422116322610176,
+        "source_validation_macro_f1_supported": 0.9422116322610176,
+        "source_validation_accuracy": 0.924924924924925
+      },
+      {
+        "C": 1.0,
+        "source_validation_macro_f1_15": 0.9725931643271452,
+        "source_validation_macro_f1_supported": 0.9725931643271452,
+        "source_validation_accuracy": 0.963963963963964
+      },
+      {
+        "C": 10.0,
+        "source_validation_macro_f1_15": 0.974616616072941,
+        "source_validation_macro_f1_supported": 0.974616616072941,
+        "source_validation_accuracy": 0.9669669669669669
+      },
+      {
+        "C": 100.0,
+        "source_validation_macro_f1_15": 0.9787456128101291,
+        "source_validation_macro_f1_supported": 0.9787456128101291,
+        "source_validation_accuracy": 0.972972972972973
+      }
+    ],
+    "refit": "all 3255 permitted source-cache rows (training + source validation); no target labels used"
+  },
+  "source_test": {
+    "n": 2916,
+    "correct": 2787,
+    "accuracy": 0.9557613168724279,
+    "macro_f1_15": 0.9373562217149173,
+    "macro_f1_supported": 0.9373562217149173,
+    "balanced_accuracy_supported": 0.9563665746638932,
+    "n_supported_classes": 15,
+    "per_class": [
+      {
+        "class_index": 0,
+        "support": 128,
+        "predicted_count": 145,
+        "correct": 123,
+        "precision": 0.8482758620689655,
+        "recall": 0.9609375,
+        "f1": 0.9010989010989011
+      },
+      {
+        "class_index": 1,
+        "support": 125,
+        "predicted_count": 129,
+        "correct": 125,
+        "precision": 0.9689922480620154,
+        "recall": 1.0,
+        "f1": 0.9842519685039369
+      },
+      {
+        "class_index": 2,
+        "support": 56,
+        "predicted_count": 114,
+        "correct": 56,
+        "precision": 0.49122807017543857,
+        "recall": 1.0,
+        "f1": 0.6588235294117647
+      },
+      {
+        "class_index": 3,
+        "support": 329,
+        "predicted_count": 328,
+        "correct": 318,
+        "precision": 0.9695121951219512,
+        "recall": 0.9665653495440729,
+        "f1": 0.9680365296803652
+      },
+      {
+        "class_index": 4,
+        "support": 304,
+        "predicted_count": 308,
+        "correct": 304,
+        "precision": 0.987012987012987,
+        "recall": 1.0,
+        "f1": 0.9934640522875817
+      },
+      {
+        "class_index": 5,
+        "support": 210,
+        "predicted_count": 125,
+        "correct": 125,
+        "precision": 1.0,
+        "recall": 0.5952380952380952,
+        "f1": 0.7462686567164178
+      },
+      {
+        "class_index": 6,
+        "support": 180,
+        "predicted_count": 180,
+        "correct": 178,
+        "precision": 0.9888888888888889,
+        "recall": 0.9888888888888889,
+        "f1": 0.9888888888888889
+      },
+      {
+        "class_index": 7,
+        "support": 103,
+        "predicted_count": 105,
+        "correct": 94,
+        "precision": 0.8952380952380953,
+        "recall": 0.912621359223301,
+        "f1": 0.903846153846154
+      },
+      {
+        "class_index": 8,
+        "support": 239,
+        "predicted_count": 239,
+        "correct": 239,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "class_index": 9,
+        "support": 197,
+        "predicted_count": 195,
+        "correct": 186,
+        "precision": 0.9538461538461539,
+        "recall": 0.9441624365482234,
+        "f1": 0.9489795918367347
+      },
+      {
+        "class_index": 10,
+        "support": 232,
+        "predicted_count": 233,
+        "correct": 232,
+        "precision": 0.9957081545064378,
+        "recall": 1.0,
+        "f1": 0.9978494623655914
+      },
+      {
+        "class_index": 11,
+        "support": 236,
+        "predicted_count": 238,
+        "correct": 234,
+        "precision": 0.9831932773109243,
+        "recall": 0.9915254237288136,
+        "f1": 0.9873417721518987
+      },
+      {
+        "class_index": 12,
+        "support": 277,
+        "predicted_count": 276,
+        "correct": 273,
+        "precision": 0.9891304347826086,
+        "recall": 0.9855595667870036,
+        "f1": 0.9873417721518988
+      },
+      {
+        "class_index": 13,
+        "support": 215,
+        "predicted_count": 215,
+        "correct": 215,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "class_index": 14,
+        "support": 85,
+        "predicted_count": 86,
+        "correct": 85,
+        "precision": 0.9883720930232558,
+        "recall": 1.0,
+        "f1": 0.9941520467836257
+      }
+    ]
+  },
+  "target_test": {
+    "n": 92,
+    "correct": 34,
+    "accuracy": 0.3695652173913043,
+    "macro_f1_15": 0.24187220187220185,
+    "macro_f1_supported": 0.3628083028083028,
+    "balanced_accuracy_supported": 0.3727272727272727,
+    "n_supported_classes": 10,
+    "per_class": [
+      {
+        "class_index": 0,
+        "support": 10,
+        "predicted_count": 11,
+        "correct": 6,
+        "precision": 0.5454545454545454,
+        "recall": 0.6,
+        "f1": 0.5714285714285713
+      },
+      {
+        "class_index": 1,
+        "support": 0,
+        "predicted_count": 4,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "class_index": 2,
+        "support": 10,
+        "predicted_count": 3,
+        "correct": 2,
+        "precision": 0.6666666666666666,
+        "recall": 0.2,
+        "f1": 0.30769230769230765
+      },
+      {
+        "class_index": 3,
+        "support": 9,
+        "predicted_count": 9,
+        "correct": 5,
+        "precision": 0.5555555555555556,
+        "recall": 0.5555555555555556,
+        "f1": 0.5555555555555556
+      },
+      {
+        "class_index": 4,
+        "support": 11,
+        "predicted_count": 9,
+        "correct": 8,
+        "precision": 0.8888888888888888,
+        "recall": 0.7272727272727273,
+        "f1": 0.7999999999999999
+      },
+      {
+        "class_index": 5,
+        "support": 0,
+        "predicted_count": 11,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "class_index": 6,
+        "support": 10,
+        "predicted_count": 2,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_index": 7,
+        "support": 3,
+        "predicted_count": 10,
+        "correct": 2,
+        "precision": 0.2,
+        "recall": 0.6666666666666666,
+        "f1": 0.30769230769230765
+      },
+      {
+        "class_index": 8,
+        "support": 10,
+        "predicted_count": 4,
+        "correct": 2,
+        "precision": 0.5,
+        "recall": 0.2,
+        "f1": 0.28571428571428575
+      },
+      {
+        "class_index": 9,
+        "support": 9,
+        "predicted_count": 6,
+        "correct": 1,
+        "precision": 0.16666666666666666,
+        "recall": 0.1111111111111111,
+        "f1": 0.13333333333333333
+      },
+      {
+        "class_index": 10,
+        "support": 0,
+        "predicted_count": 4,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "class_index": 11,
+        "support": 8,
+        "predicted_count": 3,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_index": 12,
+        "support": 0,
+        "predicted_count": 3,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "class_index": 13,
+        "support": 0,
+        "predicted_count": 1,
+        "correct": 0,
+        "precision": 0.0,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "class_index": 14,
+        "support": 12,
+        "predicted_count": 12,
+        "correct": 8,
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666
+      }
+    ],
+    "supported_class_ids": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      11,
+      14
+    ],
+    "target_image_indices": [
+      854,
+      855,
+      856,
+      857,
+      858,
+      859,
+      860,
+      861,
+      862,
+      863,
+      864,
+      865,
+      866,
+      867,
+      868,
+      869,
+      870,
+      871,
+      872,
+      873,
+      874,
+      875,
+      876,
+      877,
+      878,
+      879,
+      880,
+      881,
+      882,
+      883,
+      884,
+      885,
+      886,
+      887,
+      888,
+      889,
+      890,
+      891,
+      892,
+      893,
+      894,
+      895,
+      896,
+      897,
+      898,
+      899,
+      900,
+      901,
+      902,
+      903,
+      904,
+      905,
+      906,
+      907,
+      908,
+      909,
+      910,
+      911,
+      912,
+      913,
+      914,
+      915,
+      916,
+      917,
+      918,
+      919,
+      920,
+      921,
+      922,
+      923,
+      924,
+      925,
+      926,
+      927,
+      928,
+      929,
+      930,
+      931,
+      932,
+      933,
+      934,
+      935,
+      936,
+      937,
+      938,
+      939,
+      940,
+      941,
+      942,
+      943,
+      944,
+      945
+    ]
+  },
+  "target_predictions_file": "report/additional_baselines/dinov2_predictions.npz",
+  "input_sha256": {
+    "cache_corrected/train_x.npy": "077913e8d7220599ba793bd385e915f83645a4f6d2bf15ef9d6110e9931564f9",
+    "cache_corrected/train_y.npy": "fefbaf02d9ac89ad8dc5737d219d5b29377ce04947fa6457d72731e60c07ac27",
+    "cache_corrected/test_x.npy": "eb994b81fab388ba906e74bd9a786127bf7b9b572e9770dc8f44d10eae5956fb",
+    "cache_corrected/test_y.npy": "9e9bda662586e028f1ada7f0dab782d1986c681a23f4e13248d7336293bfed92",
+    "cache_corrected/split_indices.json": "a5998a0c987a324df8b81f6fa8e411b5db32bf8fe345d93633c720d6aaa28122",
+    "cache_pd_corrected/x.npy": "5f88df3d17cb2134293b535634d9cae6e3eec13d762caf081bbc2eb887283dac",
+    "cache_pd_corrected/y.npy": "7f1618b12a88fda49f95c6b4236853e6ab70d31f7d0795432ba5a88860dfb821",
+    "cache_pd_corrected/split_indices.json": "95813ed871e6ec1112aff10a30f4a5fe70740546e6755f4c25d6e3b4f20add3e"
+  },
+  "study_git_commit": "df78260d2e049301217d5bb8efb1b6ec6f1dae30",
+  "environment": {
+    "python": "3.12.15",
+    "torch": "2.14.1+cpu",
+    "numpy": "2.3.5",
+    "scikit_learn": "1.8.0"
+  },
+  "protocol_caveats": [
+    "Target official test was used only for final evaluation, not model or C selection.",
+    "This evaluates the 10-class mapped subset with a 15-class source classifier; predictions outside target-supported classes count as target errors.",
+    "Source cache images were stored at 160x160 and target cache images at 144x144 before resizing to 224x224; upsampling does not restore lost detail.",
+    "The DINOv2 feature extractor is deterministic; uncertainty over target images is reported separately by target_bootstrap.py."
+  ]
+}

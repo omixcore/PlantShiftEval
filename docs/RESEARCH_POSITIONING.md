@@ -12,6 +12,10 @@ Training configuration has a substantial descriptive effect: MTD-Net means range
 
 Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0.3109 target zero-shot accuracy. These are different metrics and datasets, not directly subtractable performance estimates. Synthetic corruption, source-fitted calibration, image-only AdaBN and supervised target fine-tuning are separately reported. The study does not establish semantic texture disentanglement, universal superiority or field reliability.
 
+## Frozen foundation-model baseline
+
+The frozen DINOv2-S/14 source-only linear probe achieved source macro-F1 0.9374 and target accuracy 0.3696 on the same 92-image mapped target holdout. The target accuracy interval is 0.2717–0.4674; supported-class macro-F1 is 0.3628 with class-stratified interval 0.2838–0.4345. Regularization was selected on source validation, not on target labels. The paired comparisons and McNemar/Holm results are in report/corrected_summary/target_bootstrap.json. This baseline narrows the novelty claim to controlled architecture/optimization contrasts; it does not turn published DINOv2 results from different label spaces into direct comparisons.
+
 ## Narrative and boundaries
 
 Lead with the representation hypothesis, declare the alternative explanation of optimization and initialization, and report the full corrected design before numerical claims. Use the primary paired contrast, all factorial cells and component controls. Treat non-significance as limited evidence, not equivalence. The branch labels do not prove semantic factorization; branch removal changes capacity. Separate source classification, synthetic stress tests and target transfer. Target adaptation uses additional image or label information and cannot be relabeled zero-shot generalization.

@@ -12,6 +12,7 @@ MTD-Net is the candidate architecture in an original methodological study of tex
 | Plain CNN | 0.5903 ± 0.0250 | 0.3784 | 0.1283 |
 | MTD-P | 0.8745 ± 0.0292 | 0.7781 | 0.3370 |
 | ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |
+| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |
 
 All rows average five seeds. Scratch models use six epochs / peak LR 1e-3; pretrained models use six epochs / peak LR 3e-4. Corruption averages eight conditions. The target holdout has 92 mapped official test images. Full SDs, all factorial cells and adaptation conditions are in the [results](manuscript/corrected_results.md) and [machine-readable summaries](report/corrected_summary).
 
@@ -26,6 +27,7 @@ Source macro-F1 near 0.874 for the pretrained pair coexists with only 0.3370 / 0
 - [Complete corrected manuscript (51 references)](manuscript/PlantShiftEval_corrected_manuscript.md), [reference metadata and claim-support audit](manuscript/reference_audit.md), and [research positioning](docs/RESEARCH_POSITIONING.md).
 - [Five figures in editable SVG, PDF and PNG, with plotting CSVs](report/corrected_summary).
 - [All 65 raw prediction arrays and run records](evidence/corrected), with SHA-256 index; [metric reproduction check](report/corrected_summary/public_reproduction.json) passed without disagreements.
+- [Frozen DINOv2 baseline and target bootstrap report](report/additional_baselines/dinov2_s14.json), [paired target comparisons](report/corrected_summary/target_bootstrap.json), and [per-class metrics](report/corrected_summary/target_per_class_metrics.csv).
 - [Full evidence audit](report/corrected_summary/evidence_audit.json), [workflow record](provenance/corrected_workflow.json) and [six-task completion record](docs/EXECUTION_STATUS.md).
 - [Data lineage and split audit](docs/DATA_PROVENANCE.md), [dataset attribution](DATASET_NOTICE.md), [reproduction instructions](docs/REPRODUCIBILITY.md) and [locked study dependencies](requirements-study.txt).
 
