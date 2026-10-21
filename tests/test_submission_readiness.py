@@ -2,7 +2,7 @@ import importlib.util, sys, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from audit_manuscript import parse_reference_lines, parse_citations, title_from_ref, doi_from_ref, source_audit_record
-from update_manuscript_baseline import repair_target_uncertainty_section
+from update_manuscript_baseline import repair_target_uncertainty_section, synchronize_dinov2_abstract_sentence, synchronize_readme_dinov2_row
 
 TARGET_AVAILABLE=bool(importlib.util.find_spec("numpy"))
 if TARGET_AVAILABLE:
@@ -39,6 +39,26 @@ class ManuscriptAuditTests(unittest.TestCase):
         self.assertIn("0.2389 to 0.4272",fixed)
         self.assertIn("## Discussion\n\nDiscussion content.",fixed)
         self.assertEqual(fixed.count("## Discussion"),1)
+
+    def test_abstract_dinov2_sentence_replaces_stale_metrics(self):
+        abstract="## Abstract\\n\\nPrimary results. A frozen DINOv2-S/14 linear probe old source-test macro-F1 0.9374 and supported-class macro-F1 0.3628.\\n\\n"
+        sentence="A frozen DINOv2-S/14 linear probe, with source-validation-only regularization, achieved source-test macro-F1 0.9364 and supported-class macro-F1 0.3651."
+        updated=synchronize_dinov2_abstract_sentence(abstract,sentence)
+        self.assertIn("Primary results.",updated)
+        self.assertIn("source-test macro-F1 0.9364",updated)
+        self.assertIn("supported-class macro-F1 0.3651",updated)
+        self.assertNotIn("0.9374",updated)
+        self.assertNotIn("0.3628",updated)
+        self.assertEqual(updated.count("A frozen DINOv2-S/14 linear probe"),1)
+
+    def test_readme_dinov2_row_is_deduplicated(self):
+        anchor="| ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |"
+        readme=anchor+"\\n| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |\\n| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |\\n"
+        row="| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |"
+        updated=synchronize_readme_dinov2_row(readme,row,anchor)
+        self.assertEqual(sum(line.startswith("| DINOv2-S/14 frozen probe |") for line in updated.splitlines()),1)
+        self.assertIn(row,updated)
+        self.assertNotIn("0.9374",updated)
 
     def test_doi_less_reference_requires_documented_matching_source_url(self):
         audit="""| No. | Reference | Metadata check | Relevance | Source |

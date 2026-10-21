@@ -33,6 +33,28 @@ def repair_target_uncertainty_section(text):
       "Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.")
     return text[:start]+block+"\n\n"+text[end:]
 
+def synchronize_dinov2_abstract_sentence(abstract, sentence):
+    """Replace the existing DINOv2 abstract sentence with the measured result, or append it if absent."""
+    start=abstract.find("A frozen DINOv2-S/14 linear probe")
+    if start<0:
+        return abstract.rstrip()+" "+sentence+"\n\n"
+    end=abstract.find("\n\n",start)
+    if end<0:
+        end=len(abstract)
+    return abstract[:start]+sentence+abstract[end:]
+
+
+def synchronize_readme_dinov2_row(readme_text, row, anchor):
+    """Keep exactly one DINOv2 row, placed after the ResNet-18 row."""
+    trailing_newline=readme_text.endswith("\n")
+    lines=[line for line in readme_text.splitlines() if not line.startswith("| DINOv2-S/14 frozen probe |")]
+    text="\n".join(lines)
+    if anchor not in text:
+        raise ValueError("README core result table anchor missing")
+    text=text.replace(anchor,anchor+"\n"+row,1)
+    return text+("\n" if trailing_newline else "")
+
+
 def main():
     baseline_path=ROOT/"report/additional_baselines/dinov2_s14.json"
     stats_path=ROOT/"report/corrected_summary/target_bootstrap.json"
@@ -61,9 +83,8 @@ def main():
     intro_start=text.find("## Introduction")
     if abs_start<0 or intro_start<0: raise ValueError("Manuscript abstract/introduction headings missing")
     abstract=text[abs_start:intro_start]
-    if "A frozen DINOv2-S/14 linear probe" not in abstract:
-        abstract=abstract.rstrip()+" "+sentence+"\n\n"
-        text=text[:abs_start]+abstract+text[intro_start:]
+    abstract=synchronize_dinov2_abstract_sentence(abstract,sentence)
+    text=text[:abs_start]+abstract+text[intro_start:]
     result_block=("### Frozen DINOv2-S/14 baseline\n\n"
       f"The official DINOv2-S/14 backbone was kept frozen. A multinomial logistic-regression linear probe was selected from the declared C grid using only the source validation partition (selected C = {b['classifier']['selected_C']:g}) and then refit on all permitted source-cache rows. No target labels or target-test scores were used for model selection. The baseline reached source-test accuracy {src['accuracy']:.4f} and 15-class macro-F1 {src['macro_f1_15']:.4f}.\n\n"
       f"On the same mapped target holdout, DINOv2 achieved accuracy {dino['accuracy']:.4f} (ordinary image-bootstrap 95% CI {aci[0]:.4f}–{aci[1]:.4f}) and supported-class macro-F1 {dino['macro_f1_supported']:.4f} (class-stratified 95% CI {fci[0]:.4f}–{fci[1]:.4f}). The supported-class metric averages the ten classes present in the target holdout; 15-class macro-F1 is also retained in the machine-readable output. The confidence intervals condition on the selected images and do not account for unknown acquisition dependence. {support_note}\n\n"
@@ -92,12 +113,19 @@ def main():
     rtext=readme.read_text(encoding="utf-8")
     drow=f"| DINOv2-S/14 frozen probe | {src['macro_f1_15']:.4f} (single fit) | not evaluated | {dino['accuracy']:.4f} |"
     anchor="| ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |"
-    if drow not in rtext:
-        if anchor not in rtext: raise ValueError("README core result table anchor missing")
-        rtext=rtext.replace(anchor,anchor+"\n"+drow)
+    rtext=synchronize_readme_dinov2_row(rtext,drow,anchor)
+    old_training_note="All rows average five seeds. Scratch models use six epochs / peak LR 1e-3; pretrained models use six epochs / peak LR 3e-4. Corruption averages eight conditions."
+    new_training_note="MTD-Net, Plain CNN, MTD-P and ResNet-18 rows average five seeds; the DINOv2-S/14 frozen-feature linear probe is a single deterministic fit. Scratch models use six epochs / peak LR 1e-3; supervised pretrained MTD-P and ResNet-18 use six epochs / peak LR 3e-4. Corruption averages eight conditions."
+    if old_training_note in rtext:
+        rtext=rtext.replace(old_training_note,new_training_note)
+    elif new_training_note not in rtext:
+        raise ValueError("README seed-count note missing; refusing to leave ambiguous seed reporting")
     evidence_line="- [Frozen DINOv2 baseline and target bootstrap report](report/additional_baselines/dinov2_s14.json), [paired target comparisons](report/corrected_summary/target_bootstrap.json), and [per-class metrics](report/corrected_summary/target_per_class_metrics.csv)."
     if evidence_line not in rtext:
         rtext=rtext.replace("- [Full evidence audit]",evidence_line+"\n- [Full evidence audit]")
+    audit_link="- [Editable Word manuscript](manuscript/PlantShiftEval_corrected_manuscript.docx) and [Crossref/source-record bibliography audit](report/additional_baselines/bibliography_crossref_audit.md) ([machine-readable JSON](report/additional_baselines/bibliography_crossref_audit.json))."
+    if audit_link not in rtext:
+        rtext=rtext.replace("- [Complete corrected manuscript",audit_link+"\n- [Complete corrected manuscript",1)
     readme.write_text(rtext,encoding="utf-8")
 
     positioning=ROOT/"docs/RESEARCH_POSITIONING.md"
