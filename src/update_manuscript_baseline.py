@@ -18,6 +18,21 @@ def replace_or_insert_section(text, heading, block, before_heading):
     if anchor<0: raise ValueError("Could not find insertion anchor: "+before_heading)
     return text[:anchor]+block.rstrip()+"\n\n"+text[anchor:]
 
+def repair_target_uncertainty_section(text):
+    heading="### Conditional target image uncertainty"
+    discussion="\n## Discussion"
+    start=text.find(heading)
+    end=text.find(discussion,start+len(heading)) if start>=0 else -1
+    if start<0 or end<0:
+        raise ValueError("Target uncertainty section or Discussion heading is missing")
+    block=("### Conditional target image uncertainty\n\n"
+      "The five-seed MTD-P probability ensemble correctly classified 31/92 target-test images (accuracy 0.3370; image-level Wilson 95% interval 0.2486 to 0.4383). "
+      "The five-seed ResNet-18 probability ensemble correctly classified 30/92 target-test images (accuracy 0.3261; image-level Wilson 95% interval 0.2389 to 0.4272). "
+      "These image-level intervals do not account for possible dependence among images from the same plant, leaf, or acquisition session. "
+      "The target holdout contains 92 images across ten represented classes, with class support ranging from 3 to 12 images. "
+      "Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.")
+    return text[:start]+block+"\n\n"+text[end+1:]
+
 def main():
     baseline_path=ROOT/"report/additional_baselines/dinov2_s14.json"
     stats_path=ROOT/"report/corrected_summary/target_bootstrap.json"
@@ -41,20 +56,7 @@ def main():
               f"(ordinary image-bootstrap 95% CI {aci[0]:.4f}–{aci[1]:.4f}; supported-class macro-F1 {dino['macro_f1_supported']:.4f}, class-stratified 95% CI {fci[0]:.4f}–{fci[1]:.4f}).")
     manuscript=ROOT/"manuscript/PlantShiftEval_corrected_manuscript.md"
     text=manuscript.read_text(encoding="utf-8")
-    # Repair a legacy truncated paragraph before adding newly measured results.
-    uncertainty_heading="### Conditional target image uncertainty"
-    discussion_heading="\\n## Discussion"
-    uncertainty_start=text.find(uncertainty_heading)
-    discussion_start=text.find(discussion_heading, uncertainty_start+len(uncertainty_heading)) if uncertainty_start>=0 else -1
-    if uncertainty_start<0 or discussion_start<0:
-        raise ValueError("Target uncertainty section or Discussion heading is missing")
-    uncertainty_block=("### Conditional target image uncertainty\\n\\n"
-      "The five-seed MTD-P probability ensemble correctly classified 31/92 target-test images (accuracy 0.3370; image-level Wilson 95% interval 0.2486 to 0.4383). "
-      "The five-seed ResNet-18 probability ensemble correctly classified 30/92 target-test images (accuracy 0.3261; image-level Wilson 95% interval 0.2389 to 0.4272). "
-      "These image-level intervals do not account for possible dependence among images from the same plant, leaf, or acquisition session. "
-      "The target holdout contains 92 images across ten represented classes, with class support ranging from 3 to 12 images. "
-      "Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.")
-    text=text[:uncertainty_start]+uncertainty_block+"\\n\\n"+text[discussion_start+1:]
+    text=repair_target_uncertainty_section(text)
     abs_start=text.find("## Abstract")
     intro_start=text.find("## Introduction")
     if abs_start<0 or intro_start<0: raise ValueError("Manuscript abstract/introduction headings missing")
