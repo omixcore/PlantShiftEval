@@ -15,15 +15,27 @@
   "official_train_retained": 853,
   "official_test": 92,
   "exclusions": {
-    "source_similarity_candidate": 2,
-    "conflicting_label_component_rows": 8,
-    "target_train_test_similarity_candidate": 0,
     "unmapped_category": 1619,
     "ambiguous_multilabel": 3,
-    "target_train_test_identity_overlap": 1
+    "source_similarity_candidate": 2,
+    "conflicting_label_component_rows": 8,
+    "target_train_test_identity_overlap": 1,
+    "target_train_test_similarity_candidate": 0
   },
   "target_train_rows": 683,
   "target_validation_rows": 170,
+  "test_per_class": {
+    "11": 8,
+    "8": 10,
+    "14": 12,
+    "6": 10,
+    "3": 9,
+    "4": 11,
+    "9": 9,
+    "7": 3,
+    "2": 10,
+    "0": 10
+  },
   "source": "agyaatcoder/PlantDoc",
   "revision": "ace645742b6af1b0df9aaefc2c9b0c988e141814",
   "mapping": {
@@ -39,17 +51,5 @@
     "grape leaf black rot": 11
   },
   "label_policy": "strict majority of object-category counts; mapped categories only",
-  "caveat": "official split plus exact-hash grouping; near duplicates and acquisition independence remain separate checks",
-  "test_per_class": {
-    "11": 8,
-    "8": 10,
-    "14": 12,
-    "6": 10,
-    "3": 9,
-    "4": 11,
-    "9": 9,
-    "7": 3,
-    "2": 10,
-    "0": 10
-  }
+  "caveat": "official test membership preserved after overlap/conflict filtering; source similarity candidates and target-train/test candidates screened at dHash<=4; biological independence not certified"
 }
