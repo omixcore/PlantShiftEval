@@ -41,7 +41,9 @@ class ManuscriptAuditTests(unittest.TestCase):
         self.assertEqual(fixed.count("## Discussion"),1)
 
     def test_doi_less_reference_requires_documented_matching_source_url(self):
-        audit="| No. | Reference | Metadata check | Relevance | Source |\\n|---:|---|---|---|---|\\n| 2 | Hughes & Salathé (2015) | Verified; arXiv data-release paper | Dataset provenance | [Official/source record](https://arxiv.org/abs/1511.08060) |"
+        audit="""| No. | Reference | Metadata check | Relevance | Source |
+|---:|---|---|---|---|
+| 2 | Hughes & Salathé (2015) | Verified; arXiv data-release paper | Dataset provenance | [Official/source record](https://arxiv.org/abs/1511.08060) |"""
         ref="2. Hughes DP, Salathé M. An open access repository. https://arxiv.org/abs/1511.08060"
         result=source_audit_record(audit,2,ref)
         self.assertTrue(result["source_audit_verified"])
