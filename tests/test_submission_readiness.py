@@ -1,7 +1,7 @@
 import importlib.util, sys, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
-from audit_manuscript import parse_reference_lines, parse_citations, title_from_ref, doi_from_ref
+from audit_manuscript import parse_reference_lines, parse_citations, title_from_ref, doi_from_ref, source_audit_record
 from update_manuscript_baseline import repair_target_uncertainty_section
 
 TARGET_AVAILABLE=bool(importlib.util.find_spec("numpy"))
@@ -39,6 +39,16 @@ class ManuscriptAuditTests(unittest.TestCase):
         self.assertIn("0.2389 to 0.4272",fixed)
         self.assertIn("## Discussion\n\nDiscussion content.",fixed)
         self.assertEqual(fixed.count("## Discussion"),1)
+
+    def test_doi_less_reference_requires_documented_matching_source_url(self):
+        audit="| No. | Reference | Metadata check | Relevance | Source |\\n|---:|---|---|---|---|\\n| 2 | Hughes & Salathé (2015) | Verified; arXiv data-release paper | Dataset provenance | [Official/source record](https://arxiv.org/abs/1511.08060) |"
+        ref="2. Hughes DP, Salathé M. An open access repository. https://arxiv.org/abs/1511.08060"
+        result=source_audit_record(audit,2,ref)
+        self.assertTrue(result["source_audit_verified"])
+        self.assertEqual(result["source_audit_url"],"https://arxiv.org/abs/1511.08060")
+        self.assertIsNone(source_audit_record(audit,2,ref.replace("1511.08060","0000.00000")))
+        unverified=audit.replace("Verified; arXiv data-release paper","Needs review")
+        self.assertIsNone(source_audit_record(unverified,2,ref))
 
     def test_reference_numbering_and_citation_ranges(self):
         text="\n".join(["## Intro","Claim [1, 2] and [3–4].","## References","1. A. Title.","","2. B. Title.","","3. C. Title.","","4. D. Title."])
