@@ -41,6 +41,20 @@ def main():
               f"(ordinary image-bootstrap 95% CI {aci[0]:.4f}–{aci[1]:.4f}; supported-class macro-F1 {dino['macro_f1_supported']:.4f}, class-stratified 95% CI {fci[0]:.4f}–{fci[1]:.4f}).")
     manuscript=ROOT/"manuscript/PlantShiftEval_corrected_manuscript.md"
     text=manuscript.read_text(encoding="utf-8")
+    # Repair a legacy truncated paragraph before adding newly measured results.
+    uncertainty_heading="### Conditional target image uncertainty"
+    discussion_heading="\\n## Discussion"
+    uncertainty_start=text.find(uncertainty_heading)
+    discussion_start=text.find(discussion_heading, uncertainty_start+len(uncertainty_heading)) if uncertainty_start>=0 else -1
+    if uncertainty_start<0 or discussion_start<0:
+        raise ValueError("Target uncertainty section or Discussion heading is missing")
+    uncertainty_block=("### Conditional target image uncertainty\\n\\n"
+      "The five-seed MTD-P probability ensemble correctly classified 31/92 target-test images (accuracy 0.3370; image-level Wilson 95% interval 0.2486 to 0.4383). "
+      "The five-seed ResNet-18 probability ensemble correctly classified 30/92 target-test images (accuracy 0.3261; image-level Wilson 95% interval 0.2389 to 0.4272). "
+      "These image-level intervals do not account for possible dependence among images from the same plant, leaf, or acquisition session. "
+      "The target holdout contains 92 images across ten represented classes, with class support ranging from 3 to 12 images. "
+      "Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.")
+    text=text[:uncertainty_start]+uncertainty_block+"\\n\\n"+text[discussion_start+1:]
     abs_start=text.find("## Abstract")
     intro_start=text.find("## Introduction")
     if abs_start<0 or intro_start<0: raise ValueError("Manuscript abstract/introduction headings missing")
