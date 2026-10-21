@@ -41,7 +41,12 @@ class ManuscriptAuditTests(unittest.TestCase):
         self.assertEqual(fixed.count("## Discussion"),1)
 
     def test_abstract_dinov2_sentence_replaces_stale_metrics(self):
-        abstract="## Abstract\\n\\nPrimary results. A frozen DINOv2-S/14 linear probe old source-test macro-F1 0.9374 and supported-class macro-F1 0.3628.\\n\\n"
+        abstract="\n".join([
+            "## Abstract",
+            "",
+            "Primary results. A frozen DINOv2-S/14 linear probe old source-test macro-F1 0.9374 and supported-class macro-F1 0.3628.",
+            "",
+        ])
         sentence="A frozen DINOv2-S/14 linear probe, with source-validation-only regularization, achieved source-test macro-F1 0.9364 and supported-class macro-F1 0.3651."
         updated=synchronize_dinov2_abstract_sentence(abstract,sentence)
         self.assertIn("Primary results.",updated)
@@ -53,7 +58,12 @@ class ManuscriptAuditTests(unittest.TestCase):
 
     def test_readme_dinov2_row_is_deduplicated(self):
         anchor="| ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |"
-        readme=anchor+"\\n| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |\\n| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |\\n"
+        readme="\n".join([
+            anchor,
+            "| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |",
+            "| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |",
+            "",
+        ])
         row="| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |"
         updated=synchronize_readme_dinov2_row(readme,row,anchor)
         self.assertEqual(sum(line.startswith("| DINOv2-S/14 frozen probe |") for line in updated.splitlines()),1)
