@@ -33,11 +33,11 @@ class TargetBootstrapTests(unittest.TestCase):
 
 class ManuscriptAuditTests(unittest.TestCase):
     def test_target_uncertainty_section_repairs_truncated_legacy_text(self):
-        text="## Results\\n\\n### Conditional target image uncertainty\\n\\nLegacy text 0.## Discussion\\n\\nDiscussion content."
+        text="## Results\n\n### Conditional target image uncertainty\n\nLegacy text 0.## Discussion\n\nDiscussion content."
         fixed=repair_target_uncertainty_section(text)
         self.assertNotIn("0.## Discussion",fixed)
         self.assertIn("0.2389 to 0.4272",fixed)
-        self.assertIn("## Discussion\\n\\nDiscussion content.",fixed)
+        self.assertIn("## Discussion\n\nDiscussion content.",fixed)
         self.assertEqual(fixed.count("## Discussion"),1)
 
     def test_reference_numbering_and_citation_ranges(self):
