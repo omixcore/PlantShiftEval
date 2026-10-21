@@ -171,7 +171,7 @@ def audit(root:Path,verify_crossref=True):
     if not audit_file.exists(): structural.append("Missing reference_audit.md")
     else:
         audit_text=audit_file.read_text(encoding="utf-8")
-        audit_count=len(re.findall(r"^\\|\\s*\\d+\\s*\\|",audit_text,re.M))
+        audit_count=len(re.findall(r"^\|\s*\d+\s*\|",audit_text,re.M))
         if audit_count!=len(refs): structural.append(f"Reference audit table rows {audit_count} do not match manuscript references {len(refs)}")
     for row in out_rows:
         if row["status"]=="url_present_no_doi":
