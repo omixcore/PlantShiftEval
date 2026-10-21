@@ -57,11 +57,33 @@
     51
   ],
   "uncited_reference_numbers": [],
-  "structural_errors": [],
+  "structural_errors": [
+    "Reference audit table rows 16140 do not match manuscript references 51"
+  ],
   "crossref_requested": true,
   "doi_references_checked": 34,
   "crossref_matched": 33,
   "url_only_reference_numbers": [
+    2,
+    13,
+    32,
+    34,
+    35,
+    36,
+    38,
+    39,
+    41,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
+  "source_record_verified_no_doi_reference_numbers": [],
+  "url_only_unverified_reference_numbers": [
     2,
     13,
     32,
@@ -836,5 +858,5 @@
       "flags": []
     }
   ],
-  "status": "needs_manual_review"
+  "status": "failed"
 }

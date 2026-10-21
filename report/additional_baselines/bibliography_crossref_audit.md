@@ -1,11 +1,13 @@
 # Bibliography metadata audit
 
-- Status: needs_manual_review
+- Status: failed
 - References: 51
 - In-text cited reference numbers: 51
 - DOI records with Crossref metadata retrieved: 34
 - Exact Crossref title/author/year matches: 33
-- URL-only references without DOI metadata resolution: 17
+- References with source URLs but no DOI: 17
+- DOI-less references with documented source-record verification: 0
+- DOI-less references still needing source verification: 17
 - References requiring manual review: 17
 - Metadata flags: 0
 
@@ -63,6 +65,10 @@
 | 50 | Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates | — | — | — | not available | url_present_no_doi |
 | 51 | Detection of Huanglongbing disease based on intensity-invariant texture analysis of images in the visible spectrum | 10.1016/j.compag.2019.05.032 | Detection of Huanglongbing disease based on intensity-invariant texture analysis of images in the visible spectrum | 1.000 | author=True, year=True | crossref_match |
 
+## Structural errors
+
+- Reference audit table rows 16140 do not match manuscript references 51
+
 ## Manual review required
 
 - Reference 2: status=url_present_no_doi; cited title: An open access repository of images on plant health to enable the development of mobile disease diagnostics; DOI: none; URL present: True; Crossref title: not retrieved; flags: none
@@ -83,4 +89,4 @@
 - Reference 49: status=url_present_no_doi; cited title: Decoupled Weight Decay Regularization; DOI: none; URL present: True; Crossref title: not retrieved; flags: none
 - Reference 50: status=url_present_no_doi; cited title: Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates; DOI: none; URL present: True; Crossref title: not retrieved; flags: none
 
-Crossref similarity is a triage signal, not a substitute for reading the publisher record. Preprints and proceedings without DOI are checked for numbering, URL presence and in-text use but need source-specific manual verification.
+Crossref similarity is a triage signal, not a substitute for reading the publisher record. DOI-less preprints and proceedings are not counted as Crossref matches; they are marked source_record_verified_no_doi only when the separate reference audit documents a completed metadata check and the same official source URL. Otherwise they remain in the manual-review list.
