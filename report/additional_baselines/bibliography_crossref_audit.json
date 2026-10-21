@@ -59,7 +59,46 @@
   "uncited_reference_numbers": [],
   "structural_errors": [],
   "crossref_requested": true,
-  "doi_references_checked": 1,
+  "doi_references_checked": 34,
+  "crossref_matched": 33,
+  "url_only_reference_numbers": [
+    2,
+    13,
+    32,
+    34,
+    35,
+    36,
+    38,
+    39,
+    41,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
+  "manual_review_reference_numbers": [
+    2,
+    13,
+    32,
+    34,
+    35,
+    36,
+    38,
+    39,
+    41,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
   "metadata_flags": [],
   "reference_records": [
     {
@@ -86,7 +125,7 @@
       "doi": null,
       "cited_year": 2015,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 3,
@@ -268,7 +307,7 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 14,
@@ -583,7 +622,7 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 33,
@@ -609,7 +648,7 @@
       "doi": null,
       "cited_year": 2024,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 35,
@@ -618,7 +657,7 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 36,
@@ -627,7 +666,7 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 37,
@@ -653,7 +692,7 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 39,
@@ -662,7 +701,7 @@
       "doi": null,
       "cited_year": 2021,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 40,
@@ -688,7 +727,7 @@
       "doi": null,
       "cited_year": 2016,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 42,
@@ -714,7 +753,7 @@
       "doi": null,
       "cited_year": 2016,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 44,
@@ -723,7 +762,7 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 45,
@@ -732,7 +771,7 @@
       "doi": null,
       "cited_year": 2020,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 46,
@@ -741,7 +780,7 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 47,
@@ -750,7 +789,7 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 48,
@@ -759,7 +798,7 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 49,
@@ -768,7 +807,7 @@
       "doi": null,
       "cited_year": 2019,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 50,
@@ -777,7 +816,7 @@
       "doi": null,
       "cited_year": 2017,
       "url_present": true,
-      "status": "no_doi_url_only"
+      "status": "url_present_no_doi"
     },
     {
       "number": 51,
