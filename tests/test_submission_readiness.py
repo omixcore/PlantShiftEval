@@ -2,6 +2,7 @@ import importlib.util, sys, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"src"))
 from audit_manuscript import parse_reference_lines, parse_citations, title_from_ref, doi_from_ref
+from update_manuscript_baseline import repair_target_uncertainty_section
 
 TARGET_AVAILABLE=bool(importlib.util.find_spec("numpy"))
 if TARGET_AVAILABLE:
@@ -31,6 +32,14 @@ class TargetBootstrapTests(unittest.TestCase):
         self.assertEqual(holm([.01,.03,.9]),[.03,.06,.9])
 
 class ManuscriptAuditTests(unittest.TestCase):
+    def test_target_uncertainty_section_repairs_truncated_legacy_text(self):
+        text="## Results\\n\\n### Conditional target image uncertainty\\n\\nLegacy text 0.## Discussion\\n\\nDiscussion content."
+        fixed=repair_target_uncertainty_section(text)
+        self.assertNotIn("0.## Discussion",fixed)
+        self.assertIn("0.2389 to 0.4272",fixed)
+        self.assertIn("## Discussion\\n\\nDiscussion content.",fixed)
+        self.assertEqual(fixed.count("## Discussion"),1)
+
     def test_reference_numbering_and_citation_ranges(self):
         text="\n".join(["## Intro","Claim [1, 2] and [3–4].","## References","1. A. Title.","","2. B. Title.","","3. C. Title.","","4. D. Title."])
         refs=parse_reference_lines(text)
