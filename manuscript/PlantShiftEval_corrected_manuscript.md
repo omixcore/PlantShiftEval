@@ -165,7 +165,9 @@ All methods use the same held-out target test and five source seeds. The adaptat
 
 ### Conditional target image uncertainty
 
-The five-seed MTD-P probability ensemble correctly classified 31/92 target-test images (accuracy 0.3370; image-level Wilson interval 0.2486 to 0.4383). The five-seed ResNet-18 probability ensemble correctly classified 30/92 target-test images (accuracy 0.3261; image-level Wilson interval 0.## Discussion
+The five-seed MTD-P probability ensemble correctly classified 31/92 target-test images (accuracy 0.3370; image-level Wilson interval 0.2486 to 0.4383). The five-seed ResNet-18 probability ensemble correctly classified 30/92 target-test images (accuracy 0.3261; image-level Wilson interval 0.2389 to 0.4272). These image-level intervals do not account for possible dependence among images from the same plant, leaf, or acquisition session. The target holdout contains 92 images across ten represented classes, with class support ranging from 3 to 12 images. Per-class precision, recall, F1 and class-stratified bootstrap intervals are provided in report/corrected_summary/target_per_class_metrics.csv.
+
+## Discussion
 
 The matched scratch comparison gives MTD-Net a +1.23-point mean macro-F1 difference over the plain CNN, with a seed-level 95% interval spanning −3.53 to +5.98 points. This is a small and uncertain difference under the tested six-epoch recipe. The gate and auxiliary-task contrasts likewise do not show a consistent benefit. The results therefore do not establish a general architecture advantage; they estimate the effect of the complete candidate configuration under a fixed, reproducible comparison.
 
