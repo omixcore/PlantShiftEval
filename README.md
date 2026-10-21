@@ -12,7 +12,7 @@ MTD-Net is the candidate architecture in an original methodological study of tex
 | Plain CNN | 0.5903 ± 0.0250 | 0.3784 | 0.1283 |
 | MTD-P | 0.8745 ± 0.0292 | 0.7781 | 0.3370 |
 | ResNet-18 | 0.8742 ± 0.0151 | 0.7437 | 0.3109 |
-| DINOv2-S/14 frozen probe | 0.9364 (single fit) | not evaluated | 0.3696 |
+| DINOv2-S/14 frozen probe | 0.9374 (single fit) | not evaluated | 0.3696 |
 
 MTD-Net, Plain CNN, MTD-P and ResNet-18 rows average five seeds; the DINOv2-S/14 frozen-feature linear probe is a single deterministic fit. Scratch models use six epochs / peak LR 1e-3; supervised pretrained MTD-P and ResNet-18 use six epochs / peak LR 3e-4. Corruption averages eight conditions. The target holdout has 92 mapped official test images. Full SDs, all factorial cells and adaptation conditions are in the [results](manuscript/corrected_results.md) and [machine-readable summaries](report/corrected_summary).
 
